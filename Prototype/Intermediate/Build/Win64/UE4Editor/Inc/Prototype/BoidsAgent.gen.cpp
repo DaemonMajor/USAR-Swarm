@@ -57,6 +57,13 @@ void EmptyLinkFunctionForGeneratedCodeBoidsAgent() {}
 		P_THIS->onNeighborEnter(Z_Param_agentSensor,Z_Param_neighbor,Z_Param_neighborBody,Z_Param_neighborIndex,Z_Param_bFromSweep,Z_Param_Out_SweepResult);
 		P_NATIVE_END;
 	}
+	DEFINE_FUNCTION(ABoidsAgent::execscanNeighbors)
+	{
+		P_FINISH;
+		P_NATIVE_BEGIN;
+		P_THIS->scanNeighbors();
+		P_NATIVE_END;
+	}
 	DEFINE_FUNCTION(ABoidsAgent::execsetVelocity)
 	{
 		P_GET_STRUCT(FVector,Z_Param_newVel);
@@ -80,6 +87,7 @@ void EmptyLinkFunctionForGeneratedCodeBoidsAgent() {}
 			{ "moveAgent", &ABoidsAgent::execmoveAgent },
 			{ "onNeighborEnter", &ABoidsAgent::execonNeighborEnter },
 			{ "onNeighborLeave", &ABoidsAgent::execonNeighborLeave },
+			{ "scanNeighbors", &ABoidsAgent::execscanNeighbors },
 			{ "setVelocity", &ABoidsAgent::execsetVelocity },
 		};
 		FNativeFunctionRegistrar::RegisterFunctions(Class, Funcs, UE_ARRAY_COUNT(Funcs));
@@ -221,7 +229,9 @@ void EmptyLinkFunctionForGeneratedCodeBoidsAgent() {}
 	};
 #if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UFunction_ABoidsAgent_onNeighborEnter_Statics::Function_MetaDataParams[] = {
+		{ "Comment", "// populate neighborAgents (used at BeginPlay)\n" },
 		{ "ModuleRelativePath", "Public/BoidsAgent.h" },
+		{ "ToolTip", "populate neighborAgents (used at BeginPlay)" },
 	};
 #endif
 	const UE4CodeGen_Private::FFunctionParams Z_Construct_UFunction_ABoidsAgent_onNeighborEnter_Statics::FuncParams = { (UObject*(*)())Z_Construct_UClass_ABoidsAgent, nullptr, "onNeighborEnter", nullptr, nullptr, sizeof(BoidsAgent_eventonNeighborEnter_Parms), Z_Construct_UFunction_ABoidsAgent_onNeighborEnter_Statics::PropPointers, UE_ARRAY_COUNT(Z_Construct_UFunction_ABoidsAgent_onNeighborEnter_Statics::PropPointers), RF_Public|RF_Transient|RF_MarkAsNative, (EFunctionFlags)0x00480401, 0, 0, METADATA_PARAMS(Z_Construct_UFunction_ABoidsAgent_onNeighborEnter_Statics::Function_MetaDataParams, UE_ARRAY_COUNT(Z_Construct_UFunction_ABoidsAgent_onNeighborEnter_Statics::Function_MetaDataParams)) };
@@ -291,6 +301,28 @@ void EmptyLinkFunctionForGeneratedCodeBoidsAgent() {}
 		if (!ReturnFunction)
 		{
 			UE4CodeGen_Private::ConstructUFunction(ReturnFunction, Z_Construct_UFunction_ABoidsAgent_onNeighborLeave_Statics::FuncParams);
+		}
+		return ReturnFunction;
+	}
+	struct Z_Construct_UFunction_ABoidsAgent_scanNeighbors_Statics
+	{
+#if WITH_METADATA
+		static const UE4CodeGen_Private::FMetaDataPairParam Function_MetaDataParams[];
+#endif
+		static const UE4CodeGen_Private::FFunctionParams FuncParams;
+	};
+#if WITH_METADATA
+	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UFunction_ABoidsAgent_scanNeighbors_Statics::Function_MetaDataParams[] = {
+		{ "ModuleRelativePath", "Public/BoidsAgent.h" },
+	};
+#endif
+	const UE4CodeGen_Private::FFunctionParams Z_Construct_UFunction_ABoidsAgent_scanNeighbors_Statics::FuncParams = { (UObject*(*)())Z_Construct_UClass_ABoidsAgent, nullptr, "scanNeighbors", nullptr, nullptr, 0, nullptr, 0, RF_Public|RF_Transient|RF_MarkAsNative, (EFunctionFlags)0x00080401, 0, 0, METADATA_PARAMS(Z_Construct_UFunction_ABoidsAgent_scanNeighbors_Statics::Function_MetaDataParams, UE_ARRAY_COUNT(Z_Construct_UFunction_ABoidsAgent_scanNeighbors_Statics::Function_MetaDataParams)) };
+	UFunction* Z_Construct_UFunction_ABoidsAgent_scanNeighbors()
+	{
+		static UFunction* ReturnFunction = nullptr;
+		if (!ReturnFunction)
+		{
+			UE4CodeGen_Private::ConstructUFunction(ReturnFunction, Z_Construct_UFunction_ABoidsAgent_scanNeighbors_Statics::FuncParams);
 		}
 		return ReturnFunction;
 	}
@@ -457,8 +489,9 @@ void EmptyLinkFunctionForGeneratedCodeBoidsAgent() {}
 	const FClassFunctionLinkInfo Z_Construct_UClass_ABoidsAgent_Statics::FuncInfo[] = {
 		{ &Z_Construct_UFunction_ABoidsAgent_getNeighbors, "getNeighbors" }, // 3660324261
 		{ &Z_Construct_UFunction_ABoidsAgent_moveAgent, "moveAgent" }, // 1461978895
-		{ &Z_Construct_UFunction_ABoidsAgent_onNeighborEnter, "onNeighborEnter" }, // 8925792
+		{ &Z_Construct_UFunction_ABoidsAgent_onNeighborEnter, "onNeighborEnter" }, // 535777371
 		{ &Z_Construct_UFunction_ABoidsAgent_onNeighborLeave, "onNeighborLeave" }, // 1359696961
+		{ &Z_Construct_UFunction_ABoidsAgent_scanNeighbors, "scanNeighbors" }, // 4074627598
 		{ &Z_Construct_UFunction_ABoidsAgent_setVelocity, "setVelocity" }, // 3838954681
 	};
 #if WITH_METADATA
@@ -717,7 +750,7 @@ void EmptyLinkFunctionForGeneratedCodeBoidsAgent() {}
 		}
 		return OuterClass;
 	}
-	IMPLEMENT_CLASS(ABoidsAgent, 2487079488);
+	IMPLEMENT_CLASS(ABoidsAgent, 246144711);
 	template<> PROTOTYPE_API UClass* StaticClass<ABoidsAgent>()
 	{
 		return ABoidsAgent::StaticClass();

@@ -66,9 +66,11 @@ public:
 	UFUNCTION()
 		TArray<ABoidsAgent*> getNeighbors();
 	
-	UFUNCTION()
-		void setVelocity(FVector newVel);	// set new velocity
 	
+	UFUNCTION()
+		void setVelocity(FVector newVel);			// set new velocity
+	virtual FVector GetVelocity() const override;	// get agent velocity (bypasses built-in component velocity because documentation is unclear)
+
 	/*
 	UFUNCTION()
 		FVector getTarget();				// get target location
@@ -103,6 +105,8 @@ protected:
 	UPROPERTY()
 		FVector target;
 
+	UFUNCTION()
+		void scanNeighbors();	// populate neighborAgents (used at BeginPlay)
 	UFUNCTION()
 		void onNeighborEnter(UPrimitiveComponent* agentSensor, AActor* neighbor, UPrimitiveComponent* neighborBody, int32 neighborIndex, 
 							 bool bFromSweep, const FHitResult &SweepResult);

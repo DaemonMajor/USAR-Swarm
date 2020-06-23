@@ -1,6 +1,6 @@
-B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Development\DonAINavigation\Definitions.DonAINavigation.h
-B:/Documents/Strathclyde/Master's Thesis/Prototype/Plugins/DonAINavigation/Source/DonAINavigation/Private/BehaviorTree/BTTask_FlyTo.cpp
-B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Classes\BehaviorTree/BTTask_FlyTo.h
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Development\DonAINavigation\Definitions.DonAINavigation.h
+B:/Documents/Strathclyde/Master's Thesis/USAR_Swarm/Prototype/Plugins/DonAINavigation/Source/DonAINavigation/Private/BehaviorTree/BTTask_FlyTo.cpp
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Classes\BehaviorTree/BTTask_FlyTo.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\AIModule\Classes\BehaviorTree/Tasks/BTTask_BlackboardBase.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\AIModule\Classes\BehaviorTree/BTTaskNode.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\AIModule\Classes\BehaviorTree/BTNode.h
@@ -38,9 +38,9 @@ B:\Program Files\Epic Games\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\In
 B:\Program Files\Epic Games\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\AIModule\BTNode.generated.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\AIModule\BTTaskNode.generated.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\AIModule\BTTask_BlackboardBase.generated.h
-B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Classes\DonNavigationHelper.h
-B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Classes\DonNavigationManager.h
-B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Classes\DonNavigationCommon.h
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Classes\DonNavigationHelper.h
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Classes\DonNavigationManager.h
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Classes\DonNavigationCommon.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\Core\Public\Windows/AllowWindowsPlatformTypes.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\Core\Public\Windows/WindowsHWrapper.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\Core\Public\Windows/PreWindowsApi.h
@@ -143,15 +143,15 @@ C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\um\imm.h
 C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\um\ime_cmodes.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\Core\Public\Windows/PostWindowsApi.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\Core\Public\Windows/HideWindowsPlatformTypes.h
-B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Classes\Multithreading/DonDrawDebugThreadSafe.h
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Classes\Multithreading/DonDrawDebugThreadSafe.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\Engine\Classes\Components/BoxComponent.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\Engine\Classes\Components/ShapeComponent.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\ShapeComponent.generated.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\BoxComponent.generated.h
-B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Inc\DonAINavigation\DonNavigationManager.generated.h
-B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Inc\DonAINavigation\DonNavigationHelper.generated.h
-B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Inc\DonAINavigation\BTTask_FlyTo.generated.h
-B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Private\BehaviorTree\../DonAINavigationPrivatePCH.h
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Inc\DonAINavigation\DonNavigationManager.generated.h
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Inc\DonAINavigation\DonNavigationHelper.generated.h
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Inc\DonAINavigation\BTTask_FlyTo.generated.h
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Private\BehaviorTree\../DonAINavigationPrivatePCH.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\CoreUObject\Public\CoreUObject.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\Core\Public\Misc/MonolithicHeaderBoilerplate.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\Core\Public\Core.h
@@ -813,9 +813,9 @@ B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\Core\Public\Internatio
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\Slate\Public\Widgets/Input/SSpinBox.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\Slate\Public\Widgets/Input/SSlider.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\Slate\Public\Framework/Docking/LayoutService.h
-B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Public\IDonAINavigation.h
-B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Classes\DonNavigatorInterface.h
-B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Inc\DonAINavigation\DonNavigatorInterface.generated.h
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Public\IDonAINavigation.h
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Classes\DonNavigatorInterface.h
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Inc\DonAINavigation\DonNavigatorInterface.generated.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\AIModule\Classes\BehaviorTree/BlackboardComponent.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\AIModule\Classes\BehaviorTree/Blackboard/BlackboardKeyType.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\AIModule\BlackboardKeyType.generated.h
@@ -848,21 +848,21 @@ B:\Program Files\Epic Games\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\In
 B:\Program Files\Epic Games\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\AIModule\AIController.generated.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\Engine\Public\VisualLogger/VisualLogger.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\Engine\Public\VisualLogger/VisualLoggerTypes.h
-B:/Documents/Strathclyde/Master's Thesis/Prototype/Plugins/DonAINavigation/Source/DonAINavigation/Private/DonAINavigation.cpp
-B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Private\DonAINavigationPrivatePCH.h
-B:/Documents/Strathclyde/Master's Thesis/Prototype/Plugins/DonAINavigation/Source/DonAINavigation/Private/DonNavigationHelper.cpp
-B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Private\DonAINavigationPrivatePCH.h
-B:/Documents/Strathclyde/Master's Thesis/Prototype/Plugins/DonAINavigation/Source/DonAINavigation/Private/DonNavigationManager.cpp
-B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Private\DonAINavigationPrivatePCH.h
-B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Classes\Multithreading/DonNavigationWorker.h
-B:/Documents/Strathclyde/Master's Thesis/Prototype/Plugins/DonAINavigation/Source/DonAINavigation/Private/DonNavigationManagerUnbound.cpp
-B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Classes\DonNavigationManagerUnbound.h
-B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Inc\DonAINavigation\DonNavigationManagerUnbound.generated.h
-B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Private\DonAINavigationPrivatePCH.h
-B:/Documents/Strathclyde/Master's Thesis/Prototype/Plugins/DonAINavigation/Source/DonAINavigation/Private/DonNavigatorInterface.cpp
-B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Private\DonAINavigationPrivatePCH.h
-B:/Documents/Strathclyde/Master's Thesis/Prototype/Plugins/DonAINavigation/Source/DonAINavigation/Private/EnvironmentQuery/DonEnvQueryTest_Navigation.cpp
-B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Public\EnvironmentQuery/DonEnvQueryTest_Navigation.h
+B:/Documents/Strathclyde/Master's Thesis/USAR_Swarm/Prototype/Plugins/DonAINavigation/Source/DonAINavigation/Private/DonAINavigation.cpp
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Private\DonAINavigationPrivatePCH.h
+B:/Documents/Strathclyde/Master's Thesis/USAR_Swarm/Prototype/Plugins/DonAINavigation/Source/DonAINavigation/Private/DonNavigationHelper.cpp
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Private\DonAINavigationPrivatePCH.h
+B:/Documents/Strathclyde/Master's Thesis/USAR_Swarm/Prototype/Plugins/DonAINavigation/Source/DonAINavigation/Private/DonNavigationManager.cpp
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Private\DonAINavigationPrivatePCH.h
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Classes\Multithreading/DonNavigationWorker.h
+B:/Documents/Strathclyde/Master's Thesis/USAR_Swarm/Prototype/Plugins/DonAINavigation/Source/DonAINavigation/Private/DonNavigationManagerUnbound.cpp
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Classes\DonNavigationManagerUnbound.h
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Inc\DonAINavigation\DonNavigationManagerUnbound.generated.h
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Private\DonAINavigationPrivatePCH.h
+B:/Documents/Strathclyde/Master's Thesis/USAR_Swarm/Prototype/Plugins/DonAINavigation/Source/DonAINavigation/Private/DonNavigatorInterface.cpp
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Private\DonAINavigationPrivatePCH.h
+B:/Documents/Strathclyde/Master's Thesis/USAR_Swarm/Prototype/Plugins/DonAINavigation/Source/DonAINavigation/Private/EnvironmentQuery/DonEnvQueryTest_Navigation.cpp
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Public\EnvironmentQuery/DonEnvQueryTest_Navigation.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\AIModule\Classes\EnvironmentQuery/EnvQueryTest.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\AIModule\Classes\EnvironmentQuery/Items/EnvQueryItemType.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\AIModule\EnvQueryItemType.generated.h
@@ -875,13 +875,13 @@ B:\Program Files\Epic Games\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\In
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\AIModule\Classes\EnvironmentQuery/EnvQueryNode.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\AIModule\EnvQueryNode.generated.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\AIModule\EnvQueryTest.generated.h
-B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Inc\DonAINavigation\DonEnvQueryTest_Navigation.generated.h
-B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Private\EnvironmentQuery\../DonAINavigationPrivatePCH.h
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Inc\DonAINavigation\DonEnvQueryTest_Navigation.generated.h
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Private\EnvironmentQuery\../DonAINavigationPrivatePCH.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\AIModule\Classes\EnvironmentQuery/Items/EnvQueryItemType_VectorBase.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\AIModule\EnvQueryItemType_VectorBase.generated.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\AIModule\Classes\EnvironmentQuery/Contexts/EnvQueryContext_Querier.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\AIModule\EnvQueryContext_Querier.generated.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\AIModule\Classes\EnvironmentQuery/Items/EnvQueryItemType_Point.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\AIModule\EnvQueryItemType_Point.generated.h
-B:/Documents/Strathclyde/Master's Thesis/Prototype/Plugins/DonAINavigation/Source/DonAINavigation/Private/Multithreading/DonNavigationWorker.cpp
-B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Private\Multithreading\../DonAINavigationPrivatePCH.h
+B:/Documents/Strathclyde/Master's Thesis/USAR_Swarm/Prototype/Plugins/DonAINavigation/Source/DonAINavigation/Private/Multithreading/DonNavigationWorker.cpp
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Private\Multithreading\../DonAINavigationPrivatePCH.h

@@ -2,12 +2,12 @@
 	"Targets": [
 		{
 			"Name": "Prototype",
-			"Path": "B:\\Documents\\Strathclyde\\Master's Thesis\\Prototype\\Source\\Prototype.Target.cs",
+			"Path": "B:\\Documents\\Strathclyde\\Master's Thesis\\USAR_Swarm\\Prototype\\Source\\Prototype.Target.cs",
 			"Type": "Game"
 		},
 		{
 			"Name": "PrototypeEditor",
-			"Path": "B:\\Documents\\Strathclyde\\Master's Thesis\\Prototype\\Source\\PrototypeEditor.Target.cs",
+			"Path": "B:\\Documents\\Strathclyde\\Master's Thesis\\USAR_Swarm\\Prototype\\Source\\PrototypeEditor.Target.cs",
 			"Type": "Editor"
 		}
 	]

@@ -24,6 +24,7 @@ class ABoidsAgent;
 	DECLARE_FUNCTION(execmoveAgent); \
 	DECLARE_FUNCTION(execonNeighborLeave); \
 	DECLARE_FUNCTION(execonNeighborEnter); \
+	DECLARE_FUNCTION(execscanNeighbors); \
 	DECLARE_FUNCTION(execsetVelocity); \
 	DECLARE_FUNCTION(execgetNeighbors);
 
@@ -33,6 +34,7 @@ class ABoidsAgent;
 	DECLARE_FUNCTION(execmoveAgent); \
 	DECLARE_FUNCTION(execonNeighborLeave); \
 	DECLARE_FUNCTION(execonNeighborEnter); \
+	DECLARE_FUNCTION(execscanNeighbors); \
 	DECLARE_FUNCTION(execsetVelocity); \
 	DECLARE_FUNCTION(execgetNeighbors);
 

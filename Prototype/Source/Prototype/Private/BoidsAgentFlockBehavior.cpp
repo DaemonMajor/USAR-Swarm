@@ -43,7 +43,7 @@ FVector UBoidsAgentFlockBehavior::getAlignment(ABoidsAgent* agent)
 
     TArray<ABoidsAgent*> neighbors = agent->getNeighbors();
     for (ABoidsAgent* boid : neighbors) {
-        alignVector += boid->GetVelocity().GetSafeNormal();
+        alignVector += boid->GetVelocity();
     }
     alignVector /= neighbors.Num();
 

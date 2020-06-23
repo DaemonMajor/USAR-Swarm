@@ -1,8 +1,8 @@
-B:\Documents\Strathclyde\Master's Thesis\Prototype\Intermediate\Build\Win64\UE4Editor\Development\Prototype\Definitions.Prototype.h
-B:\Documents\Strathclyde\Master's Thesis\Prototype\Source\Prototype\Public\CameraHUD.h
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Intermediate\Build\Win64\UE4Editor\Development\Prototype\Definitions.Prototype.h
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Source\Prototype\Public\CameraHUD.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\Engine\Classes\GameFramework/HUD.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\Engine\Classes\GameFramework/HUDHitBox.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\Engine\Classes\GameFramework/DebugTextInfo.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\DebugTextInfo.generated.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\HUD.generated.h
-B:\Documents\Strathclyde\Master's Thesis\Prototype\Intermediate\Build\Win64\UE4Editor\Inc\Prototype\CameraHUD.generated.h
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Intermediate\Build\Win64\UE4Editor\Inc\Prototype\CameraHUD.generated.h

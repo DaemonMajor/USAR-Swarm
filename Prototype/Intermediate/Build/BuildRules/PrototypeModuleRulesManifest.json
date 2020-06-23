@@ -1,9 +1,9 @@
 {
 	"SourceFiles": [
-		"B:\\Documents\\Strathclyde\\Master's Thesis\\Prototype\\Source\\Prototype\\Prototype.Build.cs",
-		"B:\\Documents\\Strathclyde\\Master's Thesis\\Prototype\\Plugins\\DonAINavigation\\Source\\DonAINavigation\\DonAINavigation.Build.cs",
-		"B:\\Documents\\Strathclyde\\Master's Thesis\\Prototype\\Source\\Prototype.Target.cs",
-		"B:\\Documents\\Strathclyde\\Master's Thesis\\Prototype\\Source\\PrototypeEditor.Target.cs"
+		"B:\\Documents\\Strathclyde\\Master's Thesis\\USAR_Swarm\\Prototype\\Source\\Prototype\\Prototype.Build.cs",
+		"B:\\Documents\\Strathclyde\\Master's Thesis\\USAR_Swarm\\Prototype\\Plugins\\DonAINavigation\\Source\\DonAINavigation\\DonAINavigation.Build.cs",
+		"B:\\Documents\\Strathclyde\\Master's Thesis\\USAR_Swarm\\Prototype\\Source\\Prototype.Target.cs",
+		"B:\\Documents\\Strathclyde\\Master's Thesis\\USAR_Swarm\\Prototype\\Source\\PrototypeEditor.Target.cs"
 	],
 	"EngineVersion": "4.25.1"
 }

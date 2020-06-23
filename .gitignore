@@ -73,9 +73,6 @@ Plugins/*/Intermediate/*
 # Cache files for the editor to use
 DerivedDataCache/*
 
-
-
-### FOR INITIAL PUSH ###
-DerivedDataCache/*
-Intermediate/*
+# Additional
+Content/StarterContent/*
 Plugins/*

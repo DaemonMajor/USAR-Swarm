@@ -17,8 +17,8 @@ ABoidsAgent::ABoidsAgent()
 	maxSpeed = 100;
 	maxTurnRate = 120;
 	bodySize = 25;
-	neighborRadius = 750;
-	visionRadius = 300;
+	neighborRadius = 1500;
+	visionRadius = 500;
 	alignmentWeight = 5;
 	cohesionWeight = 10;
 	separationWeight = 1;
@@ -37,6 +37,7 @@ ABoidsAgent::ABoidsAgent()
 		agentMesh->SetStaticMesh(coneVisualAsset.Object);
 		agentMesh->SetRelativeRotation(FRotator(-90, 0, 0));
 		agentMesh->SetRelativeScale3D(FVector (0.5 , 0.5 , 0.5));
+		agentMesh->SetCollisionProfileName(TEXT("AgentCollision"));
 	}
 
 	agentBody = CreateDefaultSubobject<USphereComponent>("AgentBody");
@@ -59,12 +60,12 @@ void ABoidsAgent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// instantiate neighbor list
-	TArray<TEnumAsByte<EObjectTypeQuery>> traceObjectTypes;
+	// initialize neighbor list
+	scanNeighbors();
 
 	// set up neighbor list to update when agents enter/leave neighborRadius
-	neighborSphere->OnComponentBeginOverlap.AddDynamic(this, &ABoidsAgent::onNeighborEnter);
-	neighborSphere->OnComponentEndOverlap.AddDynamic(this, &ABoidsAgent::onNeighborLeave);
+	//neighborSphere->OnComponentBeginOverlap.AddDynamic(this, &ABoidsAgent::onNeighborEnter);
+	//neighborSphere->OnComponentEndOverlap.AddDynamic(this, &ABoidsAgent::onNeighborLeave);
 }
 
 // Called every frame
@@ -78,6 +79,32 @@ void ABoidsAgent::Tick(float DeltaSeconds)
 	speed = agentVelocity.Size();
 	numNeighbors = neighborAgents.Num();
 	/*DEBUGGING*/
+}
+
+void ABoidsAgent::scanNeighbors()
+{
+	// filter by collision channel
+	TArray<TEnumAsByte<EObjectTypeQuery>> traceObjectTypes;
+	traceObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECollisionChannel::ECC_Pawn));
+
+	// ignore specific actors
+	TArray<AActor*> ignoreActors;
+	ignoreActors.Init(this, 1);		// ignore self
+
+	// filter by class
+	UClass* seekClass = ABoidsAgent::StaticClass();
+
+	// list of neighbors found
+	TArray<AActor*> foundNeighbors;
+
+	UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetActorLocation(), neighborRadius, traceObjectTypes, seekClass, ignoreActors, foundNeighbors);
+
+	// cast to ABoidsAgent
+	for (AActor* agent : foundNeighbors) {
+		if (!neighborAgents.Contains(agent)) {
+			neighborAgents.Add(Cast<ABoidsAgent>(agent));
+		}
+	}
 }
 
 void ABoidsAgent::onNeighborEnter(UPrimitiveComponent* agentSensor, AActor* neighbor, UPrimitiveComponent* neighborBody, int32 neighborIndex,
@@ -114,6 +141,11 @@ void ABoidsAgent::onNeighborLeave(UPrimitiveComponent* agentSensor, AActor* neig
 TArray<ABoidsAgent*> ABoidsAgent::getNeighbors()
 {
 	return neighborAgents;
+}
+
+FVector ABoidsAgent::GetVelocity() const
+{
+	return agentVelocity;
 }
 
 void ABoidsAgent::setVelocity(FVector newVel)

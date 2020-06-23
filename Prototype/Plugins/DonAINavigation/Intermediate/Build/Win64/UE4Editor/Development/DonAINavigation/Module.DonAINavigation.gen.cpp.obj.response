@@ -32,11 +32,11 @@
 /wd4244
 /wd4838
 /I .
-/I "B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Private"
-/I "B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Inc\DonAINavigation"
-/I "B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Source"
-/I "B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Classes"
-/I "B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Public"
+/I "B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Private"
+/I "B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Inc\DonAINavigation"
+/I "B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Source"
+/I "B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Classes"
+/I "B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Source\DonAINavigation\Public"
 /I Runtime
 /I Runtime\TraceLog\Public
 /I Runtime\Core\Public
@@ -264,12 +264,12 @@
 /I "C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\shared"
 /I "C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\um"
 /I "C:\Program Files (x86)\Windows Kits\10\include\10.0.18362.0\winrt"
-/FI"B:\Documents\Strathclyde\Master's Thesis\Prototype\Intermediate\Build\Win64\PrototypeEditor\Development\Engine\SharedPCH.Engine.NoShadow.h"
-/Yu"B:\Documents\Strathclyde\Master's Thesis\Prototype\Intermediate\Build\Win64\PrototypeEditor\Development\Engine\SharedPCH.Engine.NoShadow.h"
-/Fp"B:\Documents\Strathclyde\Master's Thesis\Prototype\Intermediate\Build\Win64\PrototypeEditor\Development\Engine\SharedPCH.Engine.NoShadow.h.pch"
-"B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Development\DonAINavigation\Module.DonAINavigation.gen.cpp"
-/FI"B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Development\DonAINavigation\Definitions.DonAINavigation.h"
-/Fo"B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Development\DonAINavigation\Module.DonAINavigation.gen.cpp.obj"
+/FI"B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Intermediate\Build\Win64\PrototypeEditor\Development\Engine\SharedPCH.Engine.NoShadow.h"
+/Yu"B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Intermediate\Build\Win64\PrototypeEditor\Development\Engine\SharedPCH.Engine.NoShadow.h"
+/Fp"B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Intermediate\Build\Win64\PrototypeEditor\Development\Engine\SharedPCH.Engine.NoShadow.h.pch"
+"B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Development\DonAINavigation\Module.DonAINavigation.gen.cpp"
+/FI"B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Development\DonAINavigation\Definitions.DonAINavigation.h"
+/Fo"B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Development\DonAINavigation\Module.DonAINavigation.gen.cpp.obj"
 /TP
 /GR-
 /W4
