@@ -14,8 +14,18 @@ PRAGMA_DISABLE_DEPRECATION_WARNINGS
 #define PROTOTYPE_BoidSpawnPoint_generated_h
 
 #define Prototype_Source_Prototype_Public_BoidSpawnPoint_h_12_SPARSE_DATA
-#define Prototype_Source_Prototype_Public_BoidSpawnPoint_h_12_RPC_WRAPPERS
-#define Prototype_Source_Prototype_Public_BoidSpawnPoint_h_12_RPC_WRAPPERS_NO_PURE_DECLS
+#define Prototype_Source_Prototype_Public_BoidSpawnPoint_h_12_RPC_WRAPPERS \
+ \
+	DECLARE_FUNCTION(execSpawnAgent); \
+	DECLARE_FUNCTION(execInit);
+
+
+#define Prototype_Source_Prototype_Public_BoidSpawnPoint_h_12_RPC_WRAPPERS_NO_PURE_DECLS \
+ \
+	DECLARE_FUNCTION(execSpawnAgent); \
+	DECLARE_FUNCTION(execInit);
+
+
 #define Prototype_Source_Prototype_Public_BoidSpawnPoint_h_12_INCLASS_NO_PURE_DECLS \
 private: \
 	static void StaticRegisterNativesABoidSpawnPoint(); \

@@ -22,9 +22,9 @@ protected:
 	virtual void OnBecomeRelevant(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 private:
-	FVector getAlignment(ABoidsAgent* agent);		// Get average velocity of neighbor agents
-	FVector getCohesion(ABoidsAgent* agent);		// Get vector pointing to center of mass of neighbor agents
-	FVector getSeparation(ABoidsAgent* agent);		// Calculate vector pointing away from neighbor agents
+	FVector GetAlignment(ABoidsAgent* agent);		// Get average velocity of neighbor agents
+	FVector GetCohesion(ABoidsAgent* agent);		// Get vector pointing to center of mass of neighbor agents
+	FVector GetSeparation(ABoidsAgent* agent);		// Calculate vector pointing away from neighbor agents
 
-	FVector calcNewVector(ABoidsAgent* agent, FVector alignFactor, FVector cohFactor, FVector sepFactor);	// calculate new vector for agent based on alignment, cohesion, and separation factors
+	FVector CalcNewVector(ABoidsAgent* agent, FVector alignFactor, FVector cohFactor, FVector sepFactor);	// calculate new vector for agent based on alignment, cohesion, and separation factors
 };

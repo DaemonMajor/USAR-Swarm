@@ -17,12 +17,12 @@ void UBoidsAgentFlockBehavior::OnBecomeRelevant(UBehaviorTreeComponent& OwnerCom
     Super::OnBecomeRelevant(OwnerComp, NodeMemory);
 
     ABoidsAgent* agent = Cast<ABoidsAgent>(OwnerComp.GetAIOwner()->GetPawn());
-    FVector alignFactor = getAlignment(agent) * agent->alignmentWeight;
-    FVector cohFactor = getCohesion(agent) * agent->cohesionWeight;
-    FVector sepFactor = getSeparation(agent) * agent->separationWeight;
+    FVector alignFactor = GetAlignment(agent) * agent->alignmentWeight;
+    FVector cohFactor = GetCohesion(agent) * agent->cohesionWeight;
+    FVector sepFactor = GetSeparation(agent) * agent->separationWeight;
 
-    FVector newVel = calcNewVector(agent, alignFactor, cohFactor, sepFactor) - agent->GetActorLocation();
-    agent->setVelocity(newVel);
+    FVector newVel = CalcNewVector(agent, alignFactor, cohFactor, sepFactor) - agent->GetActorLocation();
+    agent->SetVelocity(newVel);
 
     /*DEBUGGING*/
     agent->alignmentFactor = alignFactor.Size();
@@ -37,11 +37,11 @@ void UBoidsAgentFlockBehavior::OnBecomeRelevant(UBehaviorTreeComponent& OwnerCom
 *   @param agent Agent to calculate alignment vector for.
 *   @return Average velocity of neighbors. Returns zero if agent has no neighbors.
 */
-FVector UBoidsAgentFlockBehavior::getAlignment(ABoidsAgent* agent)
+FVector UBoidsAgentFlockBehavior::GetAlignment(ABoidsAgent* agent)
 {
     FVector alignVector = FVector::ZeroVector;
 
-    TArray<ABoidsAgent*> neighbors = agent->getNeighbors();
+    TArray<ABoidsAgent*> neighbors = agent->GetNeighbors();
     for (ABoidsAgent* boid : neighbors) {
         alignVector += boid->GetVelocity();
     }
@@ -57,11 +57,11 @@ FVector UBoidsAgentFlockBehavior::getAlignment(ABoidsAgent* agent)
 *   @param agent Agent to calculate cohesion vector for.
 *   @return Vector pointing to center mass of agent's neighbors. Returns zero if agent has no neighbors.
 */
-FVector UBoidsAgentFlockBehavior::getCohesion(ABoidsAgent* agent)
+FVector UBoidsAgentFlockBehavior::GetCohesion(ABoidsAgent* agent)
 {
     FVector centerMass = FVector::ZeroVector;
 
-    TArray<ABoidsAgent*> neighbors = agent->getNeighbors();
+    TArray<ABoidsAgent*> neighbors = agent->GetNeighbors();
     for (ABoidsAgent* boid : neighbors) {
         centerMass += boid->GetActorLocation();
     }
@@ -77,11 +77,11 @@ FVector UBoidsAgentFlockBehavior::getCohesion(ABoidsAgent* agent)
 *   @param agent Agent to calculate separation vector for.
 *   @return Vector pointing away from neighbors.
 */
-FVector UBoidsAgentFlockBehavior::getSeparation(ABoidsAgent* agent)
+FVector UBoidsAgentFlockBehavior::GetSeparation(ABoidsAgent* agent)
 {
     FVector sepDir = FVector::ZeroVector;
 
-    TArray<ABoidsAgent*> neighbors = agent->getNeighbors();
+    TArray<ABoidsAgent*> neighbors = agent->GetNeighbors();
     FVector agentLoc = agent->GetActorLocation();
     for (ABoidsAgent* boid : neighbors) {
         FVector boidLoc = boid->GetActorLocation();
@@ -111,7 +111,7 @@ FVector UBoidsAgentFlockBehavior::getSeparation(ABoidsAgent* agent)
 *   @param sepFactor Separation factor.
 *   @return Velocity vector.
 */
-FVector UBoidsAgentFlockBehavior::calcNewVector(ABoidsAgent* agent, FVector alignFactor, FVector cohFactor, FVector sepFactor)
+FVector UBoidsAgentFlockBehavior::CalcNewVector(ABoidsAgent* agent, FVector alignFactor, FVector cohFactor, FVector sepFactor)
 {
     return alignFactor + cohFactor + sepFactor;
 }

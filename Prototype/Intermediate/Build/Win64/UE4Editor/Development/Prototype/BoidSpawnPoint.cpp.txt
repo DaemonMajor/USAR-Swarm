@@ -1,3 +1,9 @@
 B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Intermediate\Build\Win64\UE4Editor\Development\Prototype\Definitions.Prototype.h
 B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Source\Prototype\Public\BoidSpawnPoint.h
 B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Intermediate\Build\Win64\UE4Editor\Inc\Prototype\BoidSpawnPoint.generated.h
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Source\Prototype\Public\BoidsAgent.h
+B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\Engine\Classes\Components/SphereComponent.h
+B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\Engine\Classes\Components/ShapeComponent.h
+B:\Program Files\Epic Games\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\ShapeComponent.generated.h
+B:\Program Files\Epic Games\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\SphereComponent.generated.h
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Intermediate\Build\Win64\UE4Editor\Inc\Prototype\BoidsAgent.generated.h

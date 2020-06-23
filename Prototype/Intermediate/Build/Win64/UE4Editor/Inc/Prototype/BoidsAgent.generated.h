@@ -21,22 +21,28 @@ class ABoidsAgent;
 #define Prototype_Source_Prototype_Public_BoidsAgent_h_13_SPARSE_DATA
 #define Prototype_Source_Prototype_Public_BoidsAgent_h_13_RPC_WRAPPERS \
  \
-	DECLARE_FUNCTION(execmoveAgent); \
-	DECLARE_FUNCTION(execonNeighborLeave); \
-	DECLARE_FUNCTION(execonNeighborEnter); \
-	DECLARE_FUNCTION(execscanNeighbors); \
-	DECLARE_FUNCTION(execsetVelocity); \
-	DECLARE_FUNCTION(execgetNeighbors);
+	DECLARE_FUNCTION(execMoveAgent); \
+	DECLARE_FUNCTION(execOnNeighborLeave); \
+	DECLARE_FUNCTION(execOnNeighborEnter); \
+	DECLARE_FUNCTION(execBootUpSequence); \
+	DECLARE_FUNCTION(execScanNeighbors); \
+	DECLARE_FUNCTION(execSetVelocity); \
+	DECLARE_FUNCTION(execGetNeighbors); \
+	DECLARE_FUNCTION(execSetID); \
+	DECLARE_FUNCTION(execGetID);
 
 
 #define Prototype_Source_Prototype_Public_BoidsAgent_h_13_RPC_WRAPPERS_NO_PURE_DECLS \
  \
-	DECLARE_FUNCTION(execmoveAgent); \
-	DECLARE_FUNCTION(execonNeighborLeave); \
-	DECLARE_FUNCTION(execonNeighborEnter); \
-	DECLARE_FUNCTION(execscanNeighbors); \
-	DECLARE_FUNCTION(execsetVelocity); \
-	DECLARE_FUNCTION(execgetNeighbors);
+	DECLARE_FUNCTION(execMoveAgent); \
+	DECLARE_FUNCTION(execOnNeighborLeave); \
+	DECLARE_FUNCTION(execOnNeighborEnter); \
+	DECLARE_FUNCTION(execBootUpSequence); \
+	DECLARE_FUNCTION(execScanNeighbors); \
+	DECLARE_FUNCTION(execSetVelocity); \
+	DECLARE_FUNCTION(execGetNeighbors); \
+	DECLARE_FUNCTION(execSetID); \
+	DECLARE_FUNCTION(execGetID);
 
 
 #define Prototype_Source_Prototype_Public_BoidsAgent_h_13_INCLASS_NO_PURE_DECLS \
@@ -85,13 +91,14 @@ DEFINE_VTABLE_PTR_HELPER_CTOR_CALLER(ABoidsAgent); \
 	FORCEINLINE static uint32 __PPO__pitchRate() { return STRUCT_OFFSET(ABoidsAgent, pitchRate); } \
 	FORCEINLINE static uint32 __PPO__yawRate() { return STRUCT_OFFSET(ABoidsAgent, yawRate); } \
 	FORCEINLINE static uint32 __PPO__rollRate() { return STRUCT_OFFSET(ABoidsAgent, rollRate); } \
-	FORCEINLINE static uint32 __PPO__flockID() { return STRUCT_OFFSET(ABoidsAgent, flockID); } \
 	FORCEINLINE static uint32 __PPO__agentMesh() { return STRUCT_OFFSET(ABoidsAgent, agentMesh); } \
 	FORCEINLINE static uint32 __PPO__moveComp() { return STRUCT_OFFSET(ABoidsAgent, moveComp); } \
 	FORCEINLINE static uint32 __PPO__agentBody() { return STRUCT_OFFSET(ABoidsAgent, agentBody); } \
 	FORCEINLINE static uint32 __PPO__neighborSphere() { return STRUCT_OFFSET(ABoidsAgent, neighborSphere); } \
 	FORCEINLINE static uint32 __PPO__neighborAgents() { return STRUCT_OFFSET(ABoidsAgent, neighborAgents); } \
-	FORCEINLINE static uint32 __PPO__target() { return STRUCT_OFFSET(ABoidsAgent, target); }
+	FORCEINLINE static uint32 __PPO__target() { return STRUCT_OFFSET(ABoidsAgent, target); } \
+	FORCEINLINE static uint32 __PPO__bootUpDelay() { return STRUCT_OFFSET(ABoidsAgent, bootUpDelay); } \
+	FORCEINLINE static uint32 __PPO__bootUpDelayTimer() { return STRUCT_OFFSET(ABoidsAgent, bootUpDelayTimer); }
 
 
 #define Prototype_Source_Prototype_Public_BoidsAgent_h_10_PROLOG

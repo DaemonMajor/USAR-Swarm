@@ -42,6 +42,12 @@ public:
 		FVector sepVector;
 	/* =============== */
 
+	/*MOVE TO PROTECTED AFTER DEBUGGING*/
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		int agentID;	// switch to const after debugging
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+		int flockID;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float maxSpeed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -64,14 +70,17 @@ public:
 	const float agentSpacing = 300;	// how far apart agents should be spaced
 
 	UFUNCTION()
-		TArray<ABoidsAgent*> getNeighbors();
-	
+		int GetID();
+	UFUNCTION()
+		void SetID(int id);
+	UFUNCTION()
+		TArray<ABoidsAgent*> GetNeighbors();
 	
 	UFUNCTION()
-		void setVelocity(FVector newVel);			// set new velocity
+		void SetVelocity(FVector newVel);			// set new velocity
 	virtual FVector GetVelocity() const override;	// get agent velocity (bypasses built-in component velocity because documentation is unclear)
 
-	/*
+	/* for future implementation
 	UFUNCTION()
 		FVector getTarget();				// get target location
 	UFUNCTION()
@@ -79,8 +88,8 @@ public:
 	*/
 
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 		
 	UPROPERTY()
 		float pitchRate = 0;
@@ -88,9 +97,6 @@ protected:
 		float yawRate = 0;
 	UPROPERTY()
 		float rollRate = 0;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		int flockID;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
 		class UStaticMeshComponent* agentMesh;
@@ -105,14 +111,21 @@ protected:
 	UPROPERTY()
 		FVector target;
 
-	UFUNCTION()
-		void scanNeighbors();	// populate neighborAgents (used at BeginPlay)
-	UFUNCTION()
-		void onNeighborEnter(UPrimitiveComponent* agentSensor, AActor* neighbor, UPrimitiveComponent* neighborBody, int32 neighborIndex, 
-							 bool bFromSweep, const FHitResult &SweepResult);
-	UFUNCTION()
-		void onNeighborLeave(UPrimitiveComponent* agentSensor, AActor* neighbor, UPrimitiveComponent* neighborBody, int32 neighborIndex);
+	UPROPERTY()
+		float bootUpDelay = 0.5;
+	UPROPERTY()
+		FTimerHandle bootUpDelayTimer;		// start neighbor scans after this delay (after all agents have been placed in world)
 
 	UFUNCTION()
-		void moveAgent(float deltaSec);
+		void ScanNeighbors();	// populate neighborAgents (used at BeginPlay)
+	UFUNCTION()
+		void BootUpSequence();
+	UFUNCTION()
+		void OnNeighborEnter(UPrimitiveComponent* agentSensor, AActor* neighbor, UPrimitiveComponent* neighborBody, int32 neighborIndex, 
+							 bool bFromSweep, const FHitResult &SweepResult);
+	UFUNCTION()
+		void OnNeighborLeave(UPrimitiveComponent* agentSensor, AActor* neighbor, UPrimitiveComponent* neighborBody, int32 neighborIndex);
+
+	UFUNCTION()
+		void MoveAgent(float deltaSec);
 };

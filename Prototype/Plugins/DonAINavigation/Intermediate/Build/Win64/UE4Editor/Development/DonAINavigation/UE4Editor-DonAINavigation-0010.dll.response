@@ -33,10 +33,10 @@
 /NODEFAULTLIB:"LIBCD"
 /NODEFAULTLIB:"LIBCPD"
 /FUNCTIONPADMIN
-"B:\Documents\Strathclyde\Master's Thesis\Prototype\Intermediate\Build\Win64\PrototypeEditor\Development\Engine\SharedPCH.Engine.NoShadow.h.obj"
-"B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Development\DonAINavigation\Module.DonAINavigation.cpp.obj"
-"B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Development\DonAINavigation\Module.DonAINavigation.gen.cpp.obj"
-"B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Development\DonAINavigation\Default.rc2.res"
+"B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Intermediate\Build\Win64\PrototypeEditor\Development\Engine\SharedPCH.Engine.NoShadow.h.obj"
+"B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Development\DonAINavigation\Module.DonAINavigation.cpp.obj"
+"B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Development\DonAINavigation\Module.DonAINavigation.gen.cpp.obj"
+"B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Development\DonAINavigation\Default.rc2.res"
 "delayimp.lib"
 "wininet.lib"
 "rpcrt4.lib"
@@ -66,8 +66,8 @@
 "B:\Program Files\Epic Games\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Development\AIModule\UE4Editor-AIModule.lib"
 "B:\Program Files\Epic Games\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Development\GameplayTasks\UE4Editor-GameplayTasks.lib"
 "B:\Program Files\Epic Games\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Development\Engine\UE4Editor-Engine.lib"
-/OUT:"B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Binaries\Win64\UE4Editor-DonAINavigation-0010.dll"
-/IMPLIB:"B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Development\DonAINavigation\UE4Editor-DonAINavigation-0010.suppressed.lib"
-/PDB:"B:\Documents\Strathclyde\Master's Thesis\Prototype\Plugins\DonAINavigation\Binaries\Win64\UE4Editor-DonAINavigation-0010.pdb"
+/OUT:"B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Binaries\Win64\UE4Editor-DonAINavigation-0010.dll"
+/IMPLIB:"B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Development\DonAINavigation\UE4Editor-DonAINavigation-0010.suppressed.lib"
+/PDB:"B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Binaries\Win64\UE4Editor-DonAINavigation-0010.pdb"
 /ignore:4078
 /INCLUDE:IMPLEMENT_MODULE_DonAINavigation
