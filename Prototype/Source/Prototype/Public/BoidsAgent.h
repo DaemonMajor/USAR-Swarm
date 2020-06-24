@@ -33,7 +33,7 @@ public:
 		int numNeighbors = 0;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		FVector agentVelocity = FVector::ZeroVector;
+		FVector agentVelocity;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FVector alignVector;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)

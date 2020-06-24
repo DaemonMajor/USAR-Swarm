@@ -42,11 +42,14 @@ FVector UBoidsAgentFlockBehavior::GetAlignment(ABoidsAgent* agent)
     FVector alignVector = FVector::ZeroVector;
 
     TArray<ABoidsAgent*> neighbors = agent->GetNeighbors();
+
     for (ABoidsAgent* boid : neighbors) {
-        alignVector += boid->GetVelocity();
+        if (boid) {
+            alignVector += boid->GetVelocity();
+        }
     }
     alignVector /= neighbors.Num();
-
+    
     agent->alignVector = alignVector;
     return alignVector;
 }
@@ -63,10 +66,12 @@ FVector UBoidsAgentFlockBehavior::GetCohesion(ABoidsAgent* agent)
 
     TArray<ABoidsAgent*> neighbors = agent->GetNeighbors();
     for (ABoidsAgent* boid : neighbors) {
-        centerMass += boid->GetActorLocation();
+        if (boid) {
+            centerMass += boid->GetActorLocation();
+        }
     }
     centerMass /= neighbors.Num();
-
+    
     agent->flockCenter = centerMass;
     return centerMass;
 }
@@ -84,18 +89,20 @@ FVector UBoidsAgentFlockBehavior::GetSeparation(ABoidsAgent* agent)
     TArray<ABoidsAgent*> neighbors = agent->GetNeighbors();
     FVector agentLoc = agent->GetActorLocation();
     for (ABoidsAgent* boid : neighbors) {
-        FVector boidLoc = boid->GetActorLocation();
-        FVector separation = agentLoc - boidLoc;
-        
-        float sepFactor = 0;
-        float dist = separation.Size();
-        float spacing = agent->neighborRadius * agent->agentSpacing;
-        if (dist < spacing) {
-            sepFactor = FMath::Pow(spacing - dist, 0.5f);
-        }
-        sepFactor = FMath::Clamp(sepFactor, 0.f, 1.f);
+        if (boid) {
+            FVector boidLoc = boid->GetActorLocation();
+            FVector separation = agentLoc - boidLoc;
 
-        sepDir += separation * sepFactor;
+            float sepFactor = 0;
+            float dist = separation.Size();
+            float spacing = agent->agentSpacing;
+            if (dist < spacing) {
+                sepFactor = FMath::Pow(spacing - dist, 0.5f);
+            }
+            sepFactor = FMath::Clamp(sepFactor, 0.f, 1.f);
+
+            sepDir += separation * sepFactor;
+        }
     }
 
     agent->sepVector = sepDir;

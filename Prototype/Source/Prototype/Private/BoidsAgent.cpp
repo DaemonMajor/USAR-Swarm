@@ -14,14 +14,16 @@ ABoidsAgent::ABoidsAgent()
 {
  	PrimaryActorTick.bCanEverTick = true;
 
-	maxSpeed = 100;
+	maxSpeed = 250;
 	maxTurnRate = 120;
 	bodySize = 25;
-	neighborRadius = 1500;
+	neighborRadius = 500;
 	visionRadius = 500;
-	alignmentWeight = 1.5;
-	cohesionWeight = 15;
-	separationWeight = 1;
+	alignmentWeight = 1;
+	cohesionWeight = 5;
+	separationWeight = 2.5;
+
+	agentVelocity = FVector::ZeroVector;
 
 	AIControllerClass = ABoidsAgentController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
@@ -35,10 +37,6 @@ ABoidsAgent::ABoidsAgent()
 		agentMesh->SetStaticMesh(coneVisualAsset.Object);
 		agentMesh->SetRelativeRotation(FRotator(-90, 0, 0));
 		agentMesh->SetRelativeScale3D(FVector (0.5 , 0.5 , 0.5));
-
-		agentMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		agentMesh->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
-		agentMesh->SetCollisionProfileName(TEXT("AgentCollision"));
 	}
 
 	agentBody = CreateDefaultSubobject<USphereComponent>("AgentBody");
@@ -46,6 +44,9 @@ ABoidsAgent::ABoidsAgent()
 	agentBody->SetSphereRadius(bodySize);
 	agentBody->SetSimulatePhysics(false);
 	agentBody->SetGenerateOverlapEvents(true);
+	agentBody->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+	agentBody->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
+	agentBody->SetCollisionProfileName(TEXT("AgentCollision"));
 	
 	moveComp = CreateDefaultSubobject<UFloatingPawnMovement>("MovementComponent");
 
@@ -54,6 +55,8 @@ ABoidsAgent::ABoidsAgent()
 	neighborSphere->SetSphereRadius(neighborRadius);
 	neighborSphere->SetSimulatePhysics(false);
 	neighborSphere->SetGenerateOverlapEvents(true);
+	neighborSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	neighborSphere->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
 }
 
 // Called when the game starts or when spawned
@@ -90,8 +93,8 @@ void ABoidsAgent::BootUpSequence()
 	ScanNeighbors();
 
 	// set up neighbor list to update when agents enter/leave neighborRadius
-	neighborSphere->OnComponentBeginOverlap.AddDynamic(this, &ABoidsAgent::OnNeighborEnter);
-	neighborSphere->OnComponentEndOverlap.AddDynamic(this, &ABoidsAgent::OnNeighborLeave);
+	//neighborSphere->OnComponentBeginOverlap.AddDynamic(this, &ABoidsAgent::OnNeighborEnter);
+	//neighborSphere->OnComponentEndOverlap.AddDynamic(this, &ABoidsAgent::OnNeighborLeave);
 
 	/*DEBUGGING*/
 	FString bootUpCompleteText = FString::Printf(TEXT("Agent %d boot sequence complete."), agentID);
@@ -115,13 +118,15 @@ void ABoidsAgent::ScanNeighbors()
 	// list of neighbors found
 	TArray<AActor*> foundNeighbors;
 
-	//UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetActorLocation(), neighborRadius, traceObjectTypes, seekClass, ignoreActors, foundNeighbors);
-	UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetActorLocation(), neighborRadius, traceObjectTypes, nullptr, ignoreActors, foundNeighbors);
+	UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetActorLocation(), neighborRadius, traceObjectTypes, seekClass, ignoreActors, foundNeighbors);
 
-	// cast to ABoidsAgent
+	// filter by distance and cast to ABoidsAgent
 	for (AActor* agent : foundNeighbors) {
-		if (!neighborAgents.Contains(agent)) {
-			neighborAgents.Add(Cast<ABoidsAgent>(agent));
+		float dist = FVector::Distance(GetActorLocation(), agent->GetActorLocation());
+		if (dist <= neighborRadius) {
+			if (!neighborAgents.Contains(agent)) {
+				neighborAgents.Add(Cast<ABoidsAgent>(agent));
+			}
 		}
 	}
 }
