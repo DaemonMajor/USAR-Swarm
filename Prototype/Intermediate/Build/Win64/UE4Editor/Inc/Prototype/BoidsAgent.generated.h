@@ -29,6 +29,8 @@ class ABoidsAgent;
 	DECLARE_FUNCTION(execBootUpSequence); \
 	DECLARE_FUNCTION(execScanNeighbors); \
 	DECLARE_FUNCTION(execSetVelocity); \
+	DECLARE_FUNCTION(execSetHeightVariance); \
+	DECLARE_FUNCTION(execSetTargetHeight); \
 	DECLARE_FUNCTION(execGetNeighbors); \
 	DECLARE_FUNCTION(execSetID); \
 	DECLARE_FUNCTION(execGetID);
@@ -43,6 +45,8 @@ class ABoidsAgent;
 	DECLARE_FUNCTION(execBootUpSequence); \
 	DECLARE_FUNCTION(execScanNeighbors); \
 	DECLARE_FUNCTION(execSetVelocity); \
+	DECLARE_FUNCTION(execSetHeightVariance); \
+	DECLARE_FUNCTION(execSetTargetHeight); \
 	DECLARE_FUNCTION(execGetNeighbors); \
 	DECLARE_FUNCTION(execSetID); \
 	DECLARE_FUNCTION(execGetID);

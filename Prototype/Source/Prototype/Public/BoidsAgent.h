@@ -48,6 +48,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 		int flockID;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		bool statusClimbing = false;
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float maxSpeed;
 	
@@ -57,6 +60,11 @@ public:
 		float neighborRadius;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float visionRadius;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float targetHeight = 500;	// height to maintain
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float heightVariance = 50;	// variance allowed between agent height and target height
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float alignmentWeight;
@@ -74,6 +82,10 @@ public:
 	UFUNCTION()
 		TArray<ABoidsAgent*> GetNeighbors();
 	
+	UFUNCTION()
+		void SetTargetHeight(float height);
+	UFUNCTION()
+		void SetHeightVariance(float var);
 	UFUNCTION()
 		void SetVelocity(FVector newVel);			// set new velocity
 	virtual FVector GetVelocity() const override;	// get agent velocity (bypasses built-in component velocity because documentation is unclear)

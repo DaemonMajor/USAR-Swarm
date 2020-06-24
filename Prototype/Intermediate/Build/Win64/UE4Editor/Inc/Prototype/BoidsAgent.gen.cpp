@@ -90,6 +90,22 @@ void EmptyLinkFunctionForGeneratedCodeBoidsAgent() {}
 		P_THIS->SetVelocity(Z_Param_newVel);
 		P_NATIVE_END;
 	}
+	DEFINE_FUNCTION(ABoidsAgent::execSetHeightVariance)
+	{
+		P_GET_PROPERTY(FFloatProperty,Z_Param_var);
+		P_FINISH;
+		P_NATIVE_BEGIN;
+		P_THIS->SetHeightVariance(Z_Param_var);
+		P_NATIVE_END;
+	}
+	DEFINE_FUNCTION(ABoidsAgent::execSetTargetHeight)
+	{
+		P_GET_PROPERTY(FFloatProperty,Z_Param_height);
+		P_FINISH;
+		P_NATIVE_BEGIN;
+		P_THIS->SetTargetHeight(Z_Param_height);
+		P_NATIVE_END;
+	}
 	DEFINE_FUNCTION(ABoidsAgent::execGetNeighbors)
 	{
 		P_FINISH;
@@ -124,7 +140,9 @@ void EmptyLinkFunctionForGeneratedCodeBoidsAgent() {}
 			{ "OnNeighborEnter", &ABoidsAgent::execOnNeighborEnter },
 			{ "OnNeighborLeave", &ABoidsAgent::execOnNeighborLeave },
 			{ "ScanNeighbors", &ABoidsAgent::execScanNeighbors },
+			{ "SetHeightVariance", &ABoidsAgent::execSetHeightVariance },
 			{ "SetID", &ABoidsAgent::execSetID },
+			{ "SetTargetHeight", &ABoidsAgent::execSetTargetHeight },
 			{ "SetVelocity", &ABoidsAgent::execSetVelocity },
 		};
 		FNativeFunctionRegistrar::RegisterFunctions(Class, Funcs, UE_ARRAY_COUNT(Funcs));
@@ -459,6 +477,38 @@ void EmptyLinkFunctionForGeneratedCodeBoidsAgent() {}
 		}
 		return ReturnFunction;
 	}
+	struct Z_Construct_UFunction_ABoidsAgent_SetHeightVariance_Statics
+	{
+		struct BoidsAgent_eventSetHeightVariance_Parms
+		{
+			float var;
+		};
+		static const UE4CodeGen_Private::FFloatPropertyParams NewProp_var;
+		static const UE4CodeGen_Private::FPropertyParamsBase* const PropPointers[];
+#if WITH_METADATA
+		static const UE4CodeGen_Private::FMetaDataPairParam Function_MetaDataParams[];
+#endif
+		static const UE4CodeGen_Private::FFunctionParams FuncParams;
+	};
+	const UE4CodeGen_Private::FFloatPropertyParams Z_Construct_UFunction_ABoidsAgent_SetHeightVariance_Statics::NewProp_var = { "var", nullptr, (EPropertyFlags)0x0010000000000080, UE4CodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, 1, STRUCT_OFFSET(BoidsAgent_eventSetHeightVariance_Parms, var), METADATA_PARAMS(nullptr, 0) };
+	const UE4CodeGen_Private::FPropertyParamsBase* const Z_Construct_UFunction_ABoidsAgent_SetHeightVariance_Statics::PropPointers[] = {
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_ABoidsAgent_SetHeightVariance_Statics::NewProp_var,
+	};
+#if WITH_METADATA
+	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UFunction_ABoidsAgent_SetHeightVariance_Statics::Function_MetaDataParams[] = {
+		{ "ModuleRelativePath", "Public/BoidsAgent.h" },
+	};
+#endif
+	const UE4CodeGen_Private::FFunctionParams Z_Construct_UFunction_ABoidsAgent_SetHeightVariance_Statics::FuncParams = { (UObject*(*)())Z_Construct_UClass_ABoidsAgent, nullptr, "SetHeightVariance", nullptr, nullptr, sizeof(BoidsAgent_eventSetHeightVariance_Parms), Z_Construct_UFunction_ABoidsAgent_SetHeightVariance_Statics::PropPointers, UE_ARRAY_COUNT(Z_Construct_UFunction_ABoidsAgent_SetHeightVariance_Statics::PropPointers), RF_Public|RF_Transient|RF_MarkAsNative, (EFunctionFlags)0x00020401, 0, 0, METADATA_PARAMS(Z_Construct_UFunction_ABoidsAgent_SetHeightVariance_Statics::Function_MetaDataParams, UE_ARRAY_COUNT(Z_Construct_UFunction_ABoidsAgent_SetHeightVariance_Statics::Function_MetaDataParams)) };
+	UFunction* Z_Construct_UFunction_ABoidsAgent_SetHeightVariance()
+	{
+		static UFunction* ReturnFunction = nullptr;
+		if (!ReturnFunction)
+		{
+			UE4CodeGen_Private::ConstructUFunction(ReturnFunction, Z_Construct_UFunction_ABoidsAgent_SetHeightVariance_Statics::FuncParams);
+		}
+		return ReturnFunction;
+	}
 	struct Z_Construct_UFunction_ABoidsAgent_SetID_Statics
 	{
 		struct BoidsAgent_eventSetID_Parms
@@ -488,6 +538,38 @@ void EmptyLinkFunctionForGeneratedCodeBoidsAgent() {}
 		if (!ReturnFunction)
 		{
 			UE4CodeGen_Private::ConstructUFunction(ReturnFunction, Z_Construct_UFunction_ABoidsAgent_SetID_Statics::FuncParams);
+		}
+		return ReturnFunction;
+	}
+	struct Z_Construct_UFunction_ABoidsAgent_SetTargetHeight_Statics
+	{
+		struct BoidsAgent_eventSetTargetHeight_Parms
+		{
+			float height;
+		};
+		static const UE4CodeGen_Private::FFloatPropertyParams NewProp_height;
+		static const UE4CodeGen_Private::FPropertyParamsBase* const PropPointers[];
+#if WITH_METADATA
+		static const UE4CodeGen_Private::FMetaDataPairParam Function_MetaDataParams[];
+#endif
+		static const UE4CodeGen_Private::FFunctionParams FuncParams;
+	};
+	const UE4CodeGen_Private::FFloatPropertyParams Z_Construct_UFunction_ABoidsAgent_SetTargetHeight_Statics::NewProp_height = { "height", nullptr, (EPropertyFlags)0x0010000000000080, UE4CodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, 1, STRUCT_OFFSET(BoidsAgent_eventSetTargetHeight_Parms, height), METADATA_PARAMS(nullptr, 0) };
+	const UE4CodeGen_Private::FPropertyParamsBase* const Z_Construct_UFunction_ABoidsAgent_SetTargetHeight_Statics::PropPointers[] = {
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UFunction_ABoidsAgent_SetTargetHeight_Statics::NewProp_height,
+	};
+#if WITH_METADATA
+	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UFunction_ABoidsAgent_SetTargetHeight_Statics::Function_MetaDataParams[] = {
+		{ "ModuleRelativePath", "Public/BoidsAgent.h" },
+	};
+#endif
+	const UE4CodeGen_Private::FFunctionParams Z_Construct_UFunction_ABoidsAgent_SetTargetHeight_Statics::FuncParams = { (UObject*(*)())Z_Construct_UClass_ABoidsAgent, nullptr, "SetTargetHeight", nullptr, nullptr, sizeof(BoidsAgent_eventSetTargetHeight_Parms), Z_Construct_UFunction_ABoidsAgent_SetTargetHeight_Statics::PropPointers, UE_ARRAY_COUNT(Z_Construct_UFunction_ABoidsAgent_SetTargetHeight_Statics::PropPointers), RF_Public|RF_Transient|RF_MarkAsNative, (EFunctionFlags)0x00020401, 0, 0, METADATA_PARAMS(Z_Construct_UFunction_ABoidsAgent_SetTargetHeight_Statics::Function_MetaDataParams, UE_ARRAY_COUNT(Z_Construct_UFunction_ABoidsAgent_SetTargetHeight_Statics::Function_MetaDataParams)) };
+	UFunction* Z_Construct_UFunction_ABoidsAgent_SetTargetHeight()
+	{
+		static UFunction* ReturnFunction = nullptr;
+		if (!ReturnFunction)
+		{
+			UE4CodeGen_Private::ConstructUFunction(ReturnFunction, Z_Construct_UFunction_ABoidsAgent_SetTargetHeight_Statics::FuncParams);
 		}
 		return ReturnFunction;
 	}
@@ -584,6 +666,14 @@ void EmptyLinkFunctionForGeneratedCodeBoidsAgent() {}
 #endif
 		static const UE4CodeGen_Private::FFloatPropertyParams NewProp_alignmentWeight;
 #if WITH_METADATA
+		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_heightVariance_MetaData[];
+#endif
+		static const UE4CodeGen_Private::FFloatPropertyParams NewProp_heightVariance;
+#if WITH_METADATA
+		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_targetHeight_MetaData[];
+#endif
+		static const UE4CodeGen_Private::FFloatPropertyParams NewProp_targetHeight;
+#if WITH_METADATA
 		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_visionRadius_MetaData[];
 #endif
 		static const UE4CodeGen_Private::FFloatPropertyParams NewProp_visionRadius;
@@ -599,6 +689,11 @@ void EmptyLinkFunctionForGeneratedCodeBoidsAgent() {}
 		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_maxSpeed_MetaData[];
 #endif
 		static const UE4CodeGen_Private::FFloatPropertyParams NewProp_maxSpeed;
+#if WITH_METADATA
+		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_statusClimbing_MetaData[];
+#endif
+		static void NewProp_statusClimbing_SetBit(void* Obj);
+		static const UE4CodeGen_Private::FBoolPropertyParams NewProp_statusClimbing;
 #if WITH_METADATA
 		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_flockID_MetaData[];
 #endif
@@ -660,7 +755,9 @@ void EmptyLinkFunctionForGeneratedCodeBoidsAgent() {}
 		{ &Z_Construct_UFunction_ABoidsAgent_OnNeighborEnter, "OnNeighborEnter" }, // 3110050870
 		{ &Z_Construct_UFunction_ABoidsAgent_OnNeighborLeave, "OnNeighborLeave" }, // 291663052
 		{ &Z_Construct_UFunction_ABoidsAgent_ScanNeighbors, "ScanNeighbors" }, // 2191607052
+		{ &Z_Construct_UFunction_ABoidsAgent_SetHeightVariance, "SetHeightVariance" }, // 1198411572
 		{ &Z_Construct_UFunction_ABoidsAgent_SetID, "SetID" }, // 646116494
+		{ &Z_Construct_UFunction_ABoidsAgent_SetTargetHeight, "SetTargetHeight" }, // 3735693517
 		{ &Z_Construct_UFunction_ABoidsAgent_SetVelocity, "SetVelocity" }, // 1508022264
 	};
 #if WITH_METADATA
@@ -750,10 +847,28 @@ void EmptyLinkFunctionForGeneratedCodeBoidsAgent() {}
 #if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_ABoidsAgent_Statics::NewProp_alignmentWeight_MetaData[] = {
 		{ "Category", "BoidsAgent" },
+		{ "Comment", "// variance allowed between agent height and target height\n" },
 		{ "ModuleRelativePath", "Public/BoidsAgent.h" },
+		{ "ToolTip", "variance allowed between agent height and target height" },
 	};
 #endif
 	const UE4CodeGen_Private::FFloatPropertyParams Z_Construct_UClass_ABoidsAgent_Statics::NewProp_alignmentWeight = { "alignmentWeight", nullptr, (EPropertyFlags)0x0010000000000005, UE4CodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, 1, STRUCT_OFFSET(ABoidsAgent, alignmentWeight), METADATA_PARAMS(Z_Construct_UClass_ABoidsAgent_Statics::NewProp_alignmentWeight_MetaData, UE_ARRAY_COUNT(Z_Construct_UClass_ABoidsAgent_Statics::NewProp_alignmentWeight_MetaData)) };
+#if WITH_METADATA
+	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_ABoidsAgent_Statics::NewProp_heightVariance_MetaData[] = {
+		{ "Category", "BoidsAgent" },
+		{ "Comment", "// height to maintain\n" },
+		{ "ModuleRelativePath", "Public/BoidsAgent.h" },
+		{ "ToolTip", "height to maintain" },
+	};
+#endif
+	const UE4CodeGen_Private::FFloatPropertyParams Z_Construct_UClass_ABoidsAgent_Statics::NewProp_heightVariance = { "heightVariance", nullptr, (EPropertyFlags)0x0010000000000005, UE4CodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, 1, STRUCT_OFFSET(ABoidsAgent, heightVariance), METADATA_PARAMS(Z_Construct_UClass_ABoidsAgent_Statics::NewProp_heightVariance_MetaData, UE_ARRAY_COUNT(Z_Construct_UClass_ABoidsAgent_Statics::NewProp_heightVariance_MetaData)) };
+#if WITH_METADATA
+	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_ABoidsAgent_Statics::NewProp_targetHeight_MetaData[] = {
+		{ "Category", "BoidsAgent" },
+		{ "ModuleRelativePath", "Public/BoidsAgent.h" },
+	};
+#endif
+	const UE4CodeGen_Private::FFloatPropertyParams Z_Construct_UClass_ABoidsAgent_Statics::NewProp_targetHeight = { "targetHeight", nullptr, (EPropertyFlags)0x0010000000000005, UE4CodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, 1, STRUCT_OFFSET(ABoidsAgent, targetHeight), METADATA_PARAMS(Z_Construct_UClass_ABoidsAgent_Statics::NewProp_targetHeight_MetaData, UE_ARRAY_COUNT(Z_Construct_UClass_ABoidsAgent_Statics::NewProp_targetHeight_MetaData)) };
 #if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_ABoidsAgent_Statics::NewProp_visionRadius_MetaData[] = {
 		{ "Category", "BoidsAgent" },
@@ -782,6 +897,17 @@ void EmptyLinkFunctionForGeneratedCodeBoidsAgent() {}
 	};
 #endif
 	const UE4CodeGen_Private::FFloatPropertyParams Z_Construct_UClass_ABoidsAgent_Statics::NewProp_maxSpeed = { "maxSpeed", nullptr, (EPropertyFlags)0x0010000000000005, UE4CodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, 1, STRUCT_OFFSET(ABoidsAgent, maxSpeed), METADATA_PARAMS(Z_Construct_UClass_ABoidsAgent_Statics::NewProp_maxSpeed_MetaData, UE_ARRAY_COUNT(Z_Construct_UClass_ABoidsAgent_Statics::NewProp_maxSpeed_MetaData)) };
+#if WITH_METADATA
+	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_ABoidsAgent_Statics::NewProp_statusClimbing_MetaData[] = {
+		{ "Category", "BoidsAgent" },
+		{ "ModuleRelativePath", "Public/BoidsAgent.h" },
+	};
+#endif
+	void Z_Construct_UClass_ABoidsAgent_Statics::NewProp_statusClimbing_SetBit(void* Obj)
+	{
+		((ABoidsAgent*)Obj)->statusClimbing = 1;
+	}
+	const UE4CodeGen_Private::FBoolPropertyParams Z_Construct_UClass_ABoidsAgent_Statics::NewProp_statusClimbing = { "statusClimbing", nullptr, (EPropertyFlags)0x0010000000020015, UE4CodeGen_Private::EPropertyGenFlags::Bool | UE4CodeGen_Private::EPropertyGenFlags::NativeBool, RF_Public|RF_Transient|RF_MarkAsNative, 1, sizeof(bool), sizeof(ABoidsAgent), &Z_Construct_UClass_ABoidsAgent_Statics::NewProp_statusClimbing_SetBit, METADATA_PARAMS(Z_Construct_UClass_ABoidsAgent_Statics::NewProp_statusClimbing_MetaData, UE_ARRAY_COUNT(Z_Construct_UClass_ABoidsAgent_Statics::NewProp_statusClimbing_MetaData)) };
 #if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_ABoidsAgent_Statics::NewProp_flockID_MetaData[] = {
 		{ "Category", "BoidsAgent" },
@@ -879,10 +1005,13 @@ void EmptyLinkFunctionForGeneratedCodeBoidsAgent() {}
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_ABoidsAgent_Statics::NewProp_separationWeight,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_ABoidsAgent_Statics::NewProp_cohesionWeight,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_ABoidsAgent_Statics::NewProp_alignmentWeight,
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_ABoidsAgent_Statics::NewProp_heightVariance,
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_ABoidsAgent_Statics::NewProp_targetHeight,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_ABoidsAgent_Statics::NewProp_visionRadius,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_ABoidsAgent_Statics::NewProp_neighborRadius,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_ABoidsAgent_Statics::NewProp_bodySize,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_ABoidsAgent_Statics::NewProp_maxSpeed,
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_ABoidsAgent_Statics::NewProp_statusClimbing,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_ABoidsAgent_Statics::NewProp_flockID,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_ABoidsAgent_Statics::NewProp_agentID,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_ABoidsAgent_Statics::NewProp_sepVector,
@@ -922,7 +1051,7 @@ void EmptyLinkFunctionForGeneratedCodeBoidsAgent() {}
 		}
 		return OuterClass;
 	}
-	IMPLEMENT_CLASS(ABoidsAgent, 3212578669);
+	IMPLEMENT_CLASS(ABoidsAgent, 1734551105);
 	template<> PROTOTYPE_API UClass* StaticClass<ABoidsAgent>()
 	{
 		return ABoidsAgent::StaticClass();

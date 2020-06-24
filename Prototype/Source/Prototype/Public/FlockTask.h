@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
-#include "BoidsAgent.h"
 #include "FlockTask.generated.h"
 
 /**

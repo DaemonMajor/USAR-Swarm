@@ -19,8 +19,8 @@ ABoidsAgent::ABoidsAgent()
 	bodySize = 25;
 	neighborRadius = 1000;
 	visionRadius = 500;
-	alignmentWeight = 1;
-	cohesionWeight = 5;
+	alignmentWeight = .5;
+	cohesionWeight = 6.5;
 	separationWeight = 2.5;
 
 	agentVelocity = FVector::ZeroVector;
@@ -186,6 +186,16 @@ FVector ABoidsAgent::GetVelocity() const
 void ABoidsAgent::SetVelocity(FVector newVel)
 {
 	agentVelocity = newVel.GetClampedToSize(0, maxSpeed);
+}
+
+void ABoidsAgent::SetTargetHeight(float height)
+{
+	targetHeight = height;
+}
+
+void ABoidsAgent::SetHeightVariance(float var)
+{
+	heightVariance = var;
 }
 
 void ABoidsAgent::MoveAgent(float deltaSec)
