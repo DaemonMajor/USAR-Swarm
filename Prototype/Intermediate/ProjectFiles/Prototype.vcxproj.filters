@@ -216,4 +216,14 @@
       <Filter>Source\Prototype\Public</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Source\Prototype\Public\HeightBehavior.h">
+      <Filter>Source\Prototype\Public</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Source\Prototype\Private\HeightBehavior.cpp">
+      <Filter>Source\Prototype\Private</Filter>
+    </ClCompile>
+  </ItemGroup>
 </Project>

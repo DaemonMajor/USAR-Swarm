@@ -8,10 +8,11 @@
 #include "UObject/ScriptMacros.h"
 
 PRAGMA_DISABLE_DEPRECATION_WARNINGS
+struct FVector;
+struct FRotator;
 class UPrimitiveComponent;
 class AActor;
 struct FHitResult;
-struct FVector;
 class ABoidsAgent;
 #ifdef PROTOTYPE_BoidsAgent_generated_h
 #error "BoidsAgent.generated.h already included, missing '#pragma once' in BoidsAgent.h"
@@ -21,6 +22,7 @@ class ABoidsAgent;
 #define Prototype_Source_Prototype_Public_BoidsAgent_h_13_SPARSE_DATA
 #define Prototype_Source_Prototype_Public_BoidsAgent_h_13_RPC_WRAPPERS \
  \
+	DECLARE_FUNCTION(execFaceDirection); \
 	DECLARE_FUNCTION(execMoveAgent); \
 	DECLARE_FUNCTION(execOnNeighborLeave); \
 	DECLARE_FUNCTION(execOnNeighborEnter); \
@@ -34,6 +36,7 @@ class ABoidsAgent;
 
 #define Prototype_Source_Prototype_Public_BoidsAgent_h_13_RPC_WRAPPERS_NO_PURE_DECLS \
  \
+	DECLARE_FUNCTION(execFaceDirection); \
 	DECLARE_FUNCTION(execMoveAgent); \
 	DECLARE_FUNCTION(execOnNeighborLeave); \
 	DECLARE_FUNCTION(execOnNeighborEnter); \
@@ -88,12 +91,10 @@ DEFINE_VTABLE_PTR_HELPER_CTOR_CALLER(ABoidsAgent); \
 
 
 #define Prototype_Source_Prototype_Public_BoidsAgent_h_13_PRIVATE_PROPERTY_OFFSET \
-	FORCEINLINE static uint32 __PPO__pitchRate() { return STRUCT_OFFSET(ABoidsAgent, pitchRate); } \
 	FORCEINLINE static uint32 __PPO__yawRate() { return STRUCT_OFFSET(ABoidsAgent, yawRate); } \
-	FORCEINLINE static uint32 __PPO__rollRate() { return STRUCT_OFFSET(ABoidsAgent, rollRate); } \
-	FORCEINLINE static uint32 __PPO__agentMesh() { return STRUCT_OFFSET(ABoidsAgent, agentMesh); } \
-	FORCEINLINE static uint32 __PPO__moveComp() { return STRUCT_OFFSET(ABoidsAgent, moveComp); } \
+	FORCEINLINE static uint32 __PPO__agentRoot() { return STRUCT_OFFSET(ABoidsAgent, agentRoot); } \
 	FORCEINLINE static uint32 __PPO__agentBody() { return STRUCT_OFFSET(ABoidsAgent, agentBody); } \
+	FORCEINLINE static uint32 __PPO__moveComp() { return STRUCT_OFFSET(ABoidsAgent, moveComp); } \
 	FORCEINLINE static uint32 __PPO__neighborSphere() { return STRUCT_OFFSET(ABoidsAgent, neighborSphere); } \
 	FORCEINLINE static uint32 __PPO__neighborAgents() { return STRUCT_OFFSET(ABoidsAgent, neighborAgents); } \
 	FORCEINLINE static uint32 __PPO__target() { return STRUCT_OFFSET(ABoidsAgent, target); } \

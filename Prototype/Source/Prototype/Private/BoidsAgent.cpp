@@ -15,9 +15,9 @@ ABoidsAgent::ABoidsAgent()
  	PrimaryActorTick.bCanEverTick = true;
 
 	maxSpeed = 250;
-	maxTurnRate = 120;
+	yawRate = 90;
 	bodySize = 25;
-	neighborRadius = 500;
+	neighborRadius = 1000;
 	visionRadius = 500;
 	alignmentWeight = 1;
 	cohesionWeight = 5;
@@ -28,25 +28,22 @@ ABoidsAgent::ABoidsAgent()
 	AIControllerClass = ABoidsAgentController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
-	agentMesh = CreateDefaultSubobject<UStaticMeshComponent>("AgentRoot");
-	SetRootComponent(agentMesh);
-	agentMesh->SetSimulatePhysics(false);
+	agentRoot = CreateDefaultSubobject<UStaticMeshComponent>("AgentRoot");
+	SetRootComponent(agentRoot);
+	agentRoot->SetSimulatePhysics(false);
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> coneVisualAsset(TEXT("/Game/StarterContent/Shapes/Shape_Cone.Shape_Cone"));
-	if (coneVisualAsset.Succeeded()) {
-		agentMesh->SetStaticMesh(coneVisualAsset.Object);
-		agentMesh->SetRelativeRotation(FRotator(-90, 0, 0));
-		agentMesh->SetRelativeScale3D(FVector (0.5 , 0.5 , 0.5));
-	}
-
-	agentBody = CreateDefaultSubobject<USphereComponent>("AgentBody");
-	agentBody->SetupAttachment(agentMesh);
-	agentBody->SetSphereRadius(bodySize);
+	agentBody = CreateDefaultSubobject<UStaticMeshComponent>("AgentBody");
+	agentBody->SetupAttachment(agentRoot);
 	agentBody->SetSimulatePhysics(false);
 	agentBody->SetGenerateOverlapEvents(true);
 	agentBody->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	agentBody->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
-	agentBody->SetCollisionProfileName(TEXT("AgentCollision"));
+
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> droneVisualAsset(TEXT("/Game/StarterContent/Shapes/Shape_Cylinder.Shape_Cylinder"));
+	if (droneVisualAsset.Succeeded()) {
+		agentBody->SetStaticMesh(droneVisualAsset.Object);
+		agentBody->SetRelativeScale3D(FVector(1, 1, 0.25));
+	}
 	
 	moveComp = CreateDefaultSubobject<UFloatingPawnMovement>("MovementComponent");
 
@@ -85,6 +82,8 @@ void ABoidsAgent::Tick(float DeltaSeconds)
 	speed = agentVelocity.Size();
 	numNeighbors = neighborAgents.Num();
 	/*DEBUGGING*/
+
+	//neighborSphere->SetSphereRadius(neighborRadius);
 }
 
 void ABoidsAgent::BootUpSequence()
@@ -191,5 +190,38 @@ void ABoidsAgent::SetVelocity(FVector newVel)
 
 void ABoidsAgent::MoveAgent(float deltaSec)
 {
+	FRotator turn = FaceDirection(agentVelocity, deltaSec);
+	turn.RotateVector(-agentVelocity);
+
 	AddActorLocalOffset(agentVelocity * deltaSec, true);
+}
+
+/* Rotate agent on z-axis to face specified direction. Rotation limited by agent yawRate.
+* 
+*	@param dir Local vector to target direction.
+*	@param deltaSec Time since last call.
+*	@return FRotator agent rotated
+*/
+FRotator ABoidsAgent::FaceDirection(FVector dir, float deltaSec)
+{
+	float maxTurn = yawRate * deltaSec;
+	float degToTurn = dir.Rotation().Yaw;
+	FRotator deltaTurn = FRotator::ZeroRotator;
+
+	if (maxTurn < degToTurn && degToTurn < 360 - maxTurn) {
+		if (degToTurn > 180) {
+			deltaTurn.Yaw = maxTurn - 360;
+		}
+		deltaTurn.Yaw = maxTurn;
+	}
+	else {
+		if (degToTurn > 180) {
+			deltaTurn.Yaw = 360 - degToTurn;
+		}
+		deltaTurn.Yaw = degToTurn;
+	}
+
+	AddActorLocalRotation(deltaTurn);
+
+	return deltaTurn;
 }

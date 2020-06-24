@@ -50,8 +50,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float maxSpeed;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float maxTurnRate;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float bodySize;
@@ -92,18 +90,14 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 		
 	UPROPERTY()
-		float pitchRate = 0;
-	UPROPERTY()
-		float yawRate = 0;
-	UPROPERTY()
-		float rollRate = 0;
-
+		float yawRate = 90;
+	
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
-		class UStaticMeshComponent* agentMesh;
+		class UStaticMeshComponent* agentRoot;
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+		class UStaticMeshComponent* agentBody;
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
 		class UFloatingPawnMovement* moveComp;
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
-		class USphereComponent* agentBody;
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
 		class USphereComponent* neighborSphere;
 	UPROPERTY()
@@ -114,10 +108,10 @@ protected:
 	UPROPERTY()
 		float bootUpDelay = 0.5;
 	UPROPERTY()
-		FTimerHandle bootUpDelayTimer;		// start neighbor scans after this delay (after all agents have been placed in world)
+		FTimerHandle bootUpDelayTimer;		// Start neighbor scans after this delay (after all agents have been placed in world).
 
 	UFUNCTION()
-		void ScanNeighbors();	// populate neighborAgents (used at BeginPlay)
+		void ScanNeighbors();	// Populate neighborAgents (used at BeginPlay).
 	UFUNCTION()
 		void BootUpSequence();
 	UFUNCTION()
@@ -128,4 +122,6 @@ protected:
 
 	UFUNCTION()
 		void MoveAgent(float deltaSec);
+	UFUNCTION()
+		FRotator FaceDirection(FVector dir, float deltaSec);	// Rotate agent on z-axis to face specified direction.
 };
