@@ -21,13 +21,18 @@ void UBoidsAgentFlockBehavior::OnBecomeRelevant(UBehaviorTreeComponent& OwnerCom
     FVector cohFactor = GetCohesion(agent) * agent->cohesionWeight;
     FVector sepFactor = GetSeparation(agent) * agent->separationWeight;
 
-    FVector newVel = CalcNewVector(agent, alignFactor, cohFactor, sepFactor) - agent->GetActorLocation();
+    FVector newVel = CalcNewVector(agent, alignFactor, cohFactor, sepFactor);
     agent->SetVelocity(newVel);
 
     /*DEBUGGING*/
     agent->alignmentFactor = alignFactor.Size();
     agent->cohesionFactor = cohFactor.Size();
     agent->separationFactor = sepFactor.Size();
+    /*DEBUGGING*/
+
+    /*DEBUGGING*/
+    //FString statusText = FString::Printf(TEXT("Agent %d flocking."), agent->agentID);
+    //GEngine->AddOnScreenDebugMessage(INDEX_NONE, 5.0f, FColor::Yellow, statusText , true);
     /*DEBUGGING*/
 }
 
@@ -55,7 +60,7 @@ FVector UBoidsAgentFlockBehavior::GetAlignment(ABoidsAgent* agent)
 }
 
 /**
-*   Calculate center of mass of neighbors for agent.
+*   Calculate center of mass of neighbors relative to agent.
 *
 *   @param agent Agent to calculate cohesion vector for.
 *   @return Vector pointing to center mass of agent's neighbors. Returns zero if agent has no neighbors.
@@ -71,6 +76,7 @@ FVector UBoidsAgentFlockBehavior::GetCohesion(ABoidsAgent* agent)
         }
     }
     centerMass /= neighbors.Num();
+    centerMass -= agent->GetActorLocation();
     
     agent->flockCenter = centerMass;
     return centerMass;
@@ -88,10 +94,11 @@ FVector UBoidsAgentFlockBehavior::GetSeparation(ABoidsAgent* agent)
 
     TArray<ABoidsAgent*> neighbors = agent->GetNeighbors();
     FVector agentLoc = agent->GetActorLocation();
+    FVector boidLoc, separation;
     for (ABoidsAgent* boid : neighbors) {
         if (boid) {
-            FVector boidLoc = boid->GetActorLocation();
-            FVector separation = agentLoc - boidLoc;
+            boidLoc = boid->GetActorLocation();
+            separation = agentLoc - boidLoc;
 
             float sepFactor = 0;
             float dist = separation.Size();
@@ -99,7 +106,6 @@ FVector UBoidsAgentFlockBehavior::GetSeparation(ABoidsAgent* agent)
             if (dist < spacing) {
                 sepFactor = FMath::Pow(spacing - dist, 0.5f);
             }
-            sepFactor = FMath::Clamp(sepFactor, 0.f, 1.f);
 
             sepDir += separation * sepFactor;
         }

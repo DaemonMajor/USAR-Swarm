@@ -23,24 +23,29 @@ void UMaintainHeightBehavior::MoveToHeight(ABoidsAgent* agent)
     float agentHeight = agent->GetActorLocation().Z;
     float minHeight = agent->targetHeight - agent->heightVariance;
     float maxHeight = agent->targetHeight + agent->heightVariance;
-    bool isClimbing = agent->statusClimbing;
 
     FVector agentVel = agent->GetVelocity();
-    if (!isClimbing && agentHeight < minHeight) {
-        agentVel += FVector(0, 0, agent->maxSpeed/2);   // fly up at half max thrust
+    if (agentHeight < minHeight) {
+        agentVel.Z = agent->maxSpeed/2;   // fly up at half max thrust
 
-        FString climbingText = FString::Printf(TEXT("Agent %d climbing from %f."), agent->agentID, agentHeight);
-        GEngine->AddOnScreenDebugMessage(INDEX_NONE, 5.0f, FColor::Green, climbingText, true);
+        /*DEBUGGING*/
+        //FString climbingText = FString::Printf(TEXT("Agent %d climbing from %f."), agent->agentID, agentHeight);
+        //GEngine->AddOnScreenDebugMessage(INDEX_NONE, 5.0f, FColor::Green, climbingText, true);
+        /*DEBUGGING*/
     }
-    else if (!isClimbing && agentHeight > maxHeight) {
-        agentVel -= FVector(0, 0, agent->maxSpeed/2);   // fly down at half max thrust
+    else if (agentHeight > maxHeight) {
+        agentVel.Z = -(agent->maxSpeed/2);   // fly down at half max thrust
 
-        FString fallingText = FString::Printf(TEXT("Agent %d falling from %f."), agent->agentID, agentHeight);
-        GEngine->AddOnScreenDebugMessage(INDEX_NONE, 5.0f, FColor::Green, fallingText, true);
-    }
-    else {
-        agent->statusClimbing = false;
+        /*DEBUGGING*/
+        //FString fallingText = FString::Printf(TEXT("Agent %d falling from %f."), agent->agentID, agentHeight);
+        //GEngine->AddOnScreenDebugMessage(INDEX_NONE, 5.0f, FColor::Green, fallingText, true);
+        /*DEBUGGING*/
     }
 
     agent->SetVelocity(agentVel);
+
+    /*DEBUGGING*/
+    //FString statusText = FString::Printf(TEXT("Agent %d maintaining height."), agent->agentID);
+    //GEngine->AddOnScreenDebugMessage(INDEX_NONE, 5.0f, FColor::Green, statusText, true);
+    /*DEBUGGING*/
 }

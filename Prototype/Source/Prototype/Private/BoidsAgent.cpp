@@ -14,14 +14,18 @@ ABoidsAgent::ABoidsAgent()
 {
  	PrimaryActorTick.bCanEverTick = true;
 
-	maxSpeed = 250;
-	yawRate = 90;
-	bodySize = 25;
-	neighborRadius = 1000;
+	// all lengths in cm (UE units)
+	maxSpeed = 150;
+	yawRate = 45;
+	bodySize = 15;
+	neighborRadius = 1500;
 	visionRadius = 500;
-	alignmentWeight = .5;
-	cohesionWeight = 6.5;
-	separationWeight = 2.5;
+
+	alignmentWeight = 0.1;
+	cohesionWeight = 0.1;
+	separationWeight = 0.35;
+
+	statusClimbing = false;
 
 	agentVelocity = FVector::ZeroVector;
 
@@ -42,7 +46,7 @@ ABoidsAgent::ABoidsAgent()
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> droneVisualAsset(TEXT("/Game/StarterContent/Shapes/Shape_Cylinder.Shape_Cylinder"));
 	if (droneVisualAsset.Succeeded()) {
 		agentBody->SetStaticMesh(droneVisualAsset.Object);
-		agentBody->SetRelativeScale3D(FVector(1, 1, 0.25));
+		agentBody->SetRelativeScale3D(FVector(.25, .25, .1));
 	}
 	
 	moveComp = CreateDefaultSubobject<UFloatingPawnMovement>("MovementComponent");
@@ -82,8 +86,6 @@ void ABoidsAgent::Tick(float DeltaSeconds)
 	speed = agentVelocity.Size();
 	numNeighbors = neighborAgents.Num();
 	/*DEBUGGING*/
-
-	//neighborSphere->SetSphereRadius(neighborRadius);
 }
 
 void ABoidsAgent::BootUpSequence()
@@ -92,8 +94,8 @@ void ABoidsAgent::BootUpSequence()
 	ScanNeighbors();
 
 	// set up neighbor list to update when agents enter/leave neighborRadius
-	//neighborSphere->OnComponentBeginOverlap.AddDynamic(this, &ABoidsAgent::OnNeighborEnter);
-	//neighborSphere->OnComponentEndOverlap.AddDynamic(this, &ABoidsAgent::OnNeighborLeave);
+	neighborSphere->OnComponentBeginOverlap.AddDynamic(this, &ABoidsAgent::OnNeighborEnter);
+	neighborSphere->OnComponentEndOverlap.AddDynamic(this, &ABoidsAgent::OnNeighborLeave);
 
 	/*DEBUGGING*/
 	FString bootUpCompleteText = FString::Printf(TEXT("Agent %d boot sequence complete."), agentID);
@@ -200,8 +202,8 @@ void ABoidsAgent::SetHeightVariance(float var)
 
 void ABoidsAgent::MoveAgent(float deltaSec)
 {
-	FRotator turn = FaceDirection(agentVelocity, deltaSec);
-	turn.RotateVector(-agentVelocity);
+	//FRotator turn = FaceDirection(agentVelocity, deltaSec).GetInverse();
+	//turn.RotateVector(agentVelocity);
 
 	AddActorLocalOffset(agentVelocity * deltaSec, true);
 }
@@ -218,20 +220,19 @@ FRotator ABoidsAgent::FaceDirection(FVector dir, float deltaSec)
 	float degToTurn = dir.Rotation().Yaw;
 	FRotator deltaTurn = FRotator::ZeroRotator;
 
-	if (maxTurn < degToTurn && degToTurn < 360 - maxTurn) {
-		if (degToTurn > 180) {
-			deltaTurn.Yaw = maxTurn - 360;
+	if (abs(degToTurn) > maxTurn) {
+		if (degToTurn > 0) {
+			deltaTurn.Yaw = maxTurn;
 		}
-		deltaTurn.Yaw = maxTurn;
+		else {
+			deltaTurn.Yaw = -maxTurn;
+		}
 	}
 	else {
-		if (degToTurn > 180) {
-			deltaTurn.Yaw = 360 - degToTurn;
-		}
 		deltaTurn.Yaw = degToTurn;
 	}
 
-	AddActorLocalRotation(deltaTurn);
+	AddActorLocalRotation(deltaTurn, true);
 
 	return deltaTurn;
 }

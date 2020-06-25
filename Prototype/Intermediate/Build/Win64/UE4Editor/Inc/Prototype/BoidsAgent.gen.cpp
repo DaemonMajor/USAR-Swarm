@@ -819,8 +819,10 @@ void EmptyLinkFunctionForGeneratedCodeBoidsAgent() {}
 #if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_ABoidsAgent_Statics::NewProp_agentRoot_MetaData[] = {
 		{ "Category", "BoidsAgent" },
+		{ "Comment", "// rate at which agent can turn in degrees per second\n" },
 		{ "EditInline", "true" },
 		{ "ModuleRelativePath", "Public/BoidsAgent.h" },
+		{ "ToolTip", "rate at which agent can turn in degrees per second" },
 	};
 #endif
 	const UE4CodeGen_Private::FObjectPropertyParams Z_Construct_UClass_ABoidsAgent_Statics::NewProp_agentRoot = { "agentRoot", nullptr, (EPropertyFlags)0x00200800000b001d, UE4CodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, 1, STRUCT_OFFSET(ABoidsAgent, agentRoot), Z_Construct_UClass_UStaticMeshComponent_NoRegister, METADATA_PARAMS(Z_Construct_UClass_ABoidsAgent_Statics::NewProp_agentRoot_MetaData, UE_ARRAY_COUNT(Z_Construct_UClass_ABoidsAgent_Statics::NewProp_agentRoot_MetaData)) };
@@ -943,7 +945,9 @@ void EmptyLinkFunctionForGeneratedCodeBoidsAgent() {}
 #if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_ABoidsAgent_Statics::NewProp_alignVector_MetaData[] = {
 		{ "Category", "BoidsAgent" },
+		{ "Comment", "// velocity in local coordinates\n" },
 		{ "ModuleRelativePath", "Public/BoidsAgent.h" },
+		{ "ToolTip", "velocity in local coordinates" },
 	};
 #endif
 	const UE4CodeGen_Private::FStructPropertyParams Z_Construct_UClass_ABoidsAgent_Statics::NewProp_alignVector = { "alignVector", nullptr, (EPropertyFlags)0x0010000000020015, UE4CodeGen_Private::EPropertyGenFlags::Struct, RF_Public|RF_Transient|RF_MarkAsNative, 1, STRUCT_OFFSET(ABoidsAgent, alignVector), Z_Construct_UScriptStruct_FVector, METADATA_PARAMS(Z_Construct_UClass_ABoidsAgent_Statics::NewProp_alignVector_MetaData, UE_ARRAY_COUNT(Z_Construct_UClass_ABoidsAgent_Statics::NewProp_alignVector_MetaData)) };
@@ -1051,7 +1055,7 @@ void EmptyLinkFunctionForGeneratedCodeBoidsAgent() {}
 		}
 		return OuterClass;
 	}
-	IMPLEMENT_CLASS(ABoidsAgent, 1734551105);
+	IMPLEMENT_CLASS(ABoidsAgent, 257701722);
 	template<> PROTOTYPE_API UClass* StaticClass<ABoidsAgent>()
 	{
 		return ABoidsAgent::StaticClass();

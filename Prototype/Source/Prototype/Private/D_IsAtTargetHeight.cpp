@@ -2,8 +2,10 @@
 
 
 #include "D_IsAtTargetHeight.h"
+#include "BoidsAgent.h"
+#include "AIController.h"
 
-bool D_IsAtTargetHeight::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+bool UD_IsAtTargetHeight::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
 {
     ABoidsAgent* agent = Cast<ABoidsAgent>(OwnerComp.GetAIOwner()->GetPawn());
     float agentHeight = agent->GetActorLocation().Z;
@@ -11,13 +13,18 @@ bool D_IsAtTargetHeight::CalculateRawConditionValue(UBehaviorTreeComponent& Owne
     float maxHeight = agent->targetHeight + agent->heightVariance;
     
     bool isClimbing = agent->statusClimbing;
-    bool isInRange = (minHeight < agentHeight) && (agentHeight > maxHeight);
-    if (isClimbing) {
-        if (isInRange) {
-            agent->statusClimbing = false;
+    bool isInRange = (minHeight < agentHeight) && (agentHeight < maxHeight);
+
+    if (!isInRange) {
+        if (isClimbing) {
+            return false;
         }
-        return false;
+
+        agent->statusClimbing = true;
+        return true;
     }
     
-    return true;
+    agent->statusClimbing = false;
+    
+    return false;
 }

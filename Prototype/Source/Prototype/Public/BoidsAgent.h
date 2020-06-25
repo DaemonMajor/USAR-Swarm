@@ -33,7 +33,7 @@ public:
 		int numNeighbors = 0;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		FVector agentVelocity;
+		FVector agentVelocity;	// velocity in local coordinates
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FVector alignVector;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -49,7 +49,7 @@ public:
 		int flockID;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		bool statusClimbing = false;
+		bool statusClimbing;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float maxSpeed;
@@ -88,7 +88,7 @@ public:
 		void SetHeightVariance(float var);
 	UFUNCTION()
 		void SetVelocity(FVector newVel);			// set new velocity
-	virtual FVector GetVelocity() const override;	// get agent velocity (bypasses built-in component velocity because documentation is unclear)
+	virtual FVector GetVelocity() const override;	// get agent velocity in local coordinates (bypasses built-in component velocity because documentation is unclear)
 
 	/* for future implementation
 	UFUNCTION()
@@ -102,7 +102,7 @@ protected:
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 		
 	UPROPERTY()
-		float yawRate = 90;
+		float yawRate;		// rate at which agent can turn in degrees per second
 	
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
 		class UStaticMeshComponent* agentRoot;
