@@ -23,6 +23,7 @@ void EmptyLinkFunctionForGeneratedCodeBoidsAgent() {}
 	ENGINE_API UClass* Z_Construct_UClass_UPrimitiveComponent_NoRegister();
 	ENGINE_API UClass* Z_Construct_UClass_AActor_NoRegister();
 	ENGINE_API UScriptStruct* Z_Construct_UScriptStruct_FTimerHandle();
+	PROTOTYPE_API UClass* Z_Construct_UClass_ASwarmWP_NoRegister();
 	ENGINE_API UClass* Z_Construct_UClass_USphereComponent_NoRegister();
 	ENGINE_API UClass* Z_Construct_UClass_UFloatingPawnMovement_NoRegister();
 	ENGINE_API UClass* Z_Construct_UClass_UStaticMeshComponent_NoRegister();
@@ -625,9 +626,10 @@ void EmptyLinkFunctionForGeneratedCodeBoidsAgent() {}
 #endif
 		static const UE4CodeGen_Private::FFloatPropertyParams NewProp_bootUpDelay;
 #if WITH_METADATA
-		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_target_MetaData[];
+		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_waypoints_MetaData[];
 #endif
-		static const UE4CodeGen_Private::FStructPropertyParams NewProp_target;
+		static const UE4CodeGen_Private::FArrayPropertyParams NewProp_waypoints;
+		static const UE4CodeGen_Private::FObjectPropertyParams NewProp_waypoints_Inner;
 #if WITH_METADATA
 		static const UE4CodeGen_Private::FMetaDataPairParam NewProp_neighborAgents_MetaData[];
 #endif
@@ -780,11 +782,12 @@ void EmptyLinkFunctionForGeneratedCodeBoidsAgent() {}
 #endif
 	const UE4CodeGen_Private::FFloatPropertyParams Z_Construct_UClass_ABoidsAgent_Statics::NewProp_bootUpDelay = { "bootUpDelay", nullptr, (EPropertyFlags)0x0020080000000000, UE4CodeGen_Private::EPropertyGenFlags::Float, RF_Public|RF_Transient|RF_MarkAsNative, 1, STRUCT_OFFSET(ABoidsAgent, bootUpDelay), METADATA_PARAMS(Z_Construct_UClass_ABoidsAgent_Statics::NewProp_bootUpDelay_MetaData, UE_ARRAY_COUNT(Z_Construct_UClass_ABoidsAgent_Statics::NewProp_bootUpDelay_MetaData)) };
 #if WITH_METADATA
-	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_ABoidsAgent_Statics::NewProp_target_MetaData[] = {
+	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_ABoidsAgent_Statics::NewProp_waypoints_MetaData[] = {
 		{ "ModuleRelativePath", "Public/BoidsAgent.h" },
 	};
 #endif
-	const UE4CodeGen_Private::FStructPropertyParams Z_Construct_UClass_ABoidsAgent_Statics::NewProp_target = { "target", nullptr, (EPropertyFlags)0x0020080000000000, UE4CodeGen_Private::EPropertyGenFlags::Struct, RF_Public|RF_Transient|RF_MarkAsNative, 1, STRUCT_OFFSET(ABoidsAgent, target), Z_Construct_UScriptStruct_FVector, METADATA_PARAMS(Z_Construct_UClass_ABoidsAgent_Statics::NewProp_target_MetaData, UE_ARRAY_COUNT(Z_Construct_UClass_ABoidsAgent_Statics::NewProp_target_MetaData)) };
+	const UE4CodeGen_Private::FArrayPropertyParams Z_Construct_UClass_ABoidsAgent_Statics::NewProp_waypoints = { "waypoints", nullptr, (EPropertyFlags)0x0020080000000000, UE4CodeGen_Private::EPropertyGenFlags::Array, RF_Public|RF_Transient|RF_MarkAsNative, 1, STRUCT_OFFSET(ABoidsAgent, waypoints), EArrayPropertyFlags::None, METADATA_PARAMS(Z_Construct_UClass_ABoidsAgent_Statics::NewProp_waypoints_MetaData, UE_ARRAY_COUNT(Z_Construct_UClass_ABoidsAgent_Statics::NewProp_waypoints_MetaData)) };
+	const UE4CodeGen_Private::FObjectPropertyParams Z_Construct_UClass_ABoidsAgent_Statics::NewProp_waypoints_Inner = { "waypoints", nullptr, (EPropertyFlags)0x0000000000000000, UE4CodeGen_Private::EPropertyGenFlags::Object, RF_Public|RF_Transient|RF_MarkAsNative, 1, 0, Z_Construct_UClass_ASwarmWP_NoRegister, METADATA_PARAMS(nullptr, 0) };
 #if WITH_METADATA
 	const UE4CodeGen_Private::FMetaDataPairParam Z_Construct_UClass_ABoidsAgent_Statics::NewProp_neighborAgents_MetaData[] = {
 		{ "ModuleRelativePath", "Public/BoidsAgent.h" },
@@ -998,7 +1001,8 @@ void EmptyLinkFunctionForGeneratedCodeBoidsAgent() {}
 	const UE4CodeGen_Private::FPropertyParamsBase* const Z_Construct_UClass_ABoidsAgent_Statics::PropPointers[] = {
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_ABoidsAgent_Statics::NewProp_bootUpDelayTimer,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_ABoidsAgent_Statics::NewProp_bootUpDelay,
-		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_ABoidsAgent_Statics::NewProp_target,
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_ABoidsAgent_Statics::NewProp_waypoints,
+		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_ABoidsAgent_Statics::NewProp_waypoints_Inner,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_ABoidsAgent_Statics::NewProp_neighborAgents,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_ABoidsAgent_Statics::NewProp_neighborAgents_Inner,
 		(const UE4CodeGen_Private::FPropertyParamsBase*)&Z_Construct_UClass_ABoidsAgent_Statics::NewProp_neighborSphere,
@@ -1055,7 +1059,7 @@ void EmptyLinkFunctionForGeneratedCodeBoidsAgent() {}
 		}
 		return OuterClass;
 	}
-	IMPLEMENT_CLASS(ABoidsAgent, 257701722);
+	IMPLEMENT_CLASS(ABoidsAgent, 2885586937);
 	template<> PROTOTYPE_API UClass* StaticClass<ABoidsAgent>()
 	{
 		return ABoidsAgent::StaticClass();

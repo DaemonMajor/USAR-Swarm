@@ -236,3 +236,21 @@ FRotator ABoidsAgent::FaceDirection(FVector dir, float deltaSec)
 
 	return deltaTurn;
 }
+
+/* Add a waypoint to the agent's list of target waypoints.
+*
+*	@param wp Waypoint to add.
+*/
+void ABoidsAgent::AddWaypoint(ASwarmWP* wp)
+{
+	waypoints.Add(wp);
+}
+
+/* Remove a waypoint from the agent's list of target waypoints.
+*
+*	@param wp Waypoint to remove.
+*/
+void ABoidsAgent::RemoveWaypoint(ASwarmWP* wp)
+{
+	waypoints.Remove(wp);
+}

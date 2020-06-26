@@ -11,3 +11,7 @@ B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\Engine\Classes\GameFra
 B:\Program Files\Epic Games\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\RootMotionSource.generated.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\Character.generated.h
 B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Intermediate\Build\Win64\UE4Editor\Inc\Prototype\PrototypeCharacter.generated.h
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Source\Prototype\PrototypeGameState.h
+B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\Engine\Classes\GameFramework/GameStateBase.h
+B:\Program Files\Epic Games\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\GameStateBase.generated.h
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Intermediate\Build\Win64\UE4Editor\Inc\Prototype\PrototypeGameState.generated.h

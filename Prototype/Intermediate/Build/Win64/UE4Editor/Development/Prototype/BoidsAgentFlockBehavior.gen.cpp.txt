@@ -7,6 +7,8 @@ B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\Engine\Classes\Compone
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\Engine\Classes\Components/ShapeComponent.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\ShapeComponent.generated.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\SphereComponent.generated.h
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Source\Prototype\Public\SwarmWP.h
+B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Intermediate\Build\Win64\UE4Editor\Inc\Prototype\SwarmWP.generated.h
 B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Intermediate\Build\Win64\UE4Editor\Inc\Prototype\BoidsAgent.generated.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\AIModule\Classes\BehaviorTree/BTService.h
 B:\Program Files\Epic Games\UE_4.25\Engine\Source\Runtime\AIModule\Classes\BehaviorTree/BTAuxiliaryNode.h

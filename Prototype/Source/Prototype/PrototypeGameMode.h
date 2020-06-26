@@ -14,6 +14,3 @@ class APrototypeGameMode : public AGameModeBase
 public:
 	APrototypeGameMode();
 };
-
-
-

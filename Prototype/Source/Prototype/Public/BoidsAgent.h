@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Components/SphereComponent.h"
+#include "SwarmWP.h"
 #include "BoidsAgent.generated.h"
 
 UCLASS()
@@ -90,12 +91,10 @@ public:
 		void SetVelocity(FVector newVel);			// set new velocity
 	virtual FVector GetVelocity() const override;	// get agent velocity in local coordinates (bypasses built-in component velocity because documentation is unclear)
 
-	/* for future implementation
 	UFUNCTION()
-		FVector getTarget();				// get target location
+		void AddWaypoint(ASwarmWP* wp);		// append waypoint to list of target waypoints
 	UFUNCTION()
-		void setTarget(FVector newTarget);	// set target location
-	*/
+		void RemoveWaypoint(ASwarmWP* wp);	// remove waypoint from list of target waypoints
 
 protected:
 	virtual void BeginPlay() override;
@@ -112,10 +111,11 @@ protected:
 		class UFloatingPawnMovement* moveComp;
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
 		class USphereComponent* neighborSphere;
+
 	UPROPERTY()
         TArray<ABoidsAgent*> neighborAgents = TArray<ABoidsAgent*>();
 	UPROPERTY()
-		FVector target;
+		TArray<ASwarmWP*> waypoints = TArray<ASwarmWP*>();
 
 	UPROPERTY()
 		float bootUpDelay = 0.5;

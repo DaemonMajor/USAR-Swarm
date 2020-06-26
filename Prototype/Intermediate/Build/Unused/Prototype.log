@@ -2,15 +2,17 @@
   Waiting for 'git status' command to complete
   Building PrototypeEditor...
   Using Visual Studio 2019 14.26.28806 toolchain (C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Tools\MSVC\14.26.28801) and Windows 10.0.18362.0 SDK (C:\Program Files (x86)\Windows Kits\10).
-  Building 5 actions with 4 processes...
-    [1/5] UE4Editor-Prototype-0069.lib
-       Creating library B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Intermediate\Build\Win64\UE4Editor\Development\Prototype\UE4Editor-Prototype-0069.lib and object B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Intermediate\Build\Win64\UE4Editor\Development\Prototype\UE4Editor-Prototype-0069.exp
-    [2/5] UE4Editor-DonAINavigation-0069.lib
-       Creating library B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Development\DonAINavigation\UE4Editor-DonAINavigation-0069.lib and object B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Development\DonAINavigation\UE4Editor-DonAINavigation-0069.exp
-    [3/5] UE4Editor-Prototype-0069.dll
-       Creating library B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Intermediate\Build\Win64\UE4Editor\Development\Prototype\UE4Editor-Prototype-0069.suppressed.lib and object B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Intermediate\Build\Win64\UE4Editor\Development\Prototype\UE4Editor-Prototype-0069.suppressed.exp
-    [4/5] UE4Editor-DonAINavigation-0069.dll
-       Creating library B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Development\DonAINavigation\UE4Editor-DonAINavigation-0069.suppressed.lib and object B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Development\DonAINavigation\UE4Editor-DonAINavigation-0069.suppressed.exp
-    [5/5] PrototypeEditor.target
-  Total time in Parallel executor: 1.31 seconds
-  Total execution time: 3.27 seconds
+  Building 7 actions with 4 processes...
+    [1/7] UE4Editor-DonAINavigation-0001.lib
+       Creating library B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Development\DonAINavigation\UE4Editor-DonAINavigation-0001.lib and object B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Development\DonAINavigation\UE4Editor-DonAINavigation-0001.exp
+    [2/7] SwarmWP.cpp
+    [3/7] BoidsAgent.cpp
+    [4/7] UE4Editor-Prototype-0001.lib
+       Creating library B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Intermediate\Build\Win64\UE4Editor\Development\Prototype\UE4Editor-Prototype-0001.lib and object B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Intermediate\Build\Win64\UE4Editor\Development\Prototype\UE4Editor-Prototype-0001.exp
+    [5/7] UE4Editor-Prototype-0001.dll
+       Creating library B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Intermediate\Build\Win64\UE4Editor\Development\Prototype\UE4Editor-Prototype-0001.suppressed.lib and object B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Intermediate\Build\Win64\UE4Editor\Development\Prototype\UE4Editor-Prototype-0001.suppressed.exp
+    [6/7] UE4Editor-DonAINavigation-0001.dll
+       Creating library B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Development\DonAINavigation\UE4Editor-DonAINavigation-0001.suppressed.lib and object B:\Documents\Strathclyde\Master's Thesis\USAR_Swarm\Prototype\Plugins\DonAINavigation\Intermediate\Build\Win64\UE4Editor\Development\DonAINavigation\UE4Editor-DonAINavigation-0001.suppressed.exp
+    [7/7] PrototypeEditor.target
+  Total time in Parallel executor: 4.66 seconds
+  Total execution time: 10.89 seconds
