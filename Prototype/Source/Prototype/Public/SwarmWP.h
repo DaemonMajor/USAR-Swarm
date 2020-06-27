@@ -40,6 +40,9 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
 		float wpRadius;
 
+	UPROPERTY()
+		FTimerHandle bootUpDelayTimer;	// timer handle for waypoints that exist on world start
+
 	UFUNCTION()
 		void OnAgentEnter(UPrimitiveComponent* wpAreaComp, AActor* agent, UPrimitiveComponent* agentBody, int32 agentIndex,
 			bool bFromSweep, const FHitResult& SweepResult);

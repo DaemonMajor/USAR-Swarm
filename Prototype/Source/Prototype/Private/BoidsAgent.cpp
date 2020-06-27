@@ -22,7 +22,7 @@ ABoidsAgent::ABoidsAgent()
 	visionRadius = 500;
 
 	alignmentWeight = 0.1;
-	cohesionWeight = 0.1;
+	cohesionWeight = 0.25;
 	separationWeight = 0.35;
 
 	statusClimbing = false;
@@ -65,6 +65,10 @@ void ABoidsAgent::BeginPlay()
 {
 	Super::BeginPlay();
 
+	/*DEBUGGING FOR PREPLACED AGENTS*/
+	AssignToFlock(1);
+	/*DEBUGGING FOR PREPLACED AGENTS*/
+
 	GetWorld()->GetTimerManager().SetTimer(bootUpDelayTimer, this, &ABoidsAgent::BootUpSequence, bootUpDelay, false);
 }
 
@@ -85,7 +89,21 @@ void ABoidsAgent::Tick(float DeltaSeconds)
 	/*DEBUGGING*/
 	speed = agentVelocity.Size();
 	numNeighbors = neighborAgents.Num();
+	
+	if (waypoints.Num()) {
+		wpLoc = waypoints[0]->GetActorLocation();
+	}
 	/*DEBUGGING*/
+}
+
+void ABoidsAgent::AssignToFlock(int flock)
+{
+	APrototypeGameState* gameState = GetWorld()->GetGameState<APrototypeGameState>();
+
+	Flock assignedFlock = gameState->AddAgent(this, flock);
+
+	flockID = assignedFlock.flockID;
+	waypoints = assignedFlock.waypoints;
 }
 
 void ABoidsAgent::BootUpSequence()
@@ -96,6 +114,8 @@ void ABoidsAgent::BootUpSequence()
 	// set up neighbor list to update when agents enter/leave neighborRadius
 	neighborSphere->OnComponentBeginOverlap.AddDynamic(this, &ABoidsAgent::OnNeighborEnter);
 	neighborSphere->OnComponentEndOverlap.AddDynamic(this, &ABoidsAgent::OnNeighborLeave);
+
+	isInitialized = true;
 
 	/*DEBUGGING*/
 	FString bootUpCompleteText = FString::Printf(TEXT("Agent %d boot sequence complete."), agentID);
@@ -180,6 +200,18 @@ TArray<ABoidsAgent*> ABoidsAgent::GetNeighbors()
 	return neighborAgents;
 }
 
+<<<<<<< HEAD
+ASwarmWP* ABoidsAgent::GetCurrWaypoint()
+{
+	if (waypoints.Num()) {
+		return waypoints[0];
+	}
+
+	return nullptr;
+}
+
+=======
+>>>>>>> parent of 6965bdd... Added waypoint handling. Waypoints still non-functional. Need to add function to add waypoints to agents on game start.
 FVector ABoidsAgent::GetVelocity() const
 {
 	return agentVelocity;

@@ -10,7 +10,17 @@ EBTNodeResult::Type UMoveToTargetTask::ExecuteTask(UBehaviorTreeComponent& Owner
     Super::ExecuteTask(OwnerComp, NodeMemory);
 
     ABoidsAgent* agent = Cast<ABoidsAgent>(OwnerComp.GetAIOwner()->GetPawn());
+<<<<<<< HEAD
+    ASwarmWP* waypoint = agent->GetCurrWaypoint();
     
+    if (waypoint) {
+        FVector targetVector = waypoint->GetActorLocation() - targetVector;
+    
+        agent->SetVelocity(targetVector);
+    }
+=======
+    
+>>>>>>> parent of 6965bdd... Added waypoint handling. Waypoints still non-functional. Need to add function to add waypoints to agents on game start.
 
     return EBTNodeResult::Succeeded;
 }

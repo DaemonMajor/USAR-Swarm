@@ -35,6 +35,20 @@ void ASwarmWP::BeginPlay()
 {
 	Super::BeginPlay();
 
+<<<<<<< HEAD
+	wpArea->OnComponentBeginOverlap.AddDynamic(this, &ASwarmWP::OnAgentEnter);
+
+	/*DEBUGGING FOR PREPLACED WAYPOINTS*/
+	FTimerDelegate InitDelegate;
+	InitDelegate.BindUFunction(this, FName("Init"), 1);
+	GetWorld()->GetTimerManager().SetTimer(bootUpDelayTimer, InitDelegate, 1.5, false);
+	/*DEBUGGING FOR PREPLACED WAYPOINTS*/
+}
+
+void ASwarmWP::Init(int flock)
+{
+=======
+>>>>>>> parent of 6965bdd... Added waypoint handling. Waypoints still non-functional. Need to add function to add waypoints to agents on game start.
 	APrototypeGameState* gameState = GetWorld()->GetGameState<APrototypeGameState>();
 	wpID = gameState->AddWaypoint(this);	// assign waypoint ID
 }

@@ -20,6 +20,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaSeconds) override;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		bool isInitialized = false;
 
 	/* FOR DEBUGGING ONLY */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -41,6 +43,8 @@ public:
 		FVector flockCenter;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FVector sepVector;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		FVector wpLoc;
 	/* =============== */
 
 	/*MOVE TO PROTECTED AFTER DEBUGGING*/
