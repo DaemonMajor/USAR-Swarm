@@ -2,6 +2,7 @@
 
 
 #include "SwarmWP.h"
+#include "BoidsAgent.h"
 #include "../PrototypeGameState.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/ShapeComponent.h"
@@ -25,7 +26,7 @@ ASwarmWP::ASwarmWP()
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> wpCylinder(TEXT("/Game/StarterContent/Shapes/Shape_Cylinder.Shape_Cylinder"));
 	if (wpCylinder.Succeeded()) {
 		wpArea->SetStaticMesh(wpCylinder.Object);
-		wpArea->SetRelativeScale3D(FVector(1, 1, 5.5));	// 1 m diameter, 5.5 m height
+		wpArea->SetRelativeScale3D(FVector(2.5, 2.5, 5.5));	// 2.5 m diameter, 5.5 m height
 		wpArea->SetVisibility(false);
 	}
 }
@@ -55,6 +56,8 @@ void ASwarmWP::Deactivate()
 	APrototypeGameState* gameState = GetWorld()->GetGameState<APrototypeGameState>();
 	gameState->RemoveWaypoint(this);
 
+	wpID = -1;
+
 	Destroy();
 }
 
@@ -69,8 +72,13 @@ void ASwarmWP::SetID(int id)
 }
 
 void ASwarmWP::OnAgentEnter(UPrimitiveComponent* wpAreaComp, AActor* agent, UPrimitiveComponent* agentBody, int32 agentIndex,
-	bool bFromSweep, const FHitResult& SweepResult)
+							bool bFromSweep, const FHitResult& SweepResult)
 {
+	/*DEBUGGING*/
+	FString wpTriggerText = FString::Printf(TEXT("Waypoint %d triggered."), wpID);
+	GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Green, wpTriggerText, true);
+	/*DEBUGGING*/
+
 	bool senseAgentBody = !(agentBody->GetName().Compare("AgentBody"));
 
 	if (senseAgentBody) {
@@ -79,6 +87,11 @@ void ASwarmWP::OnAgentEnter(UPrimitiveComponent* wpAreaComp, AActor* agent, UPri
 		if (boid) {
 			if (flockID == boid->flockID) {
 				Deactivate();
+
+				/*DEBUGGING*/
+				FString wpDeactivatedText = FString::Printf(TEXT("Waypoint %d deactivated."), wpID);
+				GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Red, wpDeactivatedText, true);
+				/*DEBUGGING*/
 			}
 		}
 	}

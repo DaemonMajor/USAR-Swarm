@@ -14,9 +14,10 @@ EBTNodeResult::Type UMoveToTargetTask::ExecuteTask(UBehaviorTreeComponent& Owner
     ASwarmWP* waypoint = agent->GetCurrWaypoint();
     
     if (waypoint) {
-        FVector targetVector = waypoint->GetActorLocation() - targetVector;
+        FVector targetVector = waypoint->GetActorLocation() - agent->GetActorLocation();
+        FVector currVector = agent->GetVelocity();
     
-        agent->SetVelocity(targetVector);
+        agent->SetVelocity(currVector + targetVector);
     }
 
     return EBTNodeResult::Succeeded;
