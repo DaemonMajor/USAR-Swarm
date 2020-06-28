@@ -12,18 +12,89 @@ APrototypeGameState::APrototypeGameState()
 	numWP = 0;
 }
 
-int APrototypeGameState::AddAgent(ABoidsAgent* agent)
+/* Give the passed agent a unique ID and assign to specified flock. Returns flock data.
+*
+*	@param agent Agent to assign.
+*	@param flockID Flock to assign the agent to. A new flock will be formed if one with the specified ID does not exist.
+*	@return Flock data on the flock the agent was assigned to.
+*/
+Flock APrototypeGameState::AddAgent(ABoidsAgent* agent, int flockID)
 {
+	Flock* flock = new Flock();
+
+	if (!flockData.Num()) {
+		flock->flockID = flockID;
+		flock->agents.Add(agent);
+
+		flockData.Add(flock);
+	}
+	else {
+		bool isAdded = false;
+
+		for (Flock* f : flockData) {
+			if (f->flockID == flockID) {
+				f->agents.Add(agent);
+				
+				flock = f;
+				isAdded = true;
+
+				break;
+			}
+		}
+
+		if (!isAdded) {
+			flock->flockID = flockID;
+			flock->agents.Add(agent);
+
+			flockData.Add(flock);
+		}
+	}
+
 	agent->SetID(numAgents);
 	numAgents++;
 
-	return numAgents - 1;
+	return *flock;
 }
 
-int APrototypeGameState::AddWaypoint(ASwarmWP* waypoint)
+/* Give the passed waypoint a unique ID and assign to specified flock. Returns waypoint ID.
+*
+*	@param waypoint Waypoint to assign a flock.
+*	@param flockID ID of the flock to assign.
+*	@return Assigned unique waypoint ID. Returns -1 if invalid flock ID.
+*/
+int APrototypeGameState::AddWaypoint(ASwarmWP* waypoint, int flockID)
 {
-	waypoint->SetID(numWP);
-	numWP++;
+	for (Flock* f : flockData) {
+		if (f->flockID == flockID) {
+			f->waypoints.Add(waypoint);
 
-	return numWP - 1;
+			for (ABoidsAgent* agent : f->agents) {
+				agent->AddWaypoint(waypoint);
+			}
+
+			waypoint->SetID(numWP);
+			numWP++;
+
+			return numWP - 1;
+		}
+	}
+	
+	return -1;
+}
+
+/* Unassign the passed waypoint. Current implementation assumes a waypoint is only assigned to one flock.
+*
+*	@param waypoint	Waypoint to unassign.
+*/
+void APrototypeGameState::RemoveWaypoint(ASwarmWP* waypoint)
+{
+	for (Flock* f : flockData) {
+		if (f->waypoints.Remove(waypoint)) {
+			for (ABoidsAgent* agent : f->agents) {
+				agent->RemoveWaypoint(waypoint);
+			}
+
+			return;
+		}
+	}
 }

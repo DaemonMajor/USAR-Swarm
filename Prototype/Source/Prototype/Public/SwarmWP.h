@@ -15,6 +15,16 @@ public:
 	// Sets default values for this actor's properties
 	ASwarmWP();
 
+	/*FOR DEBUGGING ONLY*/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		int wpID = -1;		// Unique waypoint ID. Value of -1 sets waypoint as inactive.
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		int flockID;		// Flock assigned to this waypoint.
+	/*FOR DEBUGGING ONLY*/
+
+	UFUNCTION()
+		void Init(int flock);
+
 	UFUNCTION()
 		int GetID();
 	UFUNCTION()
@@ -22,13 +32,6 @@ public:
 
 	UFUNCTION()
 		void Deactivate();
-
-	/*FOR DEBUGGING ONLY*/
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
-		int wpID = -1;		// Unique waypoint ID. Value of -1 sets waypoint as inactive.
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
-		TArray<int> flocks;		// Flock IDs affected by this waypoint.
-	/*FOR DEBUGGING ONLY*/
 
 protected:
 	virtual void BeginPlay() override;
@@ -45,7 +48,5 @@ protected:
 
 	UFUNCTION()
 		void OnAgentEnter(UPrimitiveComponent* wpAreaComp, AActor* agent, UPrimitiveComponent* agentBody, int32 agentIndex,
-			bool bFromSweep, const FHitResult& SweepResult);
-	UFUNCTION()
-		void OnAgentLeave(UPrimitiveComponent* wpAreaComp, AActor* agent, UPrimitiveComponent* agentBody, int32 agentIndex);
+						  bool bFromSweep, const FHitResult& SweepResult);
 };

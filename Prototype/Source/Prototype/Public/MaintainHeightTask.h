@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
+#include "BoidsAgent.h"
 #include "MaintainHeightTask.generated.h"
 
 /**
@@ -16,4 +17,7 @@ class PROTOTYPE_API UMaintainHeightTask : public UBTTaskNode
 
 protected:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
+
+private:
+	void MoveToHeight(ABoidsAgent* agent);
 };

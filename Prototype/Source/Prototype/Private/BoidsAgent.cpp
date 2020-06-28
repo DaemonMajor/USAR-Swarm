@@ -3,6 +3,7 @@
 
 #include "BoidsAgent.h"
 #include "BoidsAgentController.h"
+#include "../PrototypeGameState.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/ShapeComponent.h"
@@ -65,9 +66,8 @@ void ABoidsAgent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	/*DEBUGGING FOR PREPLACED AGENTS*/
+	/*FOR PREPLACED AGENTS*/
 	AssignToFlock(1);
-	/*DEBUGGING FOR PREPLACED AGENTS*/
 
 	GetWorld()->GetTimerManager().SetTimer(bootUpDelayTimer, this, &ABoidsAgent::BootUpSequence, bootUpDelay, false);
 }
@@ -200,7 +200,6 @@ TArray<ABoidsAgent*> ABoidsAgent::GetNeighbors()
 	return neighborAgents;
 }
 
-<<<<<<< HEAD
 ASwarmWP* ABoidsAgent::GetCurrWaypoint()
 {
 	if (waypoints.Num()) {
@@ -210,8 +209,6 @@ ASwarmWP* ABoidsAgent::GetCurrWaypoint()
 	return nullptr;
 }
 
-=======
->>>>>>> parent of 6965bdd... Added waypoint handling. Waypoints still non-functional. Need to add function to add waypoints to agents on game start.
 FVector ABoidsAgent::GetVelocity() const
 {
 	return agentVelocity;

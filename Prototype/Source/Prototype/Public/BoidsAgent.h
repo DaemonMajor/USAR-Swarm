@@ -85,6 +85,9 @@ public:
 	UFUNCTION()
 		void SetID(int id);
 	UFUNCTION()
+		void AssignToFlock(int flock);
+
+	UFUNCTION()
 		TArray<ABoidsAgent*> GetNeighbors();
 	
 	UFUNCTION()
@@ -99,6 +102,8 @@ public:
 		void AddWaypoint(ASwarmWP* wp);		// append waypoint to list of target waypoints
 	UFUNCTION()
 		void RemoveWaypoint(ASwarmWP* wp);	// remove waypoint from list of target waypoints
+	UFUNCTION()
+		ASwarmWP* GetCurrWaypoint();		// fetch current waypoint
 
 protected:
 	virtual void BeginPlay() override;
