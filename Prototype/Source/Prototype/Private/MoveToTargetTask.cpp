@@ -12,13 +12,12 @@ EBTNodeResult::Type UMoveToTargetTask::ExecuteTask(UBehaviorTreeComponent& Owner
     ABoidsAgent* agent = Cast<ABoidsAgent>(OwnerComp.GetAIOwner()->GetPawn());
 
     ASwarmWP* waypoint = agent->GetCurrWaypoint();
-    
+    FVector targetVector = FVector::ZeroVector;
     if (waypoint) {
-        FVector targetVector = waypoint->GetActorLocation() - agent->GetActorLocation();
-        FVector currVector = agent->GetVelocity();
-    
-        agent->SetVelocity(currVector + targetVector);
+        targetVector = waypoint->GetActorLocation() - agent->GetActorLocation();
     }
+
+    agent->SetWaypointVector(targetVector);
 
     return EBTNodeResult::Succeeded;
 }

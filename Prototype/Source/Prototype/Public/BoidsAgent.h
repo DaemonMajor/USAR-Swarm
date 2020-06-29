@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "GameFramework/FloatingPawnMovement.h"
 #include "Components/SphereComponent.h"
 #include "SwarmWP.h"
 #include "BoidsAgent.generated.h"
@@ -26,25 +27,32 @@ public:
 	/* FOR DEBUGGING ONLY */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		float speed = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		float alignmentFactor = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		float cohesionFactor = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		float separationFactor = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		int numNeighbors = 0;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	//	float alignmentFactor = 0;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	//	float cohesionFactor = 0;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	//	float separationFactor = 0;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	//	int numNeighbors = 0;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FVector agentVelocity;	// velocity in local coordinates
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		FVector alignVector;
+		FVector avoidanceVector;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		FVector flockCenter;
+		FVector heightVector;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		FVector sepVector;
+		FVector flockVector;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		FVector wpLoc;
+		FVector waypointVector;
+
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	//	FVector alignVector;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	//	FVector flockCenter;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	//	FVector sepVector;
 	/* =============== */
 
 	/*MOVE TO PROTECTED AFTER DEBUGGING*/
@@ -67,9 +75,9 @@ public:
 		float visionRadius;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float targetHeight = 500;	// height to maintain
+		float targetHeight;	// height to maintain
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float heightVariance = 50;	// variance allowed between agent height and target height
+		float heightVariance;	// variance allowed between agent height and target height
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float alignmentWeight;
@@ -94,8 +102,17 @@ public:
 		void SetTargetHeight(float height);
 	UFUNCTION()
 		void SetHeightVariance(float var);
+	
 	UFUNCTION()
-		void SetVelocity(FVector newVel);			// set new velocity
+		void SetAvoidanceVector(FVector rawVector);
+	UFUNCTION()
+		void SetHeightVector(FVector rawVector);
+	UFUNCTION()
+		void SetFlockVector(FVector rawVector);
+	UFUNCTION()
+		void SetWaypointVector(FVector rawVector);
+	UFUNCTION()
+		void SetVelocity();			// set new velocity based on component vectors (avoidanceVector, flockVector, waypointVector)
 	virtual FVector GetVelocity() const override;	// get agent velocity in local coordinates (bypasses built-in component velocity because documentation is unclear)
 
 	UFUNCTION()
@@ -113,18 +130,22 @@ protected:
 		float yawRate;		// rate at which agent can turn in degrees per second
 	
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
-		class UStaticMeshComponent* agentRoot;
+		UStaticMeshComponent* agentRoot;
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
-		class UStaticMeshComponent* agentBody;
+		UStaticMeshComponent* agentBody;
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
-		class UFloatingPawnMovement* moveComp;
+		UFloatingPawnMovement* moveComp;
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
-		class USphereComponent* neighborSphere;
+		USphereComponent* neighborSphere;
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+		USphereComponent* visionSphere;
 
 	UPROPERTY()
         TArray<ABoidsAgent*> neighborAgents = TArray<ABoidsAgent*>();
 	UPROPERTY()
 		TArray<ASwarmWP*> waypoints = TArray<ASwarmWP*>();
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		FVector wpLoc;
 
 	UPROPERTY()
 		float bootUpDelay = 0.5;

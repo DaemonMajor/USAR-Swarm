@@ -10,6 +10,7 @@ EBTNodeResult::Type UMaintainHeightTask::ExecuteTask(UBehaviorTreeComponent& Own
     Super::ExecuteTask(OwnerComp, NodeMemory);
 
     ABoidsAgent* agent = Cast<ABoidsAgent>(OwnerComp.GetAIOwner()->GetPawn());
+
     MoveToHeight(agent);
 
     return EBTNodeResult::Succeeded;
@@ -21,28 +22,18 @@ void UMaintainHeightTask::MoveToHeight(ABoidsAgent* agent)
     float minHeight = agent->targetHeight - agent->heightVariance;
     float maxHeight = agent->targetHeight + agent->heightVariance;
 
-    FVector agentVel = agent->GetVelocity();
+    FVector correctionVector = FVector::ZeroVector;
     if (agentHeight < minHeight) {
-        agentVel.Z = agent->maxSpeed/2;   // fly up at half max thrust
-
-        /*DEBUGGING*/
-        //FString climbingText = FString::Printf(TEXT("Agent %d climbing from %f."), agent->agentID, agentHeight);
-        //GEngine->AddOnScreenDebugMessage(INDEX_NONE, 5.0f, FColor::Green, climbingText, true);
-        /*DEBUGGING*/
+        correctionVector.Z = agent->maxSpeed/2;   // fly up at half max thrust
     }
     else if (agentHeight > maxHeight) {
-        agentVel.Z = -(agent->maxSpeed/2);   // fly down at half max thrust
-
-        /*DEBUGGING*/
-        //FString fallingText = FString::Printf(TEXT("Agent %d falling from %f."), agent->agentID, agentHeight);
-        //GEngine->AddOnScreenDebugMessage(INDEX_NONE, 5.0f, FColor::Green, fallingText, true);
-        /*DEBUGGING*/
+        correctionVector.Z = -(agent->maxSpeed/2);   // fly down at half max thrust
     }
 
-    agent->SetVelocity(agentVel);
+    agent->SetHeightVector(correctionVector);
 
     /*DEBUGGING*/
     //FString statusText = FString::Printf(TEXT("Agent %d maintaining height."), agent->agentID);
-    //GEngine->AddOnScreenDebugMessage(INDEX_NONE, 5.0f, FColor::Green, statusText, true);
+    //GEngine->AddOnScreenDebugMessage(INDEX_NONE, 5.0f, FColor::Yellow, statusText, true);
     /*DEBUGGING*/
 }

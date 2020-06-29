@@ -16,19 +16,26 @@ ABoidsAgent::ABoidsAgent()
  	PrimaryActorTick.bCanEverTick = true;
 
 	// all lengths in cm (UE units)
-	maxSpeed = 150;
+	maxSpeed = 250;
 	yawRate = 45;
 	bodySize = 15;
 	neighborRadius = 1500;
 	visionRadius = 500;
 
+	targetHeight = visionRadius * 0.85;
+	heightVariance = targetHeight * 0.05;
+
 	alignmentWeight = 0.1;
 	cohesionWeight = 0.25;
-	separationWeight = 0.35;
+	separationWeight = 0.25;
 
 	statusClimbing = false;
 
 	agentVelocity = FVector::ZeroVector;
+	avoidanceVector = FVector::ZeroVector;
+	heightVector = FVector::ZeroVector;
+	flockVector = FVector::ZeroVector;
+	waypointVector = FVector::ZeroVector;
 
 	AIControllerClass = ABoidsAgentController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
@@ -58,7 +65,17 @@ ABoidsAgent::ABoidsAgent()
 	neighborSphere->SetSimulatePhysics(false);
 	neighborSphere->SetGenerateOverlapEvents(true);
 	neighborSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	neighborSphere->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+	neighborSphere->SetCollisionObjectType(ECollisionChannel::ECC_Visibility);
+	neighborSphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+
+	visionSphere = CreateDefaultSubobject<USphereComponent>("VisionSensor");
+	visionSphere->SetupAttachment(RootComponent);
+	visionSphere->SetSphereRadius(visionRadius);
+	visionSphere->SetSimulatePhysics(false);
+	visionSphere->SetGenerateOverlapEvents(true);
+	visionSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	visionSphere->SetCollisionObjectType(ECollisionChannel::ECC_Visibility);
+	neighborSphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
 }
 
 // Called when the game starts or when spawned
@@ -84,11 +101,12 @@ void ABoidsAgent::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	SetVelocity();
 	MoveAgent(DeltaSeconds);
 
 	/*DEBUGGING*/
 	speed = agentVelocity.Size();
-	numNeighbors = neighborAgents.Num();
+	//numNeighbors = neighborAgents.Num();
 	
 	if (waypoints.Num()) {
 		wpLoc = waypoints[0]->GetActorLocation();
@@ -119,7 +137,7 @@ void ABoidsAgent::BootUpSequence()
 
 	/*DEBUGGING*/
 	FString bootUpCompleteText = FString::Printf(TEXT("Agent %d boot sequence complete."), agentID);
-	GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Yellow, bootUpCompleteText, true);
+	GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Green, bootUpCompleteText, true);
 	/*DEBUGGING*/
 }
 
@@ -214,9 +232,34 @@ FVector ABoidsAgent::GetVelocity() const
 	return agentVelocity;
 }
 
-void ABoidsAgent::SetVelocity(FVector newVel)
+void ABoidsAgent::SetVelocity()
 {
+	FVector newVel = avoidanceVector + flockVector + waypointVector;
+	if (statusClimbing) {
+		newVel.Z = heightVector.Z;
+	}
+
 	agentVelocity = newVel.GetClampedToSize(0, maxSpeed);
+}
+
+void ABoidsAgent::SetAvoidanceVector(FVector rawVector)
+{
+	avoidanceVector = rawVector;
+}
+
+void ABoidsAgent::SetHeightVector(FVector rawVector)
+{
+	heightVector = rawVector;
+}
+
+void ABoidsAgent::SetFlockVector(FVector rawVector)
+{
+	flockVector = rawVector;
+}
+
+void ABoidsAgent::SetWaypointVector(FVector rawVector)
+{
+	waypointVector = rawVector;
 }
 
 void ABoidsAgent::SetTargetHeight(float height)
@@ -232,7 +275,11 @@ void ABoidsAgent::SetHeightVariance(float var)
 void ABoidsAgent::MoveAgent(float deltaSec)
 {
 	//FRotator turn = FaceDirection(agentVelocity, deltaSec).GetInverse();
+	//turn.Yaw = -turn.Yaw;
 	//turn.RotateVector(agentVelocity);
+	//turn.RotateVector(avoidanceVector);
+	//turn.RotateVector(heightVector);
+	//turn.RotateVector(flockVector);
 
 	AddActorLocalOffset(agentVelocity * deltaSec, true);
 }

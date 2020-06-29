@@ -12,19 +12,15 @@ bool UD_IsAtTargetHeight::CalculateRawConditionValue(UBehaviorTreeComponent& Own
     float minHeight = agent->targetHeight - agent->heightVariance;
     float maxHeight = agent->targetHeight + agent->heightVariance;
     
-    bool isClimbing = agent->statusClimbing;
     bool isInRange = (minHeight < agentHeight) && (agentHeight < maxHeight);
 
-    if (!isInRange) {
-        if (isClimbing) {
-            return false;
-        }
+    if (isInRange) {
+        agent->statusClimbing = false;
 
-        agent->statusClimbing = true;
         return true;
     }
     
-    agent->statusClimbing = false;
+    agent->statusClimbing = true;
     
     return false;
 }

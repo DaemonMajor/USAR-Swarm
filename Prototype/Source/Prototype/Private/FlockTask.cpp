@@ -14,13 +14,13 @@ EBTNodeResult::Type UFlockTask::ExecuteTask(UBehaviorTreeComponent& OwnerComp, u
     FVector cohFactor = GetCohesion(agent) * agent->cohesionWeight;
     FVector sepFactor = GetSeparation(agent) * agent->separationWeight;
 
-    FVector newVel = CalcNewVector(agent, alignFactor, cohFactor, sepFactor);
-    agent->SetVelocity(newVel);
+    FVector flockVector = CalcNewVector(agent, alignFactor, cohFactor, sepFactor);
+    agent->SetFlockVector(flockVector);
 
     /*DEBUGGING*/
-    agent->alignmentFactor = alignFactor.Size();
-    agent->cohesionFactor = cohFactor.Size();
-    agent->separationFactor = sepFactor.Size();
+    //agent->alignmentFactor = alignFactor.Size();
+    //agent->cohesionFactor = cohFactor.Size();
+    //agent->separationFactor = sepFactor.Size();
     /*DEBUGGING*/
 
     /*DEBUGGING*/
@@ -50,7 +50,7 @@ FVector UFlockTask::GetAlignment(ABoidsAgent* agent)
     }
     alignVector /= neighbors.Num();
 
-    agent->alignVector = alignVector;
+    //agent->alignVector = alignVector;
     return alignVector;
 }
 
@@ -73,7 +73,7 @@ FVector UFlockTask::GetCohesion(ABoidsAgent* agent)
     centerMass /= neighbors.Num();
     centerMass -= agent->GetActorLocation();
 
-    agent->flockCenter = centerMass;
+    //agent->flockCenter = centerMass;
     return centerMass;
 }
 
@@ -99,14 +99,14 @@ FVector UFlockTask::GetSeparation(ABoidsAgent* agent)
             float dist = separation.Size();
             float spacing = agent->agentSpacing;
             if (dist < spacing) {
-                sepFactor = FMath::Pow(spacing - dist, 0.5f);
+                sepFactor = FMath::Pow(spacing - dist, 1.5f);
             }
 
             sepDir += separation * sepFactor;
         }
     }
 
-    agent->sepVector = sepDir;
+    //agent->sepVector = sepDir;
     return sepDir;
 }
 
