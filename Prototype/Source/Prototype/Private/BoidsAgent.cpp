@@ -157,7 +157,7 @@ void ABoidsAgent::OnNeighborEnter(UPrimitiveComponent* agentSensor, AActor* neig
 {
 	bool eventFromSensor = !(agentSensor->GetName().Compare("NeighborSensor"));
 	bool senseNeighborBody = !(neighborBody->GetName().Compare("AgentBody"));
-	
+
 	if (eventFromSensor && senseNeighborBody) {
 		ABoidsAgent* boid = Cast<ABoidsAgent>(neighbor);
 

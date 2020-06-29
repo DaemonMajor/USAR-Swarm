@@ -36,9 +36,9 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	
-	UPROPERTY()
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
 		UStaticMeshComponent* wpRoot;
-	UPROPERTY()
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
 		UStaticMeshComponent* wpArea;
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
 		float wpRadius;

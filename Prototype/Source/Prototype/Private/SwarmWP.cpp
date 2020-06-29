@@ -22,6 +22,7 @@ ASwarmWP::ASwarmWP()
 	wpArea->SetGenerateOverlapEvents(true);
 	wpArea->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	wpArea->SetCollisionObjectType(ECollisionChannel::ECC_WorldStatic);
+	wpArea->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);	// enable overlap events with pawn collision channel
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> wpCylinder(TEXT("/Game/StarterContent/Shapes/Shape_Cylinder.Shape_Cylinder"));
 	if (wpCylinder.Succeeded()) {
@@ -56,7 +57,10 @@ void ASwarmWP::Deactivate()
 	APrototypeGameState* gameState = GetWorld()->GetGameState<APrototypeGameState>();
 	gameState->RemoveWaypoint(this);
 
-	wpID = -1;
+	/*DEBUGGING*/
+	FString wpDeactivatedText = FString::Printf(TEXT("Waypoint %d deactivated."), wpID);
+	GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Red, wpDeactivatedText, true);
+	/*DEBUGGING*/
 
 	Destroy();
 }
@@ -74,11 +78,6 @@ void ASwarmWP::SetID(int id)
 void ASwarmWP::OnAgentEnter(UPrimitiveComponent* wpAreaComp, AActor* agent, UPrimitiveComponent* agentBody, int32 agentIndex,
 							bool bFromSweep, const FHitResult& SweepResult)
 {
-	/*DEBUGGING*/
-	FString wpTriggerText = FString::Printf(TEXT("Waypoint %d triggered."), wpID);
-	GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Green, wpTriggerText, true);
-	/*DEBUGGING*/
-
 	bool senseAgentBody = !(agentBody->GetName().Compare("AgentBody"));
 
 	if (senseAgentBody) {
@@ -87,11 +86,6 @@ void ASwarmWP::OnAgentEnter(UPrimitiveComponent* wpAreaComp, AActor* agent, UPri
 		if (boid) {
 			if (flockID == boid->flockID) {
 				Deactivate();
-
-				/*DEBUGGING*/
-				FString wpDeactivatedText = FString::Printf(TEXT("Waypoint %d deactivated."), wpID);
-				GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Red, wpDeactivatedText, true);
-				/*DEBUGGING*/
 			}
 		}
 	}

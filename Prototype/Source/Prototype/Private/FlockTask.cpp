@@ -25,7 +25,7 @@ EBTNodeResult::Type UFlockTask::ExecuteTask(UBehaviorTreeComponent& OwnerComp, u
 
     /*DEBUGGING*/
     //FString statusText = FString::Printf(TEXT("Agent %d flocking."), agent->agentID);
-    //GEngine->AddOnScreenDebugMessage(INDEX_NONE, 5.0f, FColor::Yellow, statusText , true);
+    //GEngine->AddOnScreenDebugMessage(INDEX_NONE, 1.0f, FColor::Yellow, statusText , true);
     /*DEBUGGING*/
 
     return EBTNodeResult::Succeeded;
