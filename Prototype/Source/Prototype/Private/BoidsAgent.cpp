@@ -27,7 +27,7 @@ ABoidsAgent::ABoidsAgent()
 	heightVariance = targetHeight * 0.05;
 
 	alignmentWeight = 0.5;
-	cohesionWeight = 1.25;
+	cohesionWeight = 0.5;
 	separationWeight = 0.25;
 
 	statusAvoiding = false;
@@ -53,6 +53,7 @@ ABoidsAgent::ABoidsAgent()
 	agentBody->SetGenerateOverlapEvents(true);
 	agentBody->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	agentBody->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
+	agentBody->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> droneVisualAsset(TEXT("/Game/StarterContent/Shapes/Shape_Cylinder.Shape_Cylinder"));
 	if (droneVisualAsset.Succeeded()) {

@@ -12,17 +12,43 @@ EBTNodeResult::Type UAgentObstacleAvoidanceTask::ExecuteTask(UBehaviorTreeCompon
     ABoidsAgent* agent = Cast<ABoidsAgent>(OwnerComp.GetAIOwner()->GetPawn());
     
     TArray<FVector> safeVectors = LookAhead(agent);
-    for (FVector vec : safeVectors) {
-        if (CheckVector(agent, vec)) {
-            FVector confirmedVector = vec - agent->GetActorLocation();
-            // need to transform to local rotation
-            agent->SetAvoidanceVector(confirmedVector);
+
+    if (safeVectors.Num()) {
+        /*DEBUGGING*/
+        //    FString avoidingText = FString::Printf(TEXT("Agent %d avoiding obstacle."), agent->agentID);
+        //    GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Yellow, avoidingText, true);
+        /*DEBUGGING*/
+
+        for (FVector vec : safeVectors) {
+            if (CheckVector(agent, vec)) {
+                FVector confirmedVector = vec - agent->GetActorLocation();
+                // need to transform to local rotation
+                
+                agent->SetAvoidanceVector(confirmedVector);
+            }
         }
+    }
+    else {
+        /*DEBUGGING*/
+            FString avoidingText = FString::Printf(TEXT("Agent %d blocked. Attempting to move around obstacle."), agent->agentID);
+            GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Yellow, avoidingText, true);
+        /*DEBUGGING*/
+
+        FRotator turnRight = FRotator(0, 90, 0);    // turn 90 degrees yaw
+        FVector avoidVector = turnRight.RotateVector(agent->GetVelocity());
+
+        agent->SetAvoidanceVector(avoidVector);
     }
 
     return EBTNodeResult::Succeeded;
 }
 
+/* Raycast in a cylinder in the direction of the agent's velocity to look for obstacles. Sets the agent status to avoiding if obstacle is detected.
+*  Returns array of "safe" vectors.
+*
+*   @param agent Agent to raycast for.
+*   @return Array of obstacle-free vectors.
+*/
 TArray<FVector> UAgentObstacleAvoidanceTask::LookAhead(ABoidsAgent* agent)
 {
     // Transform agent velocity from local to world coordinates
@@ -56,13 +82,15 @@ TArray<FVector> UAgentObstacleAvoidanceTask::LookAhead(ABoidsAgent* agent)
     queryParams.AddIgnoredActor(agent);
     FCollisionResponseParams responseParams;
     
+    // collect vectors with no obstacles.
     TArray<FVector> safeVectors;
+    agent->statusAvoiding = false;
     for (int i = 0; i < rayStartPts.Num(); i++) {
         if (!GetWorld()->LineTraceSingleByChannel(hitResult, rayStartPts[i], rayEndPts[i], ECC_WorldStatic, queryParams, responseParams)) {
             safeVectors.Add(rayEndPts[i]);
         }
         else {
-            //agent->statusAvoiding = true;
+            agent->statusAvoiding = true;
         }
     }
 
@@ -75,7 +103,7 @@ bool UAgentObstacleAvoidanceTask::CheckVector(ABoidsAgent* agent, FVector vector
 
     // raycast cone around vector
 
-    return isSafe;
+    return true;    // placeholder
 }
 
 FVector UAgentObstacleAvoidanceTask::TransformToWorld(ABoidsAgent* agent, FVector vector)
