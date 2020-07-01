@@ -32,14 +32,6 @@ public:
 		int numNeighbors = 0;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		float alignmentFactor = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		float cohesionFactor = 0;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		float separationFactor = 0;
-	
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FVector agentVelocity;	// velocity in local coordinates
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FVector avoidanceVector;
@@ -50,12 +42,19 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FVector waypointVector;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		FVector alignVector;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		FVector flockCenter;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		FVector sepVector;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	//	float alignmentFactor = 0;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	//	float cohesionFactor = 0;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	//	float separationFactor = 0;
+	
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	//	FVector alignVector;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	//	FVector flockCenter;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	//	FVector sepVector;
 	/* =============== */
 
 	/*MOVE TO PROTECTED AFTER DEBUGGING*/
@@ -69,7 +68,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		bool statusClimbing;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		bool statusTarget;
+		bool statusTraveling;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float maxSpeed;

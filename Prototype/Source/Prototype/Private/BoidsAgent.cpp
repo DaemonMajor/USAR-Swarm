@@ -26,13 +26,13 @@ ABoidsAgent::ABoidsAgent()
 	targetHeight = visionRadius * 0.85;
 	heightVariance = targetHeight * 0.05;
 
-	alignmentWeight = 0.1;
+	alignmentWeight = 1;
 	cohesionWeight = 0.25;
 	separationWeight = 0.25;
 
 	statusAvoiding = false;
 	statusClimbing = false;
-	statusTarget = false;
+	statusTraveling = false;
 
 	agentVelocity = FVector::ZeroVector;
 	avoidanceVector = FVector::ZeroVector;
@@ -48,7 +48,7 @@ ABoidsAgent::ABoidsAgent()
 	agentRoot->SetSimulatePhysics(false);
 
 	agentBody = CreateDefaultSubobject<UStaticMeshComponent>("AgentBody");
-	agentBody->SetupAttachment(agentRoot);
+	agentBody->SetupAttachment(RootComponent);
 	agentBody->SetSimulatePhysics(false);
 	agentBody->SetGenerateOverlapEvents(true);
 	agentBody->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
@@ -63,7 +63,7 @@ ABoidsAgent::ABoidsAgent()
 	moveComp = CreateDefaultSubobject<UFloatingPawnMovement>("MovementComponent");
 
 	neighborSphere = CreateDefaultSubobject<USphereComponent>("NeighborSensor");
-	neighborSphere->SetupAttachment(agentRoot);
+	neighborSphere->SetupAttachment(RootComponent);
 	neighborSphere->SetSphereRadius(neighborRadius);
 	neighborSphere->SetSimulatePhysics(false);
 	neighborSphere->SetGenerateOverlapEvents(true);
@@ -72,7 +72,7 @@ ABoidsAgent::ABoidsAgent()
 	neighborSphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 
 	visionSphere = CreateDefaultSubobject<USphereComponent>("VisionSensor");
-	visionSphere->SetupAttachment(agentRoot);
+	visionSphere->SetupAttachment(RootComponent);
 	visionSphere->SetSphereRadius(visionRadius);
 	visionSphere->SetSimulatePhysics(false);
 	visionSphere->SetGenerateOverlapEvents(true);
@@ -114,11 +114,11 @@ void ABoidsAgent::Tick(float DeltaSeconds)
 	
 	if (waypoints.Num()) {
 		wpLoc = waypoints[0]->GetActorLocation();
-		statusTarget = true;
+		statusTraveling = true;
 	}
 	else {
-		wpLoc = FVector::ZeroVector;
-		statusTarget = false;
+		wpLoc = FVector(NULL, NULL, NULL);
+		statusTraveling = false;
 	}
 }
 

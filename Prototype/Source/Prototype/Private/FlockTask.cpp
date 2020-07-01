@@ -18,9 +18,9 @@ EBTNodeResult::Type UFlockTask::ExecuteTask(UBehaviorTreeComponent& OwnerComp, u
     agent->SetFlockVector(flockVector);
 
     /*DEBUGGING*/
-    agent->alignmentFactor = alignFactor.Size();
-    agent->cohesionFactor = cohFactor.Size();
-    agent->separationFactor = sepFactor.Size();
+    //agent->alignmentFactor = alignFactor.Size();
+    //agent->cohesionFactor = cohFactor.Size();
+    //agent->separationFactor = sepFactor.Size();
     /*DEBUGGING*/
 
     /*DEBUGGING*/
@@ -50,7 +50,10 @@ FVector UFlockTask::GetAlignment(ABoidsAgent* agent)
     }
     alignVector /= neighbors.Num();
 
-    agent->alignVector = alignVector;
+    /*DEBUGGING*/
+    //agent->alignVector = alignVector;
+    /*DEBUGGING*/
+
     return alignVector;
 }
 
@@ -73,7 +76,10 @@ FVector UFlockTask::GetCohesion(ABoidsAgent* agent)
     centerMass /= neighbors.Num();
     centerMass -= agent->GetActorLocation();
 
-    agent->flockCenter = centerMass;
+    /*DEBUGGING*/
+    //agent->flockCenter = centerMass;
+    /*DEBUGGING*/
+
     return centerMass;
 }
 
@@ -106,7 +112,10 @@ FVector UFlockTask::GetSeparation(ABoidsAgent* agent)
         }
     }
 
-    agent->sepVector = sepDir;
+    /*DEBUGGING*/
+    //agent->sepVector = sepDir;
+    /*DEBUGGING*/
+
     return sepDir;
 }
 

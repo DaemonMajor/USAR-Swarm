@@ -19,14 +19,13 @@ EBTNodeResult::Type UMaintainHeightTask::ExecuteTask(UBehaviorTreeComponent& Own
 void UMaintainHeightTask::MoveToHeight(ABoidsAgent* agent)
 {
     float agentHeight = agent->GetActorLocation().Z;
-    float minHeight = agent->targetHeight - agent->heightVariance;
-    float maxHeight = agent->targetHeight + agent->heightVariance;
+    float targetHeight = agent->targetHeight;
 
     FVector correctionVector = FVector::ZeroVector;
-    if (agentHeight < minHeight) {
+    if (agentHeight < targetHeight) {
         correctionVector.Z = agent->maxSpeed/2;   // fly up at half max thrust
     }
-    else if (agentHeight > maxHeight) {
+    else if (agentHeight > targetHeight) {
         correctionVector.Z = -(agent->maxSpeed/2);   // fly down at half max thrust
     }
 

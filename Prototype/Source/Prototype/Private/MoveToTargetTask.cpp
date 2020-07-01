@@ -15,6 +15,7 @@ EBTNodeResult::Type UMoveToTargetTask::ExecuteTask(UBehaviorTreeComponent& Owner
     FVector targetVector = FVector::ZeroVector;
     if (waypoint) {
         targetVector = waypoint->GetActorLocation() - agent->GetActorLocation();
+        targetVector = targetVector.GetClampedToSize(agent->maxSpeed * 3, agent->maxSpeed * 3);     // set magnitude so agent doesn't slow down as it nears the waypoint
     }
 
     agent->SetWaypointVector(targetVector);
