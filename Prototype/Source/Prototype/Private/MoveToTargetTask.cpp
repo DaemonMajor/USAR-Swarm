@@ -14,7 +14,10 @@ EBTNodeResult::Type UMoveToTargetTask::ExecuteTask(UBehaviorTreeComponent& Owner
     ASwarmWP* waypoint = agent->GetCurrWaypoint();
     FVector targetVector = FVector::ZeroVector;
     if (waypoint) {
-        targetVector = waypoint->GetActorLocation() - agent->GetActorLocation();
+        FVector wpLoc = waypoint->GetActorLocation();
+        wpLoc.Z = agent->targetHeight;
+
+        targetVector = wpLoc - agent->GetActorLocation();
         targetVector = targetVector.GetClampedToSize(agent->maxSpeed * 3, agent->maxSpeed * 3);     // set magnitude so agent doesn't slow down as it nears the waypoint
     }
 

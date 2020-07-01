@@ -26,8 +26,8 @@ ABoidsAgent::ABoidsAgent()
 	targetHeight = visionRadius * 0.85;
 	heightVariance = targetHeight * 0.05;
 
-	alignmentWeight = 1;
-	cohesionWeight = 0.25;
+	alignmentWeight = 0.5;
+	cohesionWeight = 1.25;
 	separationWeight = 0.25;
 
 	statusAvoiding = false;
@@ -242,25 +242,19 @@ FVector ABoidsAgent::GetVelocity() const
 
 void ABoidsAgent::SetVelocity()
 {
-	FVector newVel = avoidanceVector + flockVector + waypointVector;
-	if (statusClimbing) {
-		newVel.Z = heightVector.Z;
-	}
+	FVector newVel = FVector::ZeroVector;
 
-	/*
 	if (statusAvoiding) {
 		newVel = avoidanceVector;
 	}
+	else if (statusClimbing) {
+		newVel = FVector(0, 0, heightVector.Z);
+	}
 	else {
 		newVel = flockVector + waypointVector;
-		if (statusClimbing) {
-			newVel.Z = heightVector.Z;
-		}
-		else {
-			heightVector = FVector::ZeroVector;
-		}
+		heightVector = FVector::ZeroVector;
 	}
-	*/
+	
 	agentVelocity = newVel.GetClampedToSize(0, maxSpeed);
 }
 
