@@ -16,11 +16,12 @@ ABoidsAgent::ABoidsAgent()
  	PrimaryActorTick.bCanEverTick = true;
 
 	// all lengths in cm (UE units)
-	maxSpeed = 250;
+	maxSpeed = 250;		// 2.5 m/s
 	yawRate = 45;
-	bodySize = 15;
+	bodySize = 25;		// agent body radius
 	neighborRadius = 1500;
 	visionRadius = 500;
+	obstacleAvoidDist = 125;
 
 	targetHeight = visionRadius * 0.85;
 	heightVariance = targetHeight * 0.05;
@@ -29,7 +30,9 @@ ABoidsAgent::ABoidsAgent()
 	cohesionWeight = 0.25;
 	separationWeight = 0.25;
 
+	statusAvoiding = false;
 	statusClimbing = false;
+	statusTarget = false;
 
 	agentVelocity = FVector::ZeroVector;
 	avoidanceVector = FVector::ZeroVector;
@@ -54,13 +57,13 @@ ABoidsAgent::ABoidsAgent()
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> droneVisualAsset(TEXT("/Game/StarterContent/Shapes/Shape_Cylinder.Shape_Cylinder"));
 	if (droneVisualAsset.Succeeded()) {
 		agentBody->SetStaticMesh(droneVisualAsset.Object);
-		agentBody->SetRelativeScale3D(FVector(.25, .25, .1));
+		agentBody->SetRelativeScale3D(FVector(bodySize/50.f, bodySize/50.f, .1));
 	}
 	
 	moveComp = CreateDefaultSubobject<UFloatingPawnMovement>("MovementComponent");
 
 	neighborSphere = CreateDefaultSubobject<USphereComponent>("NeighborSensor");
-	neighborSphere->SetupAttachment(RootComponent);
+	neighborSphere->SetupAttachment(agentRoot);
 	neighborSphere->SetSphereRadius(neighborRadius);
 	neighborSphere->SetSimulatePhysics(false);
 	neighborSphere->SetGenerateOverlapEvents(true);
@@ -69,13 +72,13 @@ ABoidsAgent::ABoidsAgent()
 	neighborSphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 
 	visionSphere = CreateDefaultSubobject<USphereComponent>("VisionSensor");
-	visionSphere->SetupAttachment(RootComponent);
+	visionSphere->SetupAttachment(agentRoot);
 	visionSphere->SetSphereRadius(visionRadius);
 	visionSphere->SetSimulatePhysics(false);
 	visionSphere->SetGenerateOverlapEvents(true);
 	visionSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	visionSphere->SetCollisionObjectType(ECollisionChannel::ECC_Visibility);
-	neighborSphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Overlap);
+	visionSphere->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
+	visionSphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 }
 
 // Called when the game starts or when spawned
@@ -106,12 +109,17 @@ void ABoidsAgent::Tick(float DeltaSeconds)
 
 	/*DEBUGGING*/
 	speed = agentVelocity.Size();
-	//numNeighbors = neighborAgents.Num();
+	numNeighbors = neighborAgents.Num();
+	/*DEBUGGING*/
 	
 	if (waypoints.Num()) {
 		wpLoc = waypoints[0]->GetActorLocation();
+		statusTarget = true;
 	}
-	/*DEBUGGING*/
+	else {
+		wpLoc = FVector::ZeroVector;
+		statusTarget = false;
+	}
 }
 
 void ABoidsAgent::AssignToFlock(int flock)
@@ -239,6 +247,20 @@ void ABoidsAgent::SetVelocity()
 		newVel.Z = heightVector.Z;
 	}
 
+	/*
+	if (statusAvoiding) {
+		newVel = avoidanceVector;
+	}
+	else {
+		newVel = flockVector + waypointVector;
+		if (statusClimbing) {
+			newVel.Z = heightVector.Z;
+		}
+		else {
+			heightVector = FVector::ZeroVector;
+		}
+	}
+	*/
 	agentVelocity = newVel.GetClampedToSize(0, maxSpeed);
 }
 

@@ -27,14 +27,17 @@ public:
 	/* FOR DEBUGGING ONLY */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		float speed = 0;
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	//	float alignmentFactor = 0;
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	//	float cohesionFactor = 0;
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	//	float separationFactor = 0;
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	//	int numNeighbors = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		int numNeighbors = 0;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		float alignmentFactor = 0;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		float cohesionFactor = 0;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		float separationFactor = 0;
+	
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FVector agentVelocity;	// velocity in local coordinates
@@ -47,12 +50,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FVector waypointVector;
 
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	//	FVector alignVector;
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	//	FVector flockCenter;
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	//	FVector sepVector;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		FVector alignVector;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		FVector flockCenter;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		FVector sepVector;
 	/* =============== */
 
 	/*MOVE TO PROTECTED AFTER DEBUGGING*/
@@ -62,7 +65,11 @@ public:
 		int flockID;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		bool statusAvoiding;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		bool statusClimbing;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		bool statusTarget;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float maxSpeed;
@@ -73,6 +80,8 @@ public:
 		float neighborRadius;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float visionRadius;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float obstacleAvoidDist;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float targetHeight;	// height to maintain
