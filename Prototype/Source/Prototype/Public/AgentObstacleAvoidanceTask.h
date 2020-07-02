@@ -19,7 +19,7 @@ protected:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 	UFUNCTION()
-		TArray<FVector> LookAhead(AUSARAgent* agent);
+		TArray<FVector> LookAhead(AUSARAgent* agent, FVector vel);
 	UFUNCTION()
 		bool CheckVector(AUSARAgent* agent, FVector vector);
 	UFUNCTION()

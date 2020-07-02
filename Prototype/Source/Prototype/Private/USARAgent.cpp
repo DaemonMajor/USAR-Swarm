@@ -82,20 +82,20 @@ AUSARAgent::AUSARAgent()
 	visionSphere->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
 	visionSphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
 
-	/*DEBUGGING*//*
-	velArrow = CreateDefaultSubobject<UStaticMeshComponent>("VelocityIndicator");
-	velArrow->SetupAttachment(RootComponent);
-	velArrow->SetSimulatePhysics(false);
-	velArrow->SetGenerateOverlapEvents(false);
-	velArrow->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	/*DEBUGGING*/
+	velMarker = CreateDefaultSubobject<UStaticMeshComponent>("VelocityIndicator");
+	velMarker->SetupAttachment(RootComponent);
+	velMarker->SetSimulatePhysics(false);
+	velMarker->SetGenerateOverlapEvents(false);
+	velMarker->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> velArrowAsset (TEXT("/Game/StarterContent/Shapes/Shape_Cone.Shape_Cone"));
-	if (velArrowAsset.Succeeded()) {
-		velArrow->SetStaticMesh(velArrowAsset.Object);
-		velArrow->SetRelativeScale3D(FVector(bodySize/50.f, bodySize/50.f, .1));
-		velArrow->SetRelativeLocationAndRotation(FVector(2*bodySize, 0, 0), FRotator(90, 0, 0));	// point cone to +x direction
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> velMarkerAsset (TEXT("/Game/StarterContent/Shapes/Shape_Sphere.Shape_Sphere"));
+	if (velMarkerAsset.Succeeded()) {
+		velMarker->SetStaticMesh(velMarkerAsset.Object);
+		velMarker->SetRelativeScale3D(FVector(.1, .1, .1));
+		velMarker->SetRelativeLocation(FVector(2*bodySize, 0, 0));	// point cone to +x direction
 	}
-	*//*DEBUGGING*/
+	/*DEBUGGING*/
 }
 
 // Called when the game starts or when spawned
@@ -127,6 +127,9 @@ void AUSARAgent::Tick(float DeltaSeconds)
 	/*DEBUGGING*/
 	speed = agentVelocity.Size();
 	numNeighbors = neighborAgents.Num();
+	rawVelocity = (flockVector + waypointVector).GetClampedToSize(0, maxSpeed);
+
+	velMarker->SetRelativeLocation(rawVelocity);	// point in direction of travel w/ no obstacles
 	/*DEBUGGING*/
 	
 	if (waypoints.Num()) {

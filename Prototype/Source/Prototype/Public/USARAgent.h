@@ -34,6 +34,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FVector agentVelocity;	// velocity in local coordinates
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		FVector rawVelocity;	// for debugging only (waypoint + flock vector)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FVector avoidanceVector;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FVector heightVector;
@@ -147,8 +149,8 @@ protected:
 		USphereComponent* neighborSphere;
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
 		USphereComponent* visionSphere;
-	//UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
-	//	UStaticMeshComponent* velArrow;
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+		UStaticMeshComponent* velMarker;
 
 	UPROPERTY()
         TArray<AUSARAgent*> neighborAgents = TArray<AUSARAgent*>();
