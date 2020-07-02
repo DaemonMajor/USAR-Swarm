@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
-#include "BoidsAgent.h"
+#include "USARAgent.h"
 #include "AgentObstacleAvoidanceTask.generated.h"
 
 /**
@@ -19,12 +19,12 @@ protected:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 	UFUNCTION()
-		TArray<FVector> LookAhead(ABoidsAgent* agent);
+		TArray<FVector> LookAhead(AUSARAgent* agent);
 	UFUNCTION()
-		bool CheckVector(ABoidsAgent* agent, FVector vector);
+		bool CheckVector(AUSARAgent* agent, FVector vector);
 	UFUNCTION()
-		FVector FindClearVector(ABoidsAgent* agent, FVector startingVec);
+		FVector FindClearVector(AUSARAgent* agent, FVector startingVec);
 
 	UFUNCTION()
-		FVector TransformToWorld(ABoidsAgent* agent, FVector vector);
+		FVector TransformToWorld(AUSARAgent* agent, FVector vector);
 };

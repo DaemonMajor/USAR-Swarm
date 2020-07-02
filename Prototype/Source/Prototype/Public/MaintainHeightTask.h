@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
-#include "BoidsAgent.h"
+#include "USARAgent.h"
 #include "MaintainHeightTask.generated.h"
 
 /**
@@ -19,5 +19,5 @@ protected:
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
 private:
-	void MoveToHeight(ABoidsAgent* agent);
+	void MoveToHeight(AUSARAgent* agent);
 };

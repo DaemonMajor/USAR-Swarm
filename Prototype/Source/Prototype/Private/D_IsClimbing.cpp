@@ -2,12 +2,12 @@
 
 
 #include "D_IsClimbing.h"
-#include "BoidsAgent.h"
+#include "USARAgent.h"
 #include "AIController.h"
 
 bool UD_IsClimbing::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
 {
-    ABoidsAgent* agent = Cast<ABoidsAgent>(OwnerComp.GetAIOwner()->GetPawn());
+    AUSARAgent* agent = Cast<AUSARAgent>(OwnerComp.GetAIOwner()->GetPawn());
 
     return agent->statusClimbing;
 }

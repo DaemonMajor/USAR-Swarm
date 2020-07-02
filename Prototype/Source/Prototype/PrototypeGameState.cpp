@@ -2,7 +2,7 @@
 
 
 #include "PrototypeGameState.h"
-#include "BoidsAgent.h"
+#include "USARAgent.h"
 #include "SwarmWP.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -18,7 +18,7 @@ APrototypeGameState::APrototypeGameState()
 *	@param flockID Flock to assign the agent to. A new flock will be formed if one with the specified ID does not exist.
 *	@return Flock data on the flock the agent was assigned to.
 */
-Flock APrototypeGameState::AddAgent(ABoidsAgent* agent, int flockID)
+Flock APrototypeGameState::AddAgent(AUSARAgent* agent, int flockID)
 {
 	Flock* flock = new Flock();
 
@@ -68,7 +68,7 @@ int APrototypeGameState::AddWaypoint(ASwarmWP* waypoint, int flockID)
 		if (f->flockID == flockID) {
 			f->waypoints.Add(waypoint);
 
-			for (ABoidsAgent* agent : f->agents) {
+			for (AUSARAgent* agent : f->agents) {
 				agent->AddWaypoint(waypoint);
 			}
 
@@ -90,7 +90,7 @@ void APrototypeGameState::RemoveWaypoint(ASwarmWP* waypoint)
 {
 	for (Flock* f : flockData) {
 		if (f->waypoints.Remove(waypoint)) {
-			for (ABoidsAgent* agent : f->agents) {
+			for (AUSARAgent* agent : f->agents) {
 				agent->RemoveWaypoint(waypoint);
 			}
 

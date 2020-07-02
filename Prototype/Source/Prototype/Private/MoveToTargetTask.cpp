@@ -2,14 +2,14 @@
 
 
 #include "MoveToTargetTask.h"
-#include "BoidsAgent.h"
+#include "USARAgent.h"
 #include "AIController.h"
 
 EBTNodeResult::Type UMoveToTargetTask::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
     Super::ExecuteTask(OwnerComp, NodeMemory);
 
-    ABoidsAgent* agent = Cast<ABoidsAgent>(OwnerComp.GetAIOwner()->GetPawn());
+    AUSARAgent* agent = Cast<AUSARAgent>(OwnerComp.GetAIOwner()->GetPawn());
 
     ASwarmWP* waypoint = agent->GetCurrWaypoint();
     FVector targetVector = FVector::ZeroVector;

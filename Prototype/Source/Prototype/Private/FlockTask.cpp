@@ -2,14 +2,14 @@
 
 
 #include "FlockTask.h"
-#include "BoidsAgent.h"
+#include "USARAgent.h"
 #include "AIController.h"
 
 EBTNodeResult::Type UFlockTask::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
     Super::ExecuteTask(OwnerComp, NodeMemory);
 
-    ABoidsAgent* agent = Cast<ABoidsAgent>(OwnerComp.GetAIOwner()->GetPawn());
+    AUSARAgent* agent = Cast<AUSARAgent>(OwnerComp.GetAIOwner()->GetPawn());
     FVector alignFactor = GetAlignment(agent) * agent->alignmentWeight;
     FVector cohFactor = GetCohesion(agent) * agent->cohesionWeight;
     FVector sepFactor = GetSeparation(agent) * agent->separationWeight;
@@ -37,13 +37,13 @@ EBTNodeResult::Type UFlockTask::ExecuteTask(UBehaviorTreeComponent& OwnerComp, u
 *   @param agent Agent to calculate alignment vector for.
 *   @return Average velocity of neighbors. Returns zero if agent has no neighbors.
 */
-FVector UFlockTask::GetAlignment(ABoidsAgent* agent)
+FVector UFlockTask::GetAlignment(AUSARAgent* agent)
 {
     FVector alignVector = FVector::ZeroVector;
 
-    TArray<ABoidsAgent*> neighbors = agent->GetNeighbors();
+    TArray<AUSARAgent*> neighbors = agent->GetNeighbors();
 
-    for (ABoidsAgent* boid : neighbors) {
+    for (AUSARAgent* boid : neighbors) {
         if (boid) {
             alignVector += boid->GetVelocity();
         }
@@ -63,12 +63,12 @@ FVector UFlockTask::GetAlignment(ABoidsAgent* agent)
 *   @param agent Agent to calculate cohesion vector for.
 *   @return Vector pointing to center mass of agent's neighbors. Returns zero if agent has no neighbors.
 */
-FVector UFlockTask::GetCohesion(ABoidsAgent* agent)
+FVector UFlockTask::GetCohesion(AUSARAgent* agent)
 {
     FVector centerMass = FVector::ZeroVector;
 
-    TArray<ABoidsAgent*> neighbors = agent->GetNeighbors();
-    for (ABoidsAgent* boid : neighbors) {
+    TArray<AUSARAgent*> neighbors = agent->GetNeighbors();
+    for (AUSARAgent* boid : neighbors) {
         if (boid) {
             centerMass += boid->GetActorLocation();
         }
@@ -89,14 +89,14 @@ FVector UFlockTask::GetCohesion(ABoidsAgent* agent)
 *   @param agent Agent to calculate separation vector for.
 *   @return Vector pointing away from neighbors.
 */
-FVector UFlockTask::GetSeparation(ABoidsAgent* agent)
+FVector UFlockTask::GetSeparation(AUSARAgent* agent)
 {
     FVector sepDir = FVector::ZeroVector;
 
-    TArray<ABoidsAgent*> neighbors = agent->GetNeighbors();
+    TArray<AUSARAgent*> neighbors = agent->GetNeighbors();
     FVector agentLoc = agent->GetActorLocation();
     FVector boidLoc, separation;
-    for (ABoidsAgent* boid : neighbors) {
+    for (AUSARAgent* boid : neighbors) {
         if (boid) {
             boidLoc = boid->GetActorLocation();
             separation = agentLoc - boidLoc;
@@ -128,7 +128,7 @@ FVector UFlockTask::GetSeparation(ABoidsAgent* agent)
 *   @param sepFactor Separation factor.
 *   @return Velocity vector.
 */
-FVector UFlockTask::CalcNewVector(ABoidsAgent* agent, FVector alignFactor, FVector cohFactor, FVector sepFactor)
+FVector UFlockTask::CalcNewVector(AUSARAgent* agent, FVector alignFactor, FVector cohFactor, FVector sepFactor)
 {
     return alignFactor + cohFactor + sepFactor;
 }

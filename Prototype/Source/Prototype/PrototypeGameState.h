@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "BoidsAgent.h"
+#include "USARAgent.h"
 #include "SwarmWP.h"
 #include "GameFramework/GameStateBase.h"
 #include "PrototypeGameState.generated.h"
@@ -16,7 +16,7 @@ struct Flock
 	UPROPERTY()
 		int flockID;
 	UPROPERTY()
-		TArray<ABoidsAgent*> agents;
+		TArray<AUSARAgent*> agents;
 	UPROPERTY()
 		TArray<ASwarmWP*> waypoints;
 };
@@ -33,7 +33,7 @@ public:
 	APrototypeGameState();
 
 	UFUNCTION()
-		Flock AddAgent(ABoidsAgent* agent, int flockID);	// Give the passed agent a unique ID and assign to specified flock. Returns flock data.
+		Flock AddAgent(AUSARAgent* agent, int flockID);	// Give the passed agent a unique ID and assign to specified flock. Returns flock data.
 	UFUNCTION()
 		int AddWaypoint(ASwarmWP* waypoint, int flockID);	// Give the passed waypoint a unique ID and assign to specified flock. Returns waypoint ID.
 	UFUNCTION()

@@ -2,21 +2,21 @@
 
 
 #include "MaintainHeightTask.h"
-#include "BoidsAgent.h"
+#include "USARAgent.h"
 #include "AIController.h"
 
 EBTNodeResult::Type UMaintainHeightTask::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
     Super::ExecuteTask(OwnerComp, NodeMemory);
 
-    ABoidsAgent* agent = Cast<ABoidsAgent>(OwnerComp.GetAIOwner()->GetPawn());
+    AUSARAgent* agent = Cast<AUSARAgent>(OwnerComp.GetAIOwner()->GetPawn());
 
     MoveToHeight(agent);
 
     return EBTNodeResult::Succeeded;
 }
 
-void UMaintainHeightTask::MoveToHeight(ABoidsAgent* agent)
+void UMaintainHeightTask::MoveToHeight(AUSARAgent* agent)
 {
     float agentHeight = agent->GetActorLocation().Z;
     float targetHeight = agent->targetHeight;

@@ -2,7 +2,7 @@
 
 
 #include "SwarmWP.h"
-#include "BoidsAgent.h"
+#include "USARAgent.h"
 #include "../PrototypeGameState.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/ShapeComponent.h"
@@ -81,7 +81,7 @@ void ASwarmWP::OnAgentEnter(UPrimitiveComponent* wpAreaComp, AActor* agent, UPri
 	bool senseAgentBody = !(agentBody->GetName().Compare("AgentBody"));
 
 	if (senseAgentBody) {
-		ABoidsAgent* boid = Cast<ABoidsAgent>(agent);
+		AUSARAgent* boid = Cast<AUSARAgent>(agent);
 
 		if (boid) {
 			if (flockID == boid->flockID) {

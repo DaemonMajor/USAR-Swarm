@@ -9,7 +9,7 @@ EBTNodeResult::Type UAgentObstacleAvoidanceTask::ExecuteTask(UBehaviorTreeCompon
 {
     Super::ExecuteTask(OwnerComp, NodeMemory);
 
-    ABoidsAgent* agent = Cast<ABoidsAgent>(OwnerComp.GetAIOwner()->GetPawn());
+    AUSARAgent* agent = Cast<AUSARAgent>(OwnerComp.GetAIOwner()->GetPawn());
     
     TArray<FVector> safeVectors = LookAhead(agent);
 
@@ -54,7 +54,7 @@ EBTNodeResult::Type UAgentObstacleAvoidanceTask::ExecuteTask(UBehaviorTreeCompon
 *   @param agent Agent to raycast for.
 *   @return Array of obstacle-free vectors.
 */
-TArray<FVector> UAgentObstacleAvoidanceTask::LookAhead(ABoidsAgent* agent)
+TArray<FVector> UAgentObstacleAvoidanceTask::LookAhead(AUSARAgent* agent)
 {
     // Transform agent velocity from local to world coordinates
     FVector targetVector = agent->GetVelocity();
@@ -102,7 +102,7 @@ TArray<FVector> UAgentObstacleAvoidanceTask::LookAhead(ABoidsAgent* agent)
     return safeVectors;
 }
 
-bool UAgentObstacleAvoidanceTask::CheckVector(ABoidsAgent* agent, FVector vector)
+bool UAgentObstacleAvoidanceTask::CheckVector(AUSARAgent* agent, FVector vector)
 {
     bool isSafe = false;
 
@@ -117,7 +117,7 @@ bool UAgentObstacleAvoidanceTask::CheckVector(ABoidsAgent* agent, FVector vector
 *   @param startingVec The vector to start the sweep from.
 *   @return The first vector that hits no obstacles in a LineTraceSingleByChannel call. Returns null vector if no clear vector found.
 */
-FVector UAgentObstacleAvoidanceTask::FindClearVector(ABoidsAgent* agent, FVector startingVec) {
+FVector UAgentObstacleAvoidanceTask::FindClearVector(AUSARAgent* agent, FVector startingVec) {
     float degIncr = 15;     // in case increment needs to be changed later
 
     for (int i = 0; i < 360/degIncr; i++) {
@@ -137,7 +137,7 @@ FVector UAgentObstacleAvoidanceTask::FindClearVector(ABoidsAgent* agent, FVector
     return FVector(NULL, NULL, NULL);
 }
 
-FVector UAgentObstacleAvoidanceTask::TransformToWorld(ABoidsAgent* agent, FVector vector)
+FVector UAgentObstacleAvoidanceTask::TransformToWorld(AUSARAgent* agent, FVector vector)
 {
     FRotator agentRot = agent->GetActorRotation().GetInverse();
     FVector transVector = agentRot.RotateVector(vector);
