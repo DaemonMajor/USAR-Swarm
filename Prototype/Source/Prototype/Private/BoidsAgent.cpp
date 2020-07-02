@@ -7,6 +7,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
 #include "Components/ShapeComponent.h"
+#include "Components/ArrowComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "Kismet/KismetSystemLibrary.h"
 
@@ -43,9 +44,9 @@ ABoidsAgent::ABoidsAgent()
 	AIControllerClass = ABoidsAgentController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
-	agentRoot = CreateDefaultSubobject<UStaticMeshComponent>("AgentRoot");
-	SetRootComponent(agentRoot);
-	agentRoot->SetSimulatePhysics(false);
+	//agentRoot = CreateDefaultSubobject<UStaticMeshComponent>("AgentRoot");
+	//SetRootComponent(agentRoot);
+	//agentRoot->SetSimulatePhysics(false);
 
 	agentBody = CreateDefaultSubobject<UStaticMeshComponent>("AgentBody");
 	agentBody->SetupAttachment(RootComponent);
@@ -80,6 +81,21 @@ ABoidsAgent::ABoidsAgent()
 	visionSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	visionSphere->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
 	visionSphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
+
+	/*DEBUGGING*/
+	velArrow = CreateDefaultSubobject<UStaticMeshComponent>("VelocityIndicator");
+	velArrow->SetupAttachment(RootComponent);
+	velArrow->SetSimulatePhysics(false);
+	velArrow->SetGenerateOverlapEvents(false);
+	velArrow->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> velArrowAsset (TEXT("/Game/StarterContent/Shapes/Shape_Cone.Shape_Cone"));
+	if (velArrowAsset.Succeeded()) {
+		velArrow->SetStaticMesh(velArrowAsset.Object);
+		velArrow->SetRelativeScale3D(FVector(bodySize/50.f, bodySize/50.f, .1));
+		velArrow->SetRelativeLocationAndRotation(FVector(2*bodySize, 0, 0), FRotator(90, 0, 0));	// point cone to +x direction
+	}
+	/*DEBUGGING*/
 }
 
 // Called when the game starts or when spawned

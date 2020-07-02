@@ -22,6 +22,8 @@ protected:
 		TArray<FVector> LookAhead(ABoidsAgent* agent);
 	UFUNCTION()
 		bool CheckVector(ABoidsAgent* agent, FVector vector);
+	UFUNCTION()
+		FVector FindClearVector(ABoidsAgent* agent, FVector startingVec);
 
 	UFUNCTION()
 		FVector TransformToWorld(ABoidsAgent* agent, FVector vector);

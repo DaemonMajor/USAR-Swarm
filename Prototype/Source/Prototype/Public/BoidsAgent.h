@@ -137,8 +137,8 @@ protected:
 	UPROPERTY()
 		float yawRate;		// rate at which agent can turn in degrees per second
 	
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
-		UStaticMeshComponent* agentRoot;
+	//UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+	//	UStaticMeshComponent* agentRoot;
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
 		UStaticMeshComponent* agentBody;
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
@@ -147,6 +147,8 @@ protected:
 		USphereComponent* neighborSphere;
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
 		USphereComponent* visionSphere;
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+		UStaticMeshComponent* velArrow;
 
 	UPROPERTY()
         TArray<ABoidsAgent*> neighborAgents = TArray<ABoidsAgent*>();

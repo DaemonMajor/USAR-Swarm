@@ -13,31 +13,36 @@ EBTNodeResult::Type UAgentObstacleAvoidanceTask::ExecuteTask(UBehaviorTreeCompon
     
     TArray<FVector> safeVectors = LookAhead(agent);
 
-    if (safeVectors.Num()) {
-        /*DEBUGGING*/
-        //    FString avoidingText = FString::Printf(TEXT("Agent %d avoiding obstacle."), agent->agentID);
-        //    GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Yellow, avoidingText, true);
-        /*DEBUGGING*/
+    if (agent->statusAvoiding) {
+        if (safeVectors.Num()) {
+            /*DEBUGGING*/
+            FString avoidingText = FString::Printf(TEXT("Agent %d avoiding obstacle."), agent->agentID);
+            GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Yellow, avoidingText, true);
+            /*DEBUGGING*/
 
-        for (FVector vec : safeVectors) {
-            if (CheckVector(agent, vec)) {
-                FVector confirmedVector = vec - agent->GetActorLocation();
-                // need to transform to local rotation
-                
-                agent->SetAvoidanceVector(confirmedVector);
+            for (FVector vec : safeVectors) {
+                if (CheckVector(agent, vec)) {
+                    FVector confirmedVector = vec - agent->GetActorLocation();
+                    // need to transform to local rotation
+
+                    agent->SetAvoidanceVector(confirmedVector);
+                }
             }
         }
-    }
-    else {
-        /*DEBUGGING*/
+        else {
+            /*DEBUGGING*/
             FString avoidingText = FString::Printf(TEXT("Agent %d blocked. Attempting to move around obstacle."), agent->agentID);
             GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Yellow, avoidingText, true);
-        /*DEBUGGING*/
+            /*DEBUGGING*/
 
-        FRotator turnRight = FRotator(0, 90, 0);    // turn 90 degrees yaw
-        FVector avoidVector = turnRight.RotateVector(agent->GetVelocity());
+            // turn 90 degrees yaw, then in 15 deg increments until clear
+            FVector rightTurn = FRotator(0, 90, 0).RotateVector(agent->GetActorLocation());
+            FVector clearVec = FindClearVector(agent, rightTurn);
 
-        agent->SetAvoidanceVector(avoidVector);
+            
+
+            agent->SetAvoidanceVector(clearVec);
+        }
     }
 
     return EBTNodeResult::Succeeded;
@@ -104,6 +109,32 @@ bool UAgentObstacleAvoidanceTask::CheckVector(ABoidsAgent* agent, FVector vector
     // raycast cone around vector
 
     return true;    // placeholder
+}
+
+/* Sweep a given vector in an arc in 15 degree increments, checking for collisions. Returns the first vector that hits no obstacle.
+*
+*   @param agent The agent to perform the sweep for.
+*   @param startingVec The vector to start the sweep from.
+*   @return The first vector that hits no obstacles in a LineTraceSingleByChannel call. Returns null vector if no clear vector found.
+*/
+FVector UAgentObstacleAvoidanceTask::FindClearVector(ABoidsAgent* agent, FVector startingVec) {
+    float degIncr = 15;     // in case increment needs to be changed later
+
+    for (int i = 0; i < 360/degIncr; i++) {
+        FHitResult hitResult;
+        FCollisionQueryParams queryParams;
+        queryParams.AddIgnoredActor(agent);
+        FCollisionResponseParams responseParams;
+        FRotator rot = FRotator(0, degIncr * i, 0);     // rotate around z axis
+        FVector clearVec = rot.RotateVector(startingVec);
+
+        // if vector is clear
+        if (!GetWorld()->LineTraceSingleByChannel(hitResult, agent->GetActorLocation(), clearVec, ECC_WorldStatic, queryParams, responseParams)) {
+            return clearVec;
+        }
+    }
+
+    return FVector(NULL, NULL, NULL);
 }
 
 FVector UAgentObstacleAvoidanceTask::TransformToWorld(ABoidsAgent* agent, FVector vector)
