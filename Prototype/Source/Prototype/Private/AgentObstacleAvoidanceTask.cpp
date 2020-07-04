@@ -13,6 +13,11 @@ EBTNodeResult::Type UAgentObstacleAvoidanceTask::ExecuteTask(UBehaviorTreeCompon
 
     AUSARAgent* agent = Cast<AUSARAgent>(OwnerComp.GetAIOwner()->GetPawn());
 
+    if (agent->statusClosingDist) {
+        return EBTNodeResult::Succeeded;
+    }
+
+
     bool obstructed = false;
     TArray<FVector> safeVectors = LookAhead(agent, agent->rawVelocity, obstructed);
 
@@ -57,6 +62,16 @@ EBTNodeResult::Type UAgentObstacleAvoidanceTask::ExecuteTask(UBehaviorTreeCompon
         }
     }
     else {
+        if (agent->statusAvoiding) {
+            agent->statusClosingDist = true;
+
+            float dist = agent->rawVelocity.Size() + agent->bodySize;
+            FVector wpLoc = agent->rawVelocity.GetClampedToSize(dist, dist) + agent->GetActorLocation();
+            ASwarmWP* tmpWP = GetWorld()->SpawnActor<ASwarmWP>(wpLoc, FRotator::ZeroRotator);
+
+            agent->AddWaypoint(tmpWP, false);
+        }
+
         agent->statusAvoiding = false;
         agent->SetAvoidanceVector(FVector::ZeroVector);
     }

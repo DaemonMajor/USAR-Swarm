@@ -68,6 +68,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		bool statusAvoiding;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		bool statusClosingDist;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		bool statusClimbing;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		bool statusTraveling;
@@ -126,7 +128,7 @@ public:
 	virtual FVector GetVelocity() const override;	// get agent velocity in local coordinates (bypasses built-in component velocity because documentation is unclear)
 
 	UFUNCTION()
-		void AddWaypoint(ASwarmWP* wp);		// append waypoint to list of target waypoints
+		void AddWaypoint(ASwarmWP* wp, bool atEnd = true);		// append waypoint to list of target waypoints
 	UFUNCTION()
 		void RemoveWaypoint(ASwarmWP* wp);	// remove waypoint from list of target waypoints
 	UFUNCTION()

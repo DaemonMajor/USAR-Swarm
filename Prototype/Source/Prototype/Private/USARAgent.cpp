@@ -33,6 +33,7 @@ AUSARAgent::AUSARAgent()
 	separationWeight = 0.25;
 
 	statusAvoiding = false;
+	statusClosingDist = false;
 	statusClimbing = false;
 	statusTraveling = false;
 
@@ -340,9 +341,14 @@ FRotator AUSARAgent::FaceDirection(FVector dir, float deltaSec)
 *
 *	@param wp Waypoint to add.
 */
-void AUSARAgent::AddWaypoint(ASwarmWP* wp)
+void AUSARAgent::AddWaypoint(ASwarmWP* wp, bool atEnd)
 {
-	waypoints.Add(wp);
+	if (atEnd) {
+		waypoints.Add(wp);
+	}
+	else {
+		waypoints.Insert(wp, 0);
+	}
 }
 
 /* Remove a waypoint from the agent's list of target waypoints.

@@ -40,16 +40,17 @@ void ASwarmWP::BeginPlay()
 	wpArea->OnComponentBeginOverlap.AddDynamic(this, &ASwarmWP::OnAgentEnter);
 
 	/*FOR PREPLACED WAYPOINTS*/
-	FTimerDelegate InitDelegate;
-	InitDelegate.BindUFunction(this, FName("Init"), 1);
-	GetWorld()->GetTimerManager().SetTimer(bootUpDelayTimer, InitDelegate, 1.5, false);
+	//FTimerDelegate InitDelegate;
+	//InitDelegate.BindUFunction(this, FName("Init"), 1);
+	//GetWorld()->GetTimerManager().SetTimer(bootUpDelayTimer, this, &ASwarmWP::Init, 1.5, false);
 }
 
-void ASwarmWP::Init(int flock)
+void ASwarmWP::Init()
 {
-	APrototypeGameState* gameState = GetWorld()->GetGameState<APrototypeGameState>();
-	wpID = gameState->AddWaypoint(this, flock);	// assign waypoint ID
-	flockID = flock;
+	if (flockID > 0) {
+		APrototypeGameState* gameState = GetWorld()->GetGameState<APrototypeGameState>();
+		wpID = gameState->AddWaypoint(this, flockID);	// assign waypoint ID
+	}
 }
 
 void ASwarmWP::Deactivate()

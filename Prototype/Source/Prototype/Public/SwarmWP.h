@@ -19,11 +19,11 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		int wpID = -1;		// Unique waypoint ID. Value of -1 sets waypoint as inactive.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		int flockID;		// Flock assigned to this waypoint.
+		int flockID = -1;		// Flock assigned to this waypoint.
 	/*FOR DEBUGGING ONLY*/
 
 	UFUNCTION()
-		void Init(int flock);
+		void Init();
 
 	UFUNCTION()
 		int GetID();
