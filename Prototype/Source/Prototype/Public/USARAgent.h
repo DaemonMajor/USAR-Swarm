@@ -149,8 +149,6 @@ protected:
 		USphereComponent* neighborSphere;
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
 		USphereComponent* visionSphere;
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
-		UStaticMeshComponent* velMarker;
 
 	UPROPERTY()
         TArray<AUSARAgent*> neighborAgents = TArray<AUSARAgent*>();

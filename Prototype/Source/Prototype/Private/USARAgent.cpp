@@ -10,6 +10,7 @@
 #include "Components/ArrowComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 AUSARAgent::AUSARAgent()
@@ -81,21 +82,6 @@ AUSARAgent::AUSARAgent()
 	visionSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	visionSphere->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
 	visionSphere->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);
-
-	/*DEBUGGING*/
-	velMarker = CreateDefaultSubobject<UStaticMeshComponent>("VelocityIndicator");
-	velMarker->SetupAttachment(RootComponent);
-	velMarker->SetSimulatePhysics(false);
-	velMarker->SetGenerateOverlapEvents(false);
-	velMarker->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-	static ConstructorHelpers::FObjectFinder<UStaticMesh> velMarkerAsset (TEXT("/Game/StarterContent/Shapes/Shape_Sphere.Shape_Sphere"));
-	if (velMarkerAsset.Succeeded()) {
-		velMarker->SetStaticMesh(velMarkerAsset.Object);
-		velMarker->SetRelativeScale3D(FVector(.1, .1, .1));
-		velMarker->SetRelativeLocation(FVector(2*bodySize, 0, 0));	// point cone to +x direction
-	}
-	/*DEBUGGING*/
 }
 
 // Called when the game starts or when spawned
@@ -129,7 +115,8 @@ void AUSARAgent::Tick(float DeltaSeconds)
 	numNeighbors = neighborAgents.Num();
 	rawVelocity = (flockVector + waypointVector).GetClampedToSize(0, maxSpeed);
 
-	velMarker->SetRelativeLocation(rawVelocity);	// point in direction of travel w/ no obstacles
+	DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + agentVelocity, 10.f, FColor::Blue, false, 0.01, 0, 2.5);
+	DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + rawVelocity, 5.f, FColor::Purple, false, 0.01, 0, 2.5);
 	/*DEBUGGING*/
 	
 	if (waypoints.Num()) {
