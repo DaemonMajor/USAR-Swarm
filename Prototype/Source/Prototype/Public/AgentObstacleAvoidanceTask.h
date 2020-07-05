@@ -24,7 +24,7 @@ protected:
 		bool CheckVector(AUSARAgent* agent, FVector vector);
 	UFUNCTION()
 		FVector FindClearVector(AUSARAgent* agent, FVector startingVec);
-
+	
 	UFUNCTION()
 		FVector TransformToWorld(AUSARAgent* agent, FVector vector);
 };

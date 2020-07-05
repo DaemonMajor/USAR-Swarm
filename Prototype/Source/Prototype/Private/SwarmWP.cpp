@@ -38,11 +38,6 @@ void ASwarmWP::BeginPlay()
 	Super::BeginPlay();
 
 	wpArea->OnComponentBeginOverlap.AddDynamic(this, &ASwarmWP::OnAgentEnter);
-
-	/*FOR PREPLACED WAYPOINTS*/
-	//FTimerDelegate InitDelegate;
-	//InitDelegate.BindUFunction(this, FName("Init"), 1);
-	//GetWorld()->GetTimerManager().SetTimer(bootUpDelayTimer, this, &ASwarmWP::Init, 1.5, false);
 }
 
 void ASwarmWP::Init()
@@ -74,6 +69,10 @@ int ASwarmWP::GetID()
 void ASwarmWP::SetID(int id)
 {
 	wpID = id;
+}
+
+void ASwarmWP::SetFlock(int flock) {
+	flockID = flock;
 }
 
 void ASwarmWP::OnAgentEnter(UPrimitiveComponent* wpAreaComp, AActor* agent, UPrimitiveComponent* agentBody, int32 agentIndex,

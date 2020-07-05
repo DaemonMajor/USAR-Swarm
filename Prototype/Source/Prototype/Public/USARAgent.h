@@ -44,12 +44,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FVector waypointVector;
 
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	//	float alignmentFactor = 0;
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	//	float cohesionFactor = 0;
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	//	float separationFactor = 0;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		float alignmentFactor = 0;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		float cohesionFactor = 0;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		float separationFactor = 0;
 	
 	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	//	FVector alignVector;
@@ -68,7 +68,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		bool statusAvoiding;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		bool statusClosingDist;
+		bool statusDirectMove;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		bool statusClimbing;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -118,6 +118,8 @@ public:
 	UFUNCTION()
 		void SetAvoidanceVector(FVector rawVector);
 	UFUNCTION()
+		void SetDirectMoveLoc(FVector loc);
+	UFUNCTION()
 		void SetHeightVector(FVector rawVector);
 	UFUNCTION()
 		void SetFlockVector(FVector rawVector);
@@ -133,6 +135,8 @@ public:
 		void RemoveWaypoint(ASwarmWP* wp);	// remove waypoint from list of target waypoints
 	UFUNCTION()
 		ASwarmWP* GetCurrWaypoint();		// fetch current waypoint
+	UFUNCTION()
+		FVector GetDirectMoveLoc();
 
 protected:
 	virtual void BeginPlay() override;
@@ -158,6 +162,8 @@ protected:
 		TArray<ASwarmWP*> waypoints = TArray<ASwarmWP*>();
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FVector wpLoc;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		FVector directMoveLoc;
 
 	UPROPERTY()
 		float bootUpDelay = 0.5;

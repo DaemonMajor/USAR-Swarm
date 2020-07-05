@@ -15,12 +15,15 @@ public:
 	// Sets default values for this actor's properties
 	AControlStation();
 
+	virtual void Tick(float DeltaTime) override;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	UPROPERTY()
+		FTimerHandle bootUpDelayTimer;	// timer handle for waypoints that exist on world start
 
+	UFUNCTION()
+		void InitWaypoints();	// activate preplaced waypoints
 };

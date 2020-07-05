@@ -24,7 +24,7 @@ AUSARAgent::AUSARAgent()
 	neighborRadius = 1500;
 	visionRadius = 500;
 	obstacleAvoidDist = 125;
-
+	
 	targetHeight = visionRadius * 0.85;
 	heightVariance = targetHeight * 0.05;
 
@@ -33,7 +33,7 @@ AUSARAgent::AUSARAgent()
 	separationWeight = 0.25;
 
 	statusAvoiding = false;
-	statusClosingDist = false;
+	statusDirectMove = false;
 	statusClimbing = false;
 	statusTraveling = false;
 
@@ -42,6 +42,7 @@ AUSARAgent::AUSARAgent()
 	heightVector = FVector::ZeroVector;
 	flockVector = FVector::ZeroVector;
 	waypointVector = FVector::ZeroVector;
+	directMoveLoc = FVector::ZeroVector;
 
 	AIControllerClass = AUSARAgentController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
@@ -255,6 +256,10 @@ void AUSARAgent::SetVelocity()
 	if (statusAvoiding) {
 		newVel = avoidanceVector;
 	}
+	else if (statusDirectMove) {
+		newVel = (directMoveLoc - GetActorLocation()).GetSafeNormal();
+		newVel *= maxSpeed;
+	}
 	else if (statusClimbing) {
 		newVel = FVector(0, 0, heightVector.Z);
 	}
@@ -269,6 +274,16 @@ void AUSARAgent::SetVelocity()
 void AUSARAgent::SetAvoidanceVector(FVector rawVector)
 {
 	avoidanceVector = rawVector;
+}
+
+void AUSARAgent::SetDirectMoveLoc(FVector loc)
+{
+	directMoveLoc = loc;
+}
+
+FVector AUSARAgent::GetDirectMoveLoc()
+{
+	return directMoveLoc;
 }
 
 void AUSARAgent::SetHeightVector(FVector rawVector)
@@ -358,4 +373,8 @@ void AUSARAgent::AddWaypoint(ASwarmWP* wp, bool atEnd)
 void AUSARAgent::RemoveWaypoint(ASwarmWP* wp)
 {
 	waypoints.Remove(wp);
+
+	if (wp->flockID == -1) {
+		statusDirectMove = false;
+	}
 }

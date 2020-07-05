@@ -18,9 +18,9 @@ EBTNodeResult::Type UFlockTask::ExecuteTask(UBehaviorTreeComponent& OwnerComp, u
     agent->SetFlockVector(flockVector);
 
     /*DEBUGGING*/
-    //agent->alignmentFactor = alignFactor.Size();
-    //agent->cohesionFactor = cohFactor.Size();
-    //agent->separationFactor = sepFactor.Size();
+    agent->alignmentFactor = alignFactor.Size();
+    agent->cohesionFactor = cohFactor.Size();
+    agent->separationFactor = sepFactor.Size();
     /*DEBUGGING*/
 
     /*DEBUGGING*/
@@ -105,7 +105,7 @@ FVector UFlockTask::GetSeparation(AUSARAgent* agent)
             float dist = separation.Size();
             float spacing = agent->agentSpacing;
             if (dist < spacing) {
-                sepFactor = FMath::Pow(spacing - dist, 1.5f);
+                sepFactor = FMath::Pow(1.1f, spacing - dist);
             }
 
             sepDir += separation * sepFactor;

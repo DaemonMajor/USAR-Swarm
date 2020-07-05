@@ -15,12 +15,10 @@ public:
 	// Sets default values for this actor's properties
 	ASwarmWP();
 
-	/*FOR DEBUGGING ONLY*/
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		int wpID = -1;		// Unique waypoint ID. Value of -1 sets waypoint as inactive.
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		int flockID = -1;		// Flock assigned to this waypoint.
-	/*FOR DEBUGGING ONLY*/
 
 	UFUNCTION()
 		void Init();
@@ -29,6 +27,8 @@ public:
 		int GetID();
 	UFUNCTION()
 		void SetID(int id);
+	UFUNCTION()
+		void SetFlock(int flock);
 
 	UFUNCTION()
 		void Deactivate();
@@ -40,11 +40,6 @@ protected:
 		UStaticMeshComponent* wpRoot;
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
 		UStaticMeshComponent* wpArea;
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
-		float wpRadius;
-
-	UPROPERTY()
-		FTimerHandle bootUpDelayTimer;	// timer handle for waypoints that exist on world start
 
 	UFUNCTION()
 		void OnAgentEnter(UPrimitiveComponent* wpAreaComp, AActor* agent, UPrimitiveComponent* agentBody, int32 agentIndex,

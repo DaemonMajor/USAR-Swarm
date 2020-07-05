@@ -2,7 +2,6 @@
 
 
 #include "AgentObstacleAvoidanceTask.h"
-#include "SwarmWP.h"
 #include "AIController.h"
 #include "DrawDebugHelpers.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -13,10 +12,13 @@ EBTNodeResult::Type UAgentObstacleAvoidanceTask::ExecuteTask(UBehaviorTreeCompon
 
     AUSARAgent* agent = Cast<AUSARAgent>(OwnerComp.GetAIOwner()->GetPawn());
 
-    if (agent->statusClosingDist) {
+    if (agent->statusDirectMove) {
+        if (agent->GetActorLocation() == agent->GetDirectMoveLoc()) {
+            agent->statusDirectMove = false;
+        }
+
         return EBTNodeResult::Succeeded;
     }
-
 
     bool obstructed = false;
     TArray<FVector> safeVectors = LookAhead(agent, agent->rawVelocity, obstructed);
@@ -26,8 +28,6 @@ EBTNodeResult::Type UAgentObstacleAvoidanceTask::ExecuteTask(UBehaviorTreeCompon
         FString safeVectorsText = FString::Printf(TEXT("Agent %d detected obstruction."), agent->agentID);
         GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Orange, safeVectorsText, true);
         /*DEBUGGING*/
-
-        agent->statusAvoiding = true;
 
         if (!agent->statusAvoiding) {
             FVector upVec = FVector(0, 0, agent->obstacleAvoidDist);
@@ -60,16 +60,15 @@ EBTNodeResult::Type UAgentObstacleAvoidanceTask::ExecuteTask(UBehaviorTreeCompon
                 /*DEBUGGING*/
             }
         }
+
+        agent->statusAvoiding = true;
     }
     else {
         if (agent->statusAvoiding) {
-            agent->statusClosingDist = true;
+            agent->statusDirectMove = true;
 
-            float dist = agent->rawVelocity.Size() + agent->bodySize;
-            FVector wpLoc = agent->rawVelocity.GetClampedToSize(dist, dist) + agent->GetActorLocation();
-            ASwarmWP* tmpWP = GetWorld()->SpawnActor<ASwarmWP>(wpLoc, FRotator::ZeroRotator);
-
-            agent->AddWaypoint(tmpWP, false);
+            FVector goToVec = agent->rawVelocity.GetClampedToSize(agent->obstacleAvoidDist, agent->obstacleAvoidDist);
+            agent->SetDirectMoveLoc(goToVec + agent->GetActorLocation());
         }
 
         agent->statusAvoiding = false;
