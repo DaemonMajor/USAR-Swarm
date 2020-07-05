@@ -23,7 +23,7 @@ protected:
 	UFUNCTION()
 		bool CheckVector(AUSARAgent* agent, FVector vector);
 	UFUNCTION()
-		FVector FindClearVector(AUSARAgent* agent, FVector startingVec);
+		bool FindClearVector(AUSARAgent* agent, FVector& targetVec, int fidelity);
 	
 	UFUNCTION()
 		FVector TransformToWorld(AUSARAgent* agent, FVector vector);

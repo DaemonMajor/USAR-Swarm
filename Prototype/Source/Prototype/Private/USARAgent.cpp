@@ -32,6 +32,7 @@ AUSARAgent::AUSARAgent()
 	cohesionWeight = 0.75;
 	separationWeight = 0.25;
 
+	statusStuck = false;
 	statusAvoiding = false;
 	statusDirectMove = false;
 	statusClimbing = false;
@@ -109,25 +110,30 @@ void AUSARAgent::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	SetVelocity();
-	MoveAgent(DeltaSeconds);
-
-	/*DEBUGGING*/
-	speed = agentVelocity.Size();
-	numNeighbors = neighborAgents.Num();
-	rawVelocity = (flockVector + waypointVector).GetClampedToSize(0, maxSpeed);
-
-	DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + agentVelocity, 10.f, FColor::Blue, false, 0.01, 0, 2.5);
-	DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + rawVelocity, 5.f, FColor::Purple, false, 0.01, 0, 2.5);
-	/*DEBUGGING*/
-	
-	if (waypoints.Num()) {
-		wpLoc = waypoints[0]->GetActorLocation();
-		statusTraveling = true;
+	if (statusStuck) {
+		// enter low-power state
 	}
 	else {
-		wpLoc = FVector(NULL, NULL, NULL);
-		statusTraveling = false;
+		SetVelocity();
+		MoveAgent(DeltaSeconds);
+
+		/*DEBUGGING*/
+		speed = agentVelocity.Size();
+		numNeighbors = neighborAgents.Num();
+		rawVelocity = (flockVector + waypointVector).GetClampedToSize(0, maxSpeed);
+
+		DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + agentVelocity, 10.f, FColor::Blue, false, 0.01, 0, 2.5);
+		DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + rawVelocity, 5.f, FColor::Purple, false, 0.01, 0, 2.5);
+		/*DEBUGGING*/
+
+		if (waypoints.Num()) {
+			wpLoc = waypoints[0]->GetActorLocation();
+			statusTraveling = true;
+		}
+		else {
+			wpLoc = FVector(NULL, NULL, NULL);
+			statusTraveling = false;
+		}
 	}
 }
 
@@ -377,4 +383,14 @@ void AUSARAgent::RemoveWaypoint(ASwarmWP* wp)
 	if (wp->flockID == -1) {
 		statusDirectMove = false;
 	}
+}
+
+/* Set agent status to stuck and power down non-vital systems.*/
+void AUSARAgent::SetStatusStuck()
+{
+	statusStuck = true;
+	statusAvoiding = false;
+	statusDirectMove = false;
+	statusClimbing = false;
+	statusTraveling = false;
 }

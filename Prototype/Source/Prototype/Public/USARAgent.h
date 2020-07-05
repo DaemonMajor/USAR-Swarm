@@ -66,6 +66,8 @@ public:
 		int flockID;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		bool statusStuck;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		bool statusAvoiding;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		bool statusDirectMove;
@@ -137,6 +139,9 @@ public:
 		ASwarmWP* GetCurrWaypoint();		// fetch current waypoint
 	UFUNCTION()
 		FVector GetDirectMoveLoc();
+
+	UFUNCTION()
+		void SetStatusStuck();
 
 protected:
 	virtual void BeginPlay() override;
