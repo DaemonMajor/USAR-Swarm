@@ -111,7 +111,7 @@ void AUSARAgent::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	if (statusStuck) {
-		// enter low-power state
+		// emit low-power signal
 	}
 	else {
 		SetVelocity();

@@ -15,7 +15,7 @@ EBTNodeResult::Type USpawnAgentTask::ExecuteTask(UBehaviorTreeComponent& OwnerCo
     FVector agentPos = GetRandLoc(spawn);
     FRotator zeroRot;
 
-    AUSARAgent* agent = GetWorld()->SpawnActor<AUSARAgent>(agentPos, zeroRot);
+    AUSARAgent* agent = GetWorld()->SpawnActor<AUSARAgent>(agentPos + spawn->GetActorLocation(), zeroRot);
     agent->AssignToFlock(1);
 
     spawn->numAgentsToSpawn--;
@@ -31,6 +31,7 @@ EBTNodeResult::Type USpawnAgentTask::ExecuteTask(UBehaviorTreeComponent& OwnerCo
 FVector USpawnAgentTask::GetRandLoc(ASwarmSpawnPoint* spawn)
 {
     float maxRange = spawn->spawnRadius;
+
     float xPos = FMath::FRandRange(-maxRange, maxRange);
     float yPos = FMath::FRandRange(-maxRange, maxRange);
     float zPos = FMath::FRandRange(0, maxRange);
