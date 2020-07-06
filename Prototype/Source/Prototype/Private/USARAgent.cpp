@@ -17,6 +17,8 @@ AUSARAgent::AUSARAgent()
 {
  	PrimaryActorTick.bCanEverTick = true;
 
+	showDebug = false;
+
 	// all lengths in cm (UE units)
 	maxSpeed = 250;		// 2.5 m/s
 	yawRate = 45;
@@ -30,7 +32,7 @@ AUSARAgent::AUSARAgent()
 
 	alignmentWeight = 0.1;
 	cohesionWeight = 0.75;
-	separationWeight = 0.25;
+	separationWeight = 3.5;
 
 	statusStuck = false;
 	statusAvoiding = false;
@@ -59,6 +61,7 @@ AUSARAgent::AUSARAgent()
 	agentBody->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	agentBody->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
 	agentBody->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
+	agentBody->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);		// channel used for waypoints
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> droneVisualAsset(TEXT("/Game/StarterContent/Shapes/Shape_Cylinder.Shape_Cylinder"));
 	if (droneVisualAsset.Succeeded()) {

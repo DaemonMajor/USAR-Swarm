@@ -26,8 +26,8 @@ EBTNodeResult::Type UAgentObstacleAvoidanceTask::ExecuteTask(UBehaviorTreeCompon
 
     if (obstructed) {
         /*DEBUGGING*/
-        FString obstructedText = FString::Printf(TEXT("Agent %d detected obstruction."), agent->agentID);
-        GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Orange, obstructedText, true);
+        //FString obstructedText = FString::Printf(TEXT("Agent %d detected obstruction."), agent->agentID);
+        //GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Orange, obstructedText, true);
         /*DEBUGGING*/
 
         if (!agent->statusAvoiding) {
@@ -54,10 +54,8 @@ EBTNodeResult::Type UAgentObstacleAvoidanceTask::ExecuteTask(UBehaviorTreeCompon
                     agent->SetAvoidanceVector(clearVec);
 
                     /*DEBUGGING*/
-                    FString safeVectorFoundText = FString::Printf(TEXT("Agent %d found safe vector."), agent->agentID);
-                    GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Turquoise, safeVectorFoundText, true);
-
-                    //DrawDebugPoint(GetWorld(), clearVec + agent->GetActorLocation(), 10, FColor::Green, false, 0.01);
+                    //FString safeVectorFoundText = FString::Printf(TEXT("Agent %d found safe vector."), agent->agentID);
+                    //GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Turquoise, safeVectorFoundText, true);
                     /*DEBUGGING*/
                 }
                 else {
@@ -122,9 +120,9 @@ TArray<FVector> UAgentObstacleAvoidanceTask::LookAhead(AUSARAgent* agent, FVecto
             deg += degStep;
 
             /*DEBUGGING*/
-            if (circle == agent->bodySize) {
-                DrawDebugLine(GetWorld(), agent->GetActorLocation() + offset, targetVector + offset, FColor::Orange, false, 0.01, 0, 1);
-            }
+            //if (circle == agent->bodySize) {
+            //    DrawDebugLine(GetWorld(), agent->GetActorLocation() + offset, targetVector + offset, FColor::Orange, false, 0.01, 0, 1);
+            //}
             /*DEBUGGING*/
         }
     }
@@ -145,7 +143,7 @@ TArray<FVector> UAgentObstacleAvoidanceTask::LookAhead(AUSARAgent* agent, FVecto
             obstructed = true;
             
             /*DEBUGGING*/
-            DrawDebugPoint(GetWorld(), hitResult.ImpactPoint, 3, FColor::Red, false, 0.01);
+            //DrawDebugPoint(GetWorld(), hitResult.ImpactPoint, 3, FColor::Red, false, 0.01);
             /*DEBUGGING*/
         }
     }
@@ -162,8 +160,8 @@ TArray<FVector> UAgentObstacleAvoidanceTask::LookAhead(AUSARAgent* agent, FVecto
 */
 bool UAgentObstacleAvoidanceTask::FindClearVector(AUSARAgent* agent, FVector& targetVec, int fidelity) {
     /*DEBUGGING*/
-    FString checkSurroundingsText = FString::Printf(TEXT("Agent %d checking surroundings."), agent->agentID);
-    GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Yellow, checkSurroundingsText, true);
+    //FString checkSurroundingsText = FString::Printf(TEXT("Agent %d checking surroundings."), agent->agentID);
+    //GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Yellow, checkSurroundingsText, true);
     /*DEBUGGING*/
 
     bool foundClearVec = false;
@@ -191,17 +189,17 @@ bool UAgentObstacleAvoidanceTask::FindClearVector(AUSARAgent* agent, FVector& ta
             targetVec = checkVec - agent->GetActorLocation();
 
             /*DEBUGGING*/
-            FString safeVectorFoundText = FString::Printf(TEXT("Agent %d found safe vector (%f, %f, %f)."), agent->agentID, targetVec.X, targetVec.Y, targetVec.Z);
-            GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Green, safeVectorFoundText, true);
+            //FString safeVectorFoundText = FString::Printf(TEXT("Agent %d found safe vector (%f, %f, %f)."), agent->agentID, targetVec.X, targetVec.Y, targetVec.Z);
+            //GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Green, safeVectorFoundText, true);
 
-            DrawDebugPoint(GetWorld(), checkVec, 10, FColor::Green, false, 0.01);
+            //DrawDebugPoint(GetWorld(), checkVec, 10, FColor::Green, false, 0.01);
             /*DEBUGGING*/
             
             break;
         }
         else {
             /*DEBUGGING*/
-            DrawDebugPoint(GetWorld(), checkVec, 5, FColor::Magenta, false, 0.01);
+            //DrawDebugPoint(GetWorld(), checkVec, 5, FColor::Magenta, false, 0.01);
             /*DEBUGGING*/
         }
     }

@@ -25,6 +25,9 @@ public:
 		bool isInitialized = false;
 
 	/* FOR DEBUGGING ONLY */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool showDebug;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		float speed = 0;
 

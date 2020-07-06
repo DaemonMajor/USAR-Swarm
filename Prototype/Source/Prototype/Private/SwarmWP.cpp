@@ -21,9 +21,10 @@ ASwarmWP::ASwarmWP()
 	wpArea->SetSimulatePhysics(false);
 	wpArea->SetGenerateOverlapEvents(true);
 	wpArea->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	wpArea->SetCollisionObjectType(ECollisionChannel::ECC_WorldStatic);
+	wpArea->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+	wpArea->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
 	wpArea->SetCollisionResponseToChannel(ECollisionChannel::ECC_Pawn, ECollisionResponse::ECR_Overlap);	// enable overlap events with pawn collision channel
-
+	
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> wpCylinder(TEXT("/Game/StarterContent/Shapes/Shape_Cylinder.Shape_Cylinder"));
 	if (wpCylinder.Succeeded()) {
 		wpArea->SetStaticMesh(wpCylinder.Object);

@@ -10,9 +10,9 @@ EBTNodeResult::Type UFlockTask::ExecuteTask(UBehaviorTreeComponent& OwnerComp, u
     Super::ExecuteTask(OwnerComp, NodeMemory);
 
     AUSARAgent* agent = Cast<AUSARAgent>(OwnerComp.GetAIOwner()->GetPawn());
-    FVector alignFactor = GetAlignment(agent) * agent->alignmentWeight;
-    FVector cohFactor = GetCohesion(agent) * agent->cohesionWeight;
-    FVector sepFactor = GetSeparation(agent) * agent->separationWeight;
+    FVector alignFactor = agent->alignmentWeight * GetAlignment(agent);
+    FVector cohFactor = agent->cohesionWeight * GetCohesion(agent);
+    FVector sepFactor = agent->separationWeight * GetSeparation(agent);
 
     FVector flockVector = CalcNewVector(agent, alignFactor, cohFactor, sepFactor);
     agent->SetFlockVector(flockVector);
@@ -96,19 +96,27 @@ FVector UFlockTask::GetSeparation(AUSARAgent* agent)
     TArray<AUSARAgent*> neighbors = agent->GetNeighbors();
     FVector agentLoc = agent->GetActorLocation();
     FVector boidLoc, separation;
-    for (AUSARAgent* boid : neighbors) {
-        if (boid) {
-            boidLoc = boid->GetActorLocation();
+    for (AUSARAgent* n : neighbors) {
+        if (n) {
+            boidLoc = n->GetActorLocation();
             separation = agentLoc - boidLoc;
 
             float sepFactor = 0;
             float dist = separation.Size();
             float spacing = agent->agentSpacing;
             if (dist < spacing) {
-                sepFactor = FMath::Pow(1.05f, spacing - dist);
+                //sepFactor = FMath::Pow(1.05f, (spacing - dist)) - 1;
+                sepFactor = -(FMath::Loge(dist)) + 5.7;     // zeroed for spacing == 300
             }
 
-            sepDir += separation * sepFactor;
+            sepDir += sepFactor * separation;
+
+            /*DEBUGGING*/
+            if (agent->showDebug) {
+                FString sepText = FString::Printf(TEXT("Agent %d->%d sepFactor = %f (%f)."), agent->agentID, n->agentID, sepFactor, dist);
+                GEngine->AddOnScreenDebugMessage(INDEX_NONE, 10.0f, FColor::Yellow, sepText, true);
+            }
+            /*DEBUGGING*/
         }
     }
 
