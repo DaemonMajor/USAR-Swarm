@@ -105,8 +105,7 @@ FVector UFlockTask::GetSeparation(AUSARAgent* agent)
             float dist = separation.Size();
             float spacing = agent->agentSpacing;
             if (dist < spacing) {
-                //sepFactor = FMath::Pow(1.05f, (spacing - dist)) - 1;
-                sepFactor = -(FMath::Loge(dist)) + 5.7;     // zeroed for spacing == 300
+                sepFactor = -5 * FMath::Loge(dist) + 28.5;     // zeroed for spacing == 300
             }
 
             sepDir += sepFactor * separation;

@@ -3,8 +3,8 @@
 
 #include "AgentObstacleAvoidanceTask.h"
 #include "AIController.h"
-#include "DrawDebugHelpers.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "DrawDebugHelpers.h"
 
 EBTNodeResult::Type UAgentObstacleAvoidanceTask::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {

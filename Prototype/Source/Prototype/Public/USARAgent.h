@@ -77,6 +77,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		bool statusClimbing;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		bool statusSearching;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		bool statusTraveling;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -114,6 +116,11 @@ public:
 
 	UFUNCTION()
 		TArray<AUSARAgent*> GetNeighbors();
+
+	UFUNCTION()
+		FVector GetDirectMoveLoc();
+	UFUNCTION()
+		FVector GetSearchCenter();
 	
 	UFUNCTION()
 		void SetTargetHeight(float height);
@@ -125,24 +132,24 @@ public:
 	UFUNCTION()
 		void SetDirectMoveLoc(FVector loc);
 	UFUNCTION()
+		void SetSearchCenter(FVector loc);
+	UFUNCTION()
 		void SetHeightVector(FVector rawVector);
 	UFUNCTION()
 		void SetFlockVector(FVector rawVector);
 	UFUNCTION()
 		void SetWaypointVector(FVector rawVector);
 	UFUNCTION()
-		void SetVelocity();			// set new velocity based on component vectors (avoidanceVector, flockVector, waypointVector)
+		void SetVelocity();							// set new velocity based on component vectors (avoidanceVector, flockVector, waypointVector)
 	virtual FVector GetVelocity() const override;	// get agent velocity in local coordinates (bypasses built-in component velocity because documentation is unclear)
 
 	UFUNCTION()
-		void AddWaypoint(ASwarmWP* wp, bool atEnd = true);		// append waypoint to list of target waypoints
+		void AddWaypoint(FVector wp, bool atEnd = true);	// append waypoint to list of target waypoints
 	UFUNCTION()
-		void RemoveWaypoint(ASwarmWP* wp);	// remove waypoint from list of target waypoints
+		void RemoveWaypoint(FVector wp);					// remove waypoint from list of target waypoints
 	UFUNCTION()
-		ASwarmWP* GetCurrWaypoint();		// fetch current waypoint
-	UFUNCTION()
-		FVector GetDirectMoveLoc();
-
+		bool GetCurrWaypoint(FVector& wp);					// fetch current waypoint
+	
 	UFUNCTION()
 		void SetStatusStuck();
 
@@ -150,8 +157,8 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 		
-	UPROPERTY()
-		float yawRate;		// rate at which agent can turn in degrees per second
+	//UPROPERTY()
+	//	float yawRate;		// rate at which agent can turn in degrees per second
 	
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
 		UStaticMeshComponent* agentRoot;
@@ -167,11 +174,13 @@ protected:
 	UPROPERTY()
         TArray<AUSARAgent*> neighborAgents = TArray<AUSARAgent*>();
 	UPROPERTY()
-		TArray<ASwarmWP*> waypoints = TArray<ASwarmWP*>();
+		TArray<FVector> waypoints = TArray<FVector>();
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FVector wpLoc;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FVector directMoveLoc;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		FVector searchCenter;
 
 	UPROPERTY()
 		float bootUpDelay = 0.5;
@@ -190,6 +199,6 @@ protected:
 
 	UFUNCTION()
 		void MoveAgent(float deltaSec);
-	UFUNCTION()
-		FRotator FaceDirection(FVector dir, float deltaSec);	// Rotate agent on z-axis to face specified direction.
+	//UFUNCTION()
+	//	FRotator FaceDirection(FVector dir, float deltaSec);	// Rotate agent on z-axis to face specified direction.
 };

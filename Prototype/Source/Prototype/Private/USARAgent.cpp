@@ -20,32 +20,34 @@ AUSARAgent::AUSARAgent()
 	showDebug = false;
 
 	// all lengths in cm (UE units)
-	maxSpeed = 250;		// 2.5 m/s
-	yawRate = 45;
-	bodySize = 25;		// agent body radius
-	neighborRadius = 1500;
-	visionRadius = 500;
+	maxSpeed =			250;	// 2.5 m/s
+	//yawRate =			45;
+	bodySize =			25;		// agent body radius
+	neighborRadius =	1500;
+	visionRadius =		500;
 	obstacleAvoidDist = 125;
 	
 	targetHeight = visionRadius * 0.85;
 	heightVariance = targetHeight * 0.05;
 
-	alignmentWeight = 0.1;
-	cohesionWeight = 0.75;
-	separationWeight = 3.5;
+	alignmentWeight =	0.1;
+	cohesionWeight =	0.75;
+	separationWeight =	3.5f;
 
-	statusStuck = false;
-	statusAvoiding = false;
-	statusDirectMove = false;
-	statusClimbing = false;
-	statusTraveling = false;
+	statusStuck =		false;
+	statusAvoiding =	false;
+	statusDirectMove =	false;
+	statusClimbing =	false;
+	statusSearching =	false;
+	statusTraveling =	false;
 
-	agentVelocity = FVector::ZeroVector;
-	avoidanceVector = FVector::ZeroVector;
-	heightVector = FVector::ZeroVector;
-	flockVector = FVector::ZeroVector;
-	waypointVector = FVector::ZeroVector;
-	directMoveLoc = FVector::ZeroVector;
+	agentVelocity =		FVector::ZeroVector;
+	avoidanceVector =	FVector::ZeroVector;
+	heightVector =		FVector::ZeroVector;
+	flockVector =		FVector::ZeroVector;
+	waypointVector =	FVector::ZeroVector;
+	directMoveLoc =		FVector::ZeroVector;
+	searchCenter =		FVector::ZeroVector;
 
 	AIControllerClass = AUSARAgentController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
@@ -130,7 +132,7 @@ void AUSARAgent::Tick(float DeltaSeconds)
 		/*DEBUGGING*/
 
 		if (waypoints.Num()) {
-			wpLoc = waypoints[0]->GetActorLocation();
+			wpLoc = waypoints[0];
 			statusTraveling = true;
 		}
 		else {
@@ -147,7 +149,9 @@ void AUSARAgent::AssignToFlock(int flock)
 	Flock assignedFlock = gameState->AddAgent(this, flock);
 
 	flockID = assignedFlock.flockID;
-	waypoints = assignedFlock.waypoints;
+	for (ASwarmWP* wp : assignedFlock.waypoints) {
+		waypoints.Add(wp->GetActorLocation());
+	}
 }
 
 void AUSARAgent::BootUpSequence()
@@ -244,13 +248,15 @@ TArray<AUSARAgent*> AUSARAgent::GetNeighbors()
 	return neighborAgents;
 }
 
-ASwarmWP* AUSARAgent::GetCurrWaypoint()
+bool AUSARAgent::GetCurrWaypoint(FVector& wp)
 {
 	if (waypoints.Num()) {
-		return waypoints[0];
+		wp = waypoints[0];
+
+		return true;
 	}
 
-	return nullptr;
+	return false;
 }
 
 FVector AUSARAgent::GetVelocity() const
@@ -285,14 +291,23 @@ void AUSARAgent::SetAvoidanceVector(FVector rawVector)
 	avoidanceVector = rawVector;
 }
 
+FVector AUSARAgent::GetDirectMoveLoc()
+{
+	return directMoveLoc;
+}
 void AUSARAgent::SetDirectMoveLoc(FVector loc)
 {
 	directMoveLoc = loc;
 }
 
-FVector AUSARAgent::GetDirectMoveLoc()
+FVector AUSARAgent::GetSearchCenter()
 {
-	return directMoveLoc;
+	return searchCenter;
+}
+
+void AUSARAgent::SetSearchCenter(FVector loc)
+{
+	searchCenter = loc;
 }
 
 void AUSARAgent::SetHeightVector(FVector rawVector)
@@ -338,34 +353,34 @@ void AUSARAgent::MoveAgent(float deltaSec)
 *	@param deltaSec Time since last call.
 *	@return FRotator agent rotated
 */
-FRotator AUSARAgent::FaceDirection(FVector dir, float deltaSec)
-{
-	float maxTurn = yawRate * deltaSec;
-	float degToTurn = dir.Rotation().Yaw;
-	FRotator deltaTurn = FRotator::ZeroRotator;
-
-	if (abs(degToTurn) > maxTurn) {
-		if (degToTurn > 0) {
-			deltaTurn.Yaw = maxTurn;
-		}
-		else {
-			deltaTurn.Yaw = -maxTurn;
-		}
-	}
-	else {
-		deltaTurn.Yaw = degToTurn;
-	}
-
-	AddActorLocalRotation(deltaTurn, true);
-
-	return deltaTurn;
-}
+//FRotator AUSARAgent::FaceDirection(FVector dir, float deltaSec)
+//{
+//	float maxTurn = yawRate * deltaSec;
+//	float degToTurn = dir.Rotation().Yaw;
+//	FRotator deltaTurn = FRotator::ZeroRotator;
+//
+//	if (abs(degToTurn) > maxTurn) {
+//		if (degToTurn > 0) {
+//			deltaTurn.Yaw = maxTurn;
+//		}
+//		else {
+//			deltaTurn.Yaw = -maxTurn;
+//		}
+//	}
+//	else {
+//		deltaTurn.Yaw = degToTurn;
+//	}
+//
+//	AddActorLocalRotation(deltaTurn, true);
+//
+//	return deltaTurn;
+//}
 
 /* Add a waypoint to the agent's list of target waypoints.
 *
 *	@param wp Waypoint to add.
 */
-void AUSARAgent::AddWaypoint(ASwarmWP* wp, bool atEnd)
+void AUSARAgent::AddWaypoint(FVector wp, bool atEnd)
 {
 	if (atEnd) {
 		waypoints.Add(wp);
@@ -379,12 +394,15 @@ void AUSARAgent::AddWaypoint(ASwarmWP* wp, bool atEnd)
 *
 *	@param wp Waypoint to remove.
 */
-void AUSARAgent::RemoveWaypoint(ASwarmWP* wp)
+void AUSARAgent::RemoveWaypoint(FVector wp)
 {
 	waypoints.Remove(wp);
 
-	if (wp->flockID == -1) {
+	if (statusDirectMove) {
 		statusDirectMove = false;
+	}
+	else if (!statusSearching) {
+		statusSearching = true;
 	}
 }
 
