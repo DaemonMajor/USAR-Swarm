@@ -20,34 +20,40 @@ AUSARAgent::AUSARAgent()
 	showDebug = false;
 
 	// all lengths in cm (UE units)
-	maxSpeed =			250;	// 2.5 m/s
-	//yawRate =			45;
-	bodySize =			25;		// agent body radius
-	neighborRadius =	1500;
-	visionRadius =		500;
-	obstacleAvoidDist = 125;
+	maxSpeed			= 250;	// 2.5 m/s
+	searchSpeed			= 100;
+	//yawRate			= 45;
+	bodySize			= 25;		// agent body radius
+	neighborRadius		= 1500;
+	visionRadius		= 500;
+	obstacleAvoidDist	= 100;
 	
 	targetHeight = visionRadius * 0.85;
 	heightVariance = targetHeight * 0.05;
 
-	alignmentWeight =	0.1;
-	cohesionWeight =	0.75;
-	separationWeight =	3.5f;
+	maxSearchHeight			= 500;
+	searchRadiusPerAgent	= 350;
+	searchRadius			= 0;
 
-	statusStuck =		false;
-	statusAvoiding =	false;
-	statusDirectMove =	false;
-	statusClimbing =	false;
-	statusSearching =	false;
-	statusTraveling =	false;
+	alignmentWeight		= 0.1;
+	cohesionWeight		= 1.5;
+	separationWeight	= 3.5f;
 
-	agentVelocity =		FVector::ZeroVector;
-	avoidanceVector =	FVector::ZeroVector;
-	heightVector =		FVector::ZeroVector;
-	flockVector =		FVector::ZeroVector;
-	waypointVector =	FVector::ZeroVector;
-	directMoveLoc =		FVector::ZeroVector;
-	searchCenter =		FVector::ZeroVector;
+	statusStuck			= false;
+	statusAvoiding		= false;
+	statusDirectMove	= false;
+	statusReadyToSearch	= false;
+	statusActiveSearch	= false;
+	statusClimbing		= false;
+	statusSearching		= false;
+	statusTraveling		= false;
+
+	agentVelocity	= FVector::ZeroVector;
+	avoidanceVector = FVector::ZeroVector;
+	heightVector	= FVector::ZeroVector;
+	flockVector		= FVector::ZeroVector;
+	flockWPVector	= FVector::ZeroVector;
+	directMoveLoc	= FVector::ZeroVector;
 
 	AIControllerClass = AUSARAgentController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
@@ -119,25 +125,43 @@ void AUSARAgent::Tick(float DeltaSeconds)
 		// emit low-power signal
 	}
 	else {
+		CheckDetections();
+
+		if (statusReadyToSearch) {
+			if (FlockReadyToSearch()) {
+				StartSearchPattern();
+			}
+		}
+
 		SetVelocity();
 		MoveAgent(DeltaSeconds);
 
-		/*DEBUGGING*/
 		speed = agentVelocity.Size();
 		numNeighbors = neighborAgents.Num();
-		rawVelocity = (flockVector + waypointVector).GetClampedToSize(0, maxSpeed);
 
+		/*DEBUGGING*/
 		DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + agentVelocity, 10.f, FColor::Blue, false, 0.01, 0, 2.5);
 		DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + rawVelocity, 5.f, FColor::Purple, false, 0.01, 0, 2.5);
 		/*DEBUGGING*/
 
-		if (waypoints.Num()) {
-			wpLoc = waypoints[0];
-			statusTraveling = true;
+		if (statusActiveSearch) {
+			wpLoc = searchWPs[0];
 		}
 		else {
-			wpLoc = FVector(NULL, NULL, NULL);
-			statusTraveling = false;
+			if (flockWPs.Num()) {
+				wpLoc = flockWPs[0];
+				statusTraveling = true;
+			}
+			else {
+				wpLoc = FVector(NULL, NULL, NULL);
+				statusTraveling = false;
+			}
+		}
+	}
+
+	if (showDebug) {
+		for (FVector point : searchWPs) {
+			DrawDebugPoint(GetWorld(), point, 15, FColor::Blue, false, 0.01);
 		}
 	}
 }
@@ -150,7 +174,7 @@ void AUSARAgent::AssignToFlock(int flock)
 
 	flockID = assignedFlock.flockID;
 	for (ASwarmWP* wp : assignedFlock.waypoints) {
-		waypoints.Add(wp->GetActorLocation());
+		flockWPs.Add(wp->GetActorLocation());
 	}
 }
 
@@ -162,6 +186,13 @@ void AUSARAgent::BootUpSequence()
 	// set up neighbor list to update when agents enter/leave neighborRadius
 	neighborSphere->OnComponentBeginOverlap.AddDynamic(this, &AUSARAgent::OnNeighborEnter);
 	neighborSphere->OnComponentEndOverlap.AddDynamic(this, &AUSARAgent::OnNeighborLeave);
+
+	// trigger event on reaching a flockWP
+	agentBody->OnComponentBeginOverlap.AddDynamic(this, &AUSARAgent::OnReachWP);
+
+	// trigger event on "seeing" a human
+	visionSphere->OnComponentBeginOverlap.AddDynamic(this, &AUSARAgent::OnDetectHuman);
+	visionSphere->OnComponentEndOverlap.AddDynamic(this, &AUSARAgent::OnUnDetectHuman);
 
 	isInitialized = true;
 
@@ -201,7 +232,7 @@ void AUSARAgent::ScanNeighbors()
 }
 
 void AUSARAgent::OnNeighborEnter(UPrimitiveComponent* agentSensor, AActor* neighbor, UPrimitiveComponent* neighborBody, int32 neighborIndex,
-								  bool bFromSweep, const FHitResult& SweepResult)
+								 bool bFromSweep, const FHitResult& SweepResult)
 {
 	bool eventFromSensor = !(agentSensor->GetName().Compare("NeighborSensor"));
 	bool senseNeighborBody = !(neighborBody->GetName().Compare("AgentBody"));
@@ -233,6 +264,44 @@ void AUSARAgent::OnNeighborLeave(UPrimitiveComponent* agentSensor, AActor* neigh
 	}
 }
 
+void AUSARAgent::OnReachWP(UPrimitiveComponent* body, AActor* swarmWP, UPrimitiveComponent* wpArea, int32 neighborIndex,
+			   bool bFromSweep, const FHitResult& SweepResult)
+{
+	bool eventFromBody = !(body->GetName().Compare("AgentBody"));
+	bool senseWP = !(wpArea->GetName().Compare("WPArea"));
+
+	if (eventFromBody && senseWP) {
+		AUSARAgent* agent = Cast<AUSARAgent>(body->GetOwner());
+		agent->statusReadyToSearch = true;
+
+		/*DEBUGGING*/
+		//FString reachedWPText = FString::Printf(TEXT("Agent %d reached waypoint."), agentID);
+		//GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Green, reachedWPText, true);
+		/*DEBUGGING*/
+	}
+}
+
+void AUSARAgent::OnDetectHuman(UPrimitiveComponent* agentSensor, AActor* victim, UPrimitiveComponent* humanBody, int32 neighborIndex,
+							   bool bFromSweep, const FHitResult& SweepResult)
+{
+	bool eventFromSensor = !(agentSensor->GetName().Compare("VisionSensor"));
+	bool senseVictim = victim->IsA(AVictimActor::StaticClass());
+
+	if (eventFromSensor && senseVictim) {
+		victimsInRange.AddUnique(Cast<AVictimActor>(victim));
+	}
+}
+
+void AUSARAgent::OnUnDetectHuman(UPrimitiveComponent* agentSensor, AActor* victim, UPrimitiveComponent* humanBody, int32 neighborIndex)
+{
+	bool eventFromSensor = !(agentSensor->GetName().Compare("VisionSensor"));
+	bool senseVictim = victim->IsA(AVictimActor::StaticClass());
+
+	if (eventFromSensor && senseVictim) {
+		victimsInRange.Remove(Cast<AVictimActor>(victim));
+	}
+}
+
 int AUSARAgent::GetID()
 {
 	return agentID;
@@ -248,10 +317,10 @@ TArray<AUSARAgent*> AUSARAgent::GetNeighbors()
 	return neighborAgents;
 }
 
-bool AUSARAgent::GetCurrWaypoint(FVector& wp)
+bool AUSARAgent::GetCurrFlockWP(FVector& wp)
 {
-	if (waypoints.Num()) {
-		wp = waypoints[0];
+	if (flockWPs.Num()) {
+		wp = flockWPs[0];
 
 		return true;
 	}
@@ -266,20 +335,36 @@ FVector AUSARAgent::GetVelocity() const
 
 void AUSARAgent::SetVelocity()
 {
-	FVector newVel = FVector::ZeroVector;
+	if (statusActiveSearch) {
+		rawVelocity = searchVector.GetClampedToSize(0, searchSpeed);
+	}
+	else {
+		rawVelocity = (flockVector + flockWPVector).GetClampedToSize(0, maxSpeed);
+	}
 
+	FVector newVel = FVector::ZeroVector;
 	if (statusAvoiding) {
 		newVel = avoidanceVector;
 	}
 	else if (statusDirectMove) {
 		newVel = (directMoveLoc - GetActorLocation()).GetSafeNormal();
-		newVel *= maxSpeed;
+		
+		if (statusActiveSearch) {
+			newVel *= searchSpeed;
+		}
+		else {
+			newVel *= maxSpeed;
+		}
+	}
+	else if (statusActiveSearch) {
+		newVel = searchVector;
+		heightVector = FVector::ZeroVector;
 	}
 	else if (statusClimbing) {
 		newVel = FVector(0, 0, heightVector.Z);
 	}
 	else {
-		newVel = flockVector + waypointVector;
+		newVel = flockVector + flockWPVector;
 		heightVector = FVector::ZeroVector;
 	}
 	
@@ -295,19 +380,26 @@ FVector AUSARAgent::GetDirectMoveLoc()
 {
 	return directMoveLoc;
 }
+
+bool AUSARAgent::GetSearchWP(FVector& vec)
+{
+	if (searchWPs.Num()) {
+		vec = searchWPs[0];
+
+		return true;
+	}
+
+	return false;
+}
+
 void AUSARAgent::SetDirectMoveLoc(FVector loc)
 {
 	directMoveLoc = loc;
 }
 
-FVector AUSARAgent::GetSearchCenter()
+void AUSARAgent::SetSearchVector(FVector rawVector)
 {
-	return searchCenter;
-}
-
-void AUSARAgent::SetSearchCenter(FVector loc)
-{
-	searchCenter = loc;
+	searchVector = rawVector;
 }
 
 void AUSARAgent::SetHeightVector(FVector rawVector)
@@ -320,9 +412,9 @@ void AUSARAgent::SetFlockVector(FVector rawVector)
 	flockVector = rawVector;
 }
 
-void AUSARAgent::SetWaypointVector(FVector rawVector)
+void AUSARAgent::SetFlockWPVector(FVector rawVector)
 {
-	waypointVector = rawVector;
+	flockWPVector = rawVector;
 }
 
 void AUSARAgent::SetTargetHeight(float height)
@@ -376,27 +468,27 @@ void AUSARAgent::MoveAgent(float deltaSec)
 //	return deltaTurn;
 //}
 
-/* Add a waypoint to the agent's list of target waypoints.
+/* Add a waypoint to the agent's list of target flockWPs.
 *
-*	@param wp Waypoint to add.
+*	@param wp WP to add.
 */
-void AUSARAgent::AddWaypoint(FVector wp, bool atEnd)
+void AUSARAgent::AddFlockWP(FVector wp, bool atEnd)
 {
 	if (atEnd) {
-		waypoints.Add(wp);
+		flockWPs.Add(wp);
 	}
 	else {
-		waypoints.Insert(wp, 0);
+		flockWPs.Insert(wp, 0);
 	}
 }
 
-/* Remove a waypoint from the agent's list of target waypoints.
+/* Remove a waypoint from the agent's list of target flockWPs.
 *
-*	@param wp Waypoint to remove.
+*	@param wp WP to remove.
 */
-void AUSARAgent::RemoveWaypoint(FVector wp)
+void AUSARAgent::RemoveFlockWP(FVector wp)
 {
-	waypoints.Remove(wp);
+	flockWPs.Remove(wp);
 
 	if (statusDirectMove) {
 		statusDirectMove = false;
@@ -406,7 +498,17 @@ void AUSARAgent::RemoveWaypoint(FVector wp)
 	}
 }
 
-/* Set agent status to stuck and power down non-vital systems.*/
+/* Pops top search waypoint off the stack.
+*
+*/
+void AUSARAgent::RemoveSearchWP()
+{
+	searchWPs.RemoveAt(0);
+}
+
+/* Set agent status to stuck and power down non-vital systems.
+*
+*/
 void AUSARAgent::SetStatusStuck()
 {
 	statusStuck = true;
@@ -414,4 +516,91 @@ void AUSARAgent::SetStatusStuck()
 	statusDirectMove = false;
 	statusClimbing = false;
 	statusTraveling = false;
+}
+
+/* Determines if the flock is ready to enter search behavior by checking if all neighbors' statusReadyToSearch.
+*
+*/
+bool AUSARAgent::FlockReadyToSearch()
+{
+	bool ready = true;
+
+	for (AUSARAgent* n : neighborAgents) {
+		if (!(n->statusReadyToSearch || n->statusActiveSearch)) {
+			ready = false;
+		}
+	}
+
+	return ready;
+}
+
+/* Sets waypoints for search pattern based on current waypoint.
+*
+*/
+void AUSARAgent::StartSearchPattern()
+{
+	// safety in case function triggers with no waypoints
+	if (!flockWPs.Num()) {
+		return;
+	}
+
+	FVector searchCenter = flockWPs[0];
+	float maxDist = neighborAgents.Num() * searchRadiusPerAgent;
+	float dist;
+
+	bool goodStart = false;
+	while (!goodStart) {
+		dist = maxDist * FMath::SRand();
+		dist = FMath::Clamp(dist, searchRadiusPerAgent, maxDist);
+
+		goodStart = true;
+		for (AUSARAgent* n : neighborAgents) {
+			if (n->searchRadius > 0) {
+				if (abs(n->searchRadius - dist) < searchRadiusPerAgent/2) {
+					goodStart = false;
+				}
+			}
+		}
+	}
+
+	FVector startVec = FMath::VRand();
+	startVec.Z = 0;
+	startVec = dist * startVec.GetSafeNormal();
+	float searchHeight = FMath::Clamp(FMath::SRand() * maxSearchHeight, targetHeight/2, maxSearchHeight);
+	startVec.Z = searchHeight;
+
+	for (int deg = 0; deg < 180; deg += 10) {
+		FRotator rot = FRotator(0, deg, 0);
+		FVector searchLoc = rot.RotateVector(startVec) + searchCenter;
+
+		searchWPs.Add(searchLoc);
+	}
+
+	searchRadius = dist;
+	statusReadyToSearch = false;
+	statusActiveSearch = true;
+}
+
+int AUSARAgent::CheckDetections()
+{
+	int numPosIDs = 0;
+
+	FHitResult hitResult;
+	FCollisionQueryParams queryParams;
+	queryParams.AddIgnoredActor(this);
+	FCollisionResponseParams responseParams;
+
+	for (AVictimActor* vic : victimsInRange) {
+		if (GetWorld()->LineTraceSingleByChannel(hitResult, GetActorLocation(), vic->GetActorLocation(), ECC_Pawn, queryParams, responseParams)) {
+			if (hitResult.GetActor()->IsA(AVictimActor::StaticClass())) {
+				numPosIDs++;
+
+				/*DEBUGGING*/
+				DrawDebugPoint(GetWorld(), vic->GetActorLocation(), 25, FColor::Emerald, true, 1.f);
+				/*DEBUGGING*/
+			}
+		}
+	}
+
+	return numPosIDs;
 }

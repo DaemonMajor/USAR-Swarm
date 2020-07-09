@@ -28,7 +28,7 @@ ASwarmWP::ASwarmWP()
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> wpCylinder(TEXT("/Game/StarterContent/Shapes/Shape_Cylinder.Shape_Cylinder"));
 	if (wpCylinder.Succeeded()) {
 		wpArea->SetStaticMesh(wpCylinder.Object);
-		wpArea->SetRelativeScale3D(FVector(2.5, 2.5, 5.5));	// 2.5 m diameter, 5.5 m height
+		wpArea->SetRelativeScale3D(FVector(10, 10, 5.5));	// 10 m diameter, 5.5 m height
 		wpArea->SetVisibility(false);
 	}
 }
@@ -38,7 +38,7 @@ void ASwarmWP::BeginPlay()
 {
 	Super::BeginPlay();
 
-	wpArea->OnComponentBeginOverlap.AddDynamic(this, &ASwarmWP::OnAgentEnter);
+	//wpArea->OnComponentBeginOverlap.AddDynamic(this, &ASwarmWP::OnAgentEnter);
 }
 
 void ASwarmWP::Init()

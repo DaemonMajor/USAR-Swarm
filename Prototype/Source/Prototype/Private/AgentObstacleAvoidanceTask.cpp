@@ -120,30 +120,35 @@ TArray<FVector> UAgentObstacleAvoidanceTask::LookAhead(AUSARAgent* agent, FVecto
             deg += degStep;
 
             /*DEBUGGING*/
-            //if (circle == agent->bodySize) {
-            //    DrawDebugLine(GetWorld(), agent->GetActorLocation() + offset, targetVector + offset, FColor::Orange, false, 0.01, 0, 1);
-            //}
+            if (agent->showDebug) {
+                if (circle == agent->bodySize) {
+                    DrawDebugLine(GetWorld(), agent->GetActorLocation() + offset, targetVector + offset, FColor::Orange, false, 0.01, 0, 1);
+                }
+            }
             /*DEBUGGING*/
         }
     }
 
     FHitResult hitResult;
+    FCollisionObjectQueryParams objectParams;
+    objectParams.AddObjectTypesToQuery(ECC_WorldStatic);
     FCollisionQueryParams queryParams;
     queryParams.AddIgnoredActor(agent);
-    FCollisionResponseParams responseParams;
     
     TArray<FVector> safeVectors;
 
     // collect vectors with no obstacles.
     for (int i = 0; i < rayStartPts.Num(); i++) {
-        if (!GetWorld()->LineTraceSingleByChannel(hitResult, rayStartPts[i], rayEndPts[i], ECC_WorldStatic, queryParams, responseParams)) {
+        if(!GetWorld()->LineTraceSingleByObjectType(hitResult, rayStartPts[i], rayEndPts[i], objectParams, queryParams)) {
             safeVectors.Add(rayEndPts[i]);
         }
         else {
             obstructed = true;
             
             /*DEBUGGING*/
-            //DrawDebugPoint(GetWorld(), hitResult.ImpactPoint, 3, FColor::Red, false, 0.01);
+            if (agent->showDebug) {
+                DrawDebugPoint(GetWorld(), hitResult.ImpactPoint, 3, FColor::Red, false, 0.01);
+            }
             /*DEBUGGING*/
         }
     }
@@ -189,10 +194,12 @@ bool UAgentObstacleAvoidanceTask::FindClearVector(AUSARAgent* agent, FVector& ta
             targetVec = checkVec - agent->GetActorLocation();
 
             /*DEBUGGING*/
-            //FString safeVectorFoundText = FString::Printf(TEXT("Agent %d found safe vector (%f, %f, %f)."), agent->agentID, targetVec.X, targetVec.Y, targetVec.Z);
-            //GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Green, safeVectorFoundText, true);
+            if (agent->showDebug) {
+                //FString safeVectorFoundText = FString::Printf(TEXT("Agent %d found safe vector (%f, %f, %f)."), agent->agentID, targetVec.X, targetVec.Y, targetVec.Z);
+                //GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Green, safeVectorFoundText, true);
 
-            //DrawDebugPoint(GetWorld(), checkVec, 10, FColor::Green, false, 0.01);
+                DrawDebugPoint(GetWorld(), checkVec, 10, FColor::Green, false, 0.01);
+            }
             /*DEBUGGING*/
             
             break;

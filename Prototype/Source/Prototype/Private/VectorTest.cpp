@@ -14,7 +14,7 @@ EBTNodeResult::Type UVectorTest::ExecuteTask(UBehaviorTreeComponent& OwnerComp, 
     FRotator testRot = FRotator(0, 90, 0);
     testVec = testRot.RotateVector(testVec);
 
-    agent->SetWaypointVector(testVec);
+    agent->SetFlockWPVector(testVec);
 
     return EBTNodeResult::Succeeded;
 }

@@ -13,14 +13,14 @@ EBTNodeResult::Type UMoveToTargetTask::ExecuteTask(UBehaviorTreeComponent& Owner
 
     FVector waypoint;
     FVector targetVector = FVector::ZeroVector;
-    if (agent->GetCurrWaypoint(waypoint)) {
+    if (agent->GetCurrFlockWP(waypoint)) {
         waypoint.Z = agent->targetHeight;
 
         targetVector = waypoint - agent->GetActorLocation();
         targetVector = targetVector.GetClampedToSize(agent->maxSpeed * 3, agent->maxSpeed * 3);     // set magnitude so agent doesn't slow down as it nears the waypoint
     }
 
-    agent->SetWaypointVector(targetVector);
+    agent->SetFlockWPVector(targetVector);
 
     return EBTNodeResult::Succeeded;
 }

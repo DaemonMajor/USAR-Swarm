@@ -7,6 +7,7 @@
 #include "GameFramework/FloatingPawnMovement.h"
 #include "Components/SphereComponent.h"
 #include "SwarmWP.h"
+#include "VictimActor.h"
 #include "USARAgent.generated.h"
 
 UCLASS()
@@ -37,15 +38,19 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FVector agentVelocity;	// velocity in local coordinates
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		FVector rawVelocity;	// for debugging only (waypoint + flock vector)
+		FVector rawVelocity;	// for debugging only (flockWP + flock vector)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FVector avoidanceVector;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		FVector searchVector;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FVector heightVector;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FVector flockVector;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		FVector waypointVector;
+		FVector flockWPVector;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		FVector wpLoc;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		float alignmentFactor = 0;
@@ -54,12 +59,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		float separationFactor = 0;
 	
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	//	FVector alignVector;
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	//	FVector flockCenter;
-	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	//	FVector sepVector;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		FVector alignVector;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		FVector flockCenter;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		FVector sepVector;
 	/* =============== */
 
 	/*MOVE TO PROTECTED AFTER DEBUGGING*/
@@ -75,6 +80,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		bool statusDirectMove;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		bool statusReadyToSearch;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		bool statusActiveSearch;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		bool statusClimbing;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		bool statusSearching;
@@ -83,6 +92,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float maxSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float searchSpeed;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float bodySize;
@@ -94,9 +105,16 @@ public:
 		float obstacleAvoidDist;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float targetHeight;	// height to maintain
+		float targetHeight;			// height to maintain
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float heightVariance;	// variance allowed between agent height and target height
+		float heightVariance;		// variance allowed between agent height and target height
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float maxSearchHeight;		
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float searchRadiusPerAgent;	// multiplied by number of neighbors to determine how far to expand search radius in search behavior
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		float searchRadius;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float alignmentWeight;
@@ -119,8 +137,6 @@ public:
 
 	UFUNCTION()
 		FVector GetDirectMoveLoc();
-	UFUNCTION()
-		FVector GetSearchCenter();
 	
 	UFUNCTION()
 		void SetTargetHeight(float height);
@@ -132,24 +148,29 @@ public:
 	UFUNCTION()
 		void SetDirectMoveLoc(FVector loc);
 	UFUNCTION()
-		void SetSearchCenter(FVector loc);
+		void SetSearchVector(FVector rawVector);
 	UFUNCTION()
 		void SetHeightVector(FVector rawVector);
 	UFUNCTION()
 		void SetFlockVector(FVector rawVector);
 	UFUNCTION()
-		void SetWaypointVector(FVector rawVector);
+		void SetFlockWPVector(FVector rawVector);
 	UFUNCTION()
-		void SetVelocity();							// set new velocity based on component vectors (avoidanceVector, flockVector, waypointVector)
-	virtual FVector GetVelocity() const override;	// get agent velocity in local coordinates (bypasses built-in component velocity because documentation is unclear)
+		void SetVelocity();								// set new velocity based on component vectors (avoidanceVector, flockVector, flockWPVector)
+	virtual FVector GetVelocity() const override;		// get agent velocity in local coordinates (bypasses built-in component velocity because documentation is unclear)
 
 	UFUNCTION()
-		void AddWaypoint(FVector wp, bool atEnd = true);	// append waypoint to list of target waypoints
+		void AddFlockWP(FVector wp, bool atEnd = true);	// append waypoint to list of target waypoints
 	UFUNCTION()
-		void RemoveWaypoint(FVector wp);					// remove waypoint from list of target waypoints
+		void RemoveFlockWP(FVector wp);					// remove waypoint from list of target waypoints
 	UFUNCTION()
-		bool GetCurrWaypoint(FVector& wp);					// fetch current waypoint
-	
+		bool GetCurrFlockWP(FVector& wp);				// fetch current waypoint
+
+	UFUNCTION()
+		void RemoveSearchWP();
+	UFUNCTION()
+		bool GetSearchWP(FVector& vec);
+
 	UFUNCTION()
 		void SetStatusStuck();
 
@@ -174,13 +195,16 @@ protected:
 	UPROPERTY()
         TArray<AUSARAgent*> neighborAgents = TArray<AUSARAgent*>();
 	UPROPERTY()
-		TArray<FVector> waypoints = TArray<FVector>();
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		FVector wpLoc;
+		TArray<AVictimActor*> victimsInRange = TArray<AVictimActor*>();
+	UPROPERTY()
+		TArray<FVector> flockWPs = TArray<FVector>();
+	UPROPERTY()
+		TArray<FVector> searchWPs = TArray<FVector>();
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FVector directMoveLoc;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		FVector searchCenter;
+	
+	//UPROPERTY()
+		TArray<AVictimActor*> detectedVictims = TArray<AVictimActor*>();
 
 	UPROPERTY()
 		float bootUpDelay = 0.5;
@@ -196,9 +220,24 @@ protected:
 							 bool bFromSweep, const FHitResult &SweepResult);
 	UFUNCTION()
 		void OnNeighborLeave(UPrimitiveComponent* agentSensor, AActor* neighbor, UPrimitiveComponent* neighborBody, int32 neighborIndex);
+	UFUNCTION()
+		void OnReachWP(UPrimitiveComponent* body, AActor* swarmWP, UPrimitiveComponent* wpArea, int32 neighborIndex,
+					   bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+		void OnDetectHuman(UPrimitiveComponent* agentSensor, AActor* victim, UPrimitiveComponent* humanBody, int32 neighborIndex,
+						   bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+		void OnUnDetectHuman(UPrimitiveComponent* agentSensor, AActor* victim, UPrimitiveComponent* humanBody, int32 neighborIndex);
 
 	UFUNCTION()
 		void MoveAgent(float deltaSec);
 	//UFUNCTION()
 	//	FRotator FaceDirection(FVector dir, float deltaSec);	// Rotate agent on z-axis to face specified direction.
+
+	UFUNCTION()
+		bool FlockReadyToSearch();
+	UFUNCTION()
+		void StartSearchPattern();
+	UFUNCTION()
+		int CheckDetections();
 };

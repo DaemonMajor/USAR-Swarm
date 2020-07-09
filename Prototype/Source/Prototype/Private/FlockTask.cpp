@@ -51,7 +51,7 @@ FVector UFlockTask::GetAlignment(AUSARAgent* agent)
     alignVector /= neighbors.Num();
 
     /*DEBUGGING*/
-    //agent->alignVector = alignVector;
+    agent->alignVector = alignVector;
     /*DEBUGGING*/
 
     return alignVector;
@@ -77,7 +77,7 @@ FVector UFlockTask::GetCohesion(AUSARAgent* agent)
     centerMass -= agent->GetActorLocation();
 
     /*DEBUGGING*/
-    //agent->flockCenter = centerMass;
+    agent->flockCenter = centerMass;
     /*DEBUGGING*/
 
     return centerMass;
@@ -111,16 +111,16 @@ FVector UFlockTask::GetSeparation(AUSARAgent* agent)
             sepDir += sepFactor * separation;
 
             /*DEBUGGING*/
-            if (agent->showDebug) {
-                FString sepText = FString::Printf(TEXT("Agent %d->%d sepFactor = %f (%f)."), agent->agentID, n->agentID, sepFactor, dist);
-                GEngine->AddOnScreenDebugMessage(INDEX_NONE, 10.0f, FColor::Yellow, sepText, true);
-            }
+            //if (agent->showDebug) {
+            //    FString sepText = FString::Printf(TEXT("Agent %d->%d sepFactor = %f (%f)."), agent->agentID, n->agentID, sepFactor, dist);
+            //    GEngine->AddOnScreenDebugMessage(INDEX_NONE, 10.0f, FColor::Yellow, sepText, true);
+            //}
             /*DEBUGGING*/
         }
     }
 
     /*DEBUGGING*/
-    //agent->sepVector = sepDir;
+    agent->sepVector = sepDir;
     /*DEBUGGING*/
 
     return sepDir;

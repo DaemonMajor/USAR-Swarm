@@ -69,7 +69,7 @@ int APrototypeGameState::AddWaypoint(ASwarmWP* waypoint, int flockID)
 			f->waypoints.Add(waypoint);
 
 			for (AUSARAgent* agent : f->agents) {
-				agent->AddWaypoint(waypoint->GetActorLocation());
+				agent->AddFlockWP(waypoint->GetActorLocation());
 			}
 
 			waypoint->SetID(numWP);
@@ -91,7 +91,7 @@ void APrototypeGameState::RemoveWaypoint(ASwarmWP* waypoint)
 	for (Flock* f : flockData) {
 		if (f->waypoints.Remove(waypoint)) {
 			for (AUSARAgent* agent : f->agents) {
-				agent->RemoveWaypoint(waypoint->GetActorLocation());
+				agent->RemoveFlockWP(waypoint->GetActorLocation());
 			}
 
 			return;
