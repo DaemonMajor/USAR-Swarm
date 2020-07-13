@@ -28,7 +28,7 @@ ASwarmWP::ASwarmWP()
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> wpCylinder(TEXT("/Game/StarterContent/Shapes/Shape_Cylinder.Shape_Cylinder"));
 	if (wpCylinder.Succeeded()) {
 		wpArea->SetStaticMesh(wpCylinder.Object);
-		wpArea->SetRelativeScale3D(FVector(10, 10, 5.5));	// 10 m diameter, 5.5 m height
+		wpArea->SetRelativeScale3D(FVector(15, 15, 5.5));	// 15 m diameter, 5.5 m height
 		wpArea->SetVisibility(false);
 	}
 }
@@ -37,8 +37,6 @@ ASwarmWP::ASwarmWP()
 void ASwarmWP::BeginPlay()
 {
 	Super::BeginPlay();
-
-	//wpArea->OnComponentBeginOverlap.AddDynamic(this, &ASwarmWP::OnAgentEnter);
 }
 
 void ASwarmWP::Init()
@@ -74,20 +72,4 @@ void ASwarmWP::SetID(int id)
 
 void ASwarmWP::SetFlock(int flock) {
 	flockID = flock;
-}
-
-void ASwarmWP::OnAgentEnter(UPrimitiveComponent* wpAreaComp, AActor* agent, UPrimitiveComponent* agentBody, int32 agentIndex,
-							bool bFromSweep, const FHitResult& SweepResult)
-{
-	bool senseAgentBody = !(agentBody->GetName().Compare("AgentBody"));
-
-	if (senseAgentBody) {
-		AUSARAgent* boid = Cast<AUSARAgent>(agent);
-
-		if (boid) {
-			if (flockID == boid->flockID) {
-				Deactivate();
-			}
-		}
-	}
 }

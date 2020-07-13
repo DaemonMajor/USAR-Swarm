@@ -40,8 +40,4 @@ protected:
 		UStaticMeshComponent* wpRoot;
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
 		UStaticMeshComponent* wpArea;
-
-	UFUNCTION()
-		void OnAgentEnter(UPrimitiveComponent* wpAreaComp, AActor* agent, UPrimitiveComponent* agentBody, int32 agentIndex,
-						  bool bFromSweep, const FHitResult& SweepResult);
 };

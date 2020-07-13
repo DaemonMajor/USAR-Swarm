@@ -86,8 +86,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		bool statusClimbing;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		bool statusSearching;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		bool statusTraveling;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -239,5 +237,10 @@ protected:
 	UFUNCTION()
 		void StartSearchPattern();
 	UFUNCTION()
+		bool FlockReadyToMove();
+	UFUNCTION()
 		int CheckDetections();
+
+private:
+	int numSearchRadii;
 };

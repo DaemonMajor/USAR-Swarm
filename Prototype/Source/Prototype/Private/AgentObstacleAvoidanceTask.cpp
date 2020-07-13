@@ -105,29 +105,29 @@ TArray<FVector> UAgentObstacleAvoidanceTask::LookAhead(AUSARAgent* agent, FVecto
     TArray<FVector> rayEndPts;
     rayEndPts.Add(targetVector);
 
-    float degStep = 15;  // decrease to increase fidelity of raycast cylinders. recommend factor of 360
-    for (int circle = 5; circle <= agent->bodySize; circle += 5) {
-        FVector offset = FVector(0, circle, 0);
+    //float degStep = 15;  // decrease to increase fidelity of raycast cylinders. recommend factor of 360
+    //for (int circle = 5; circle <= agent->bodySize; circle += 5) {
+    //    FVector offset = FVector(0, circle, 0);
 
-        for (float deg = 0; deg < 360; deg += degStep) {
-            //offset = velRot.RotateVector(offset);
-            FRotator rotRoll = FRotator(0, 0, deg);
-            offset = rotRoll.RotateVector(offset);
-            
-            rayStartPts.Add(agent->GetActorLocation() + offset);
-            rayEndPts.Add(targetVector + offset);
+    //    for (float deg = 0; deg < 360; deg += degStep) {
+    //        //offset = velRot.RotateVector(offset);
+    //        FRotator rotRoll = FRotator(0, 0, deg);
+    //        offset = rotRoll.RotateVector(offset);
+    //        
+    //        rayStartPts.Add(agent->GetActorLocation() + offset);
+    //        rayEndPts.Add(targetVector + offset);
 
-            deg += degStep;
+    //        deg += degStep;
 
-            /*DEBUGGING*/
-            if (agent->showDebug) {
-                if (circle == agent->bodySize) {
-                    DrawDebugLine(GetWorld(), agent->GetActorLocation() + offset, targetVector + offset, FColor::Orange, false, 0.01, 0, 1);
-                }
-            }
-            /*DEBUGGING*/
-        }
-    }
+    //        /*DEBUGGING*/
+    //        if (agent->showDebug) {
+    //            if (circle == agent->bodySize) {
+    //                DrawDebugLine(GetWorld(), agent->GetActorLocation() + offset, targetVector + offset, FColor::Orange, false, 0.01, 0, 1);
+    //            }
+    //        }
+    //        /*DEBUGGING*/
+    //    }
+    //}
 
     FHitResult hitResult;
     FCollisionObjectQueryParams objectParams;

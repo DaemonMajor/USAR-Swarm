@@ -23,10 +23,10 @@ EBTNodeResult::Type USpiralSearchTask::ExecuteTask(UBehaviorTreeComponent& Owner
         }
 
         /*DEBUGGING*/
-        if (agent->showDebug) {
-            FString wpRemovedText = FString::Printf(TEXT("Agent %d reached search waypoint."), agent->agentID);
-            GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Yellow, wpRemovedText, true);
-        }
+        //if (agent->showDebug) {
+        //    FString wpRemovedText = FString::Printf(TEXT("Agent %d reached search waypoint."), agent->agentID);
+        //    GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Yellow, wpRemovedText, true);
+        //}
         /*DEBUGGING*/
     }
 

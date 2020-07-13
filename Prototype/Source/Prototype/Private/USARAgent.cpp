@@ -34,6 +34,7 @@ AUSARAgent::AUSARAgent()
 	maxSearchHeight			= 500;
 	searchRadiusPerAgent	= 350;
 	searchRadius			= 0;
+	numSearchRadii			= 0;
 
 	alignmentWeight		= 0.1;
 	cohesionWeight		= 1.5;
@@ -45,7 +46,6 @@ AUSARAgent::AUSARAgent()
 	statusReadyToSearch	= false;
 	statusActiveSearch	= false;
 	statusClimbing		= false;
-	statusSearching		= false;
 	statusTraveling		= false;
 
 	agentVelocity	= FVector::ZeroVector;
@@ -131,6 +131,9 @@ void AUSARAgent::Tick(float DeltaSeconds)
 			if (FlockReadyToSearch()) {
 				StartSearchPattern();
 			}
+		}
+		else if (statusActiveSearch) {
+			statusTraveling = FlockReadyToMove();
 		}
 
 		SetVelocity();
@@ -272,7 +275,11 @@ void AUSARAgent::OnReachWP(UPrimitiveComponent* body, AActor* swarmWP, UPrimitiv
 
 	if (eventFromBody && senseWP) {
 		AUSARAgent* agent = Cast<AUSARAgent>(body->GetOwner());
-		agent->statusReadyToSearch = true;
+
+		if (statusTraveling) {
+			agent->statusReadyToSearch	= true;
+			agent->statusTraveling		= false;
+		}
 
 		/*DEBUGGING*/
 		//FString reachedWPText = FString::Printf(TEXT("Agent %d reached waypoint."), agentID);
@@ -489,13 +496,6 @@ void AUSARAgent::AddFlockWP(FVector wp, bool atEnd)
 void AUSARAgent::RemoveFlockWP(FVector wp)
 {
 	flockWPs.Remove(wp);
-
-	if (statusDirectMove) {
-		statusDirectMove = false;
-	}
-	else if (!statusSearching) {
-		statusSearching = true;
-	}
 }
 
 /* Pops top search waypoint off the stack.
@@ -553,11 +553,18 @@ void AUSARAgent::StartSearchPattern()
 		dist = maxDist * FMath::SRand();
 		dist = FMath::Clamp(dist, searchRadiusPerAgent, maxDist);
 
-		goodStart = true;
-		for (AUSARAgent* n : neighborAgents) {
-			if (n->searchRadius > 0) {
-				if (abs(n->searchRadius - dist) < searchRadiusPerAgent/2) {
-					goodStart = false;
+		bool notTooFar = false;
+		if (dist < maxDist/2) {
+			notTooFar = true;
+		}
+
+		if (!statusActiveSearch || (statusActiveSearch && notTooFar)) {
+			goodStart = true;
+			for (AUSARAgent* n : neighborAgents) {
+				if (n->searchRadius > 0) {
+					if (abs(n->searchRadius - dist) < searchRadiusPerAgent/2) {
+						goodStart = false;
+					}
 				}
 			}
 		}
@@ -577,8 +584,28 @@ void AUSARAgent::StartSearchPattern()
 	}
 
 	searchRadius = dist;
+	numSearchRadii++;
 	statusReadyToSearch = false;
 	statusActiveSearch = true;
+
+	if ((numSearchRadii <= 3) && (searchRadius < maxDist * 0.25)) {
+		StartSearchPattern();
+	}
+	else {
+		flockWPs.RemoveAt(0);
+	}
+}
+
+bool AUSARAgent::FlockReadyToMove()
+{
+	bool ready = true;
+	for (AUSARAgent* n : neighborAgents) {
+		if (n->statusActiveSearch) {
+			ready = false;
+		}
+	}
+
+	return ready;
 }
 
 int AUSARAgent::CheckDetections()
