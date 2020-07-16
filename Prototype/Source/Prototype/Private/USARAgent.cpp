@@ -2,7 +2,6 @@
 
 
 #include "USARAgent.h"
-#include "USARAgentController.h"
 #include "../PrototypeGameState.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SphereComponent.h"
@@ -55,7 +54,6 @@ AUSARAgent::AUSARAgent()
 	flockWPVector	= FVector::ZeroVector;
 	directMoveLoc	= FVector::ZeroVector;
 
-	AIControllerClass = AUSARAgentController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	agentRoot = CreateDefaultSubobject<UStaticMeshComponent>("AgentRoot");
@@ -196,6 +194,9 @@ void AUSARAgent::BootUpSequence()
 	// trigger event on "seeing" a human
 	visionSphere->OnComponentBeginOverlap.AddDynamic(this, &AUSARAgent::OnDetectHuman);
 	visionSphere->OnComponentEndOverlap.AddDynamic(this, &AUSARAgent::OnUnDetectHuman);
+
+	// initialize behavior modules
+	//GetWorld()->GetTimerManager().SetTimer(timerHeightTask, this, )
 
 	isInitialized = true;
 
@@ -546,7 +547,7 @@ void AUSARAgent::StartSearchPattern()
 
 	FVector searchCenter = flockWPs[0];
 	float maxDist = neighborAgents.Num() * searchRadiusPerAgent;
-	float dist;
+	float dist = 0;
 
 	bool goodStart = false;
 	while (!goodStart) {

@@ -1,34 +1,26 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "FlockTask.h"
 #include "USARAgent.h"
-#include "AIController.h"
 
-EBTNodeResult::Type UFlockTask::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
+void AUSARAgent::FlockTask()
 {
-    Super::ExecuteTask(OwnerComp, NodeMemory);
+    FVector alignFactor = alignmentWeight * GetAlignment();
+    FVector cohFactor = cohesionWeight * GetCohesion();
+    FVector sepFactor = separationWeight * GetSeparation();
 
-    AUSARAgent* agent = Cast<AUSARAgent>(OwnerComp.GetAIOwner()->GetPawn());
-    FVector alignFactor = agent->alignmentWeight * GetAlignment(agent);
-    FVector cohFactor = agent->cohesionWeight * GetCohesion(agent);
-    FVector sepFactor = agent->separationWeight * GetSeparation(agent);
-
-    FVector flockVector = CalcNewVector(agent, alignFactor, cohFactor, sepFactor);
-    agent->SetFlockVector(flockVector);
+    flockVector = CalcNewVector(alignFactor, cohFactor, sepFactor);
 
     /*DEBUGGING*/
-    agent->alignmentFactor = alignFactor.Size();
-    agent->cohesionFactor = cohFactor.Size();
-    agent->separationFactor = sepFactor.Size();
+    alignmentFactor = alignFactor.Size();
+    cohesionFactor = cohFactor.Size();
+    separationFactor = sepFactor.Size();
     /*DEBUGGING*/
 
     /*DEBUGGING*/
     //FString statusText = FString::Printf(TEXT("Agent %d flocking."), agent->agentID);
     //GEngine->AddOnScreenDebugMessage(INDEX_NONE, 1.0f, FColor::Yellow, statusText , true);
     /*DEBUGGING*/
-
-    return EBTNodeResult::Succeeded;
 }
 
 /**
@@ -37,24 +29,24 @@ EBTNodeResult::Type UFlockTask::ExecuteTask(UBehaviorTreeComponent& OwnerComp, u
 *   @param agent Agent to calculate alignment vector for.
 *   @return Average velocity of neighbors. Returns zero if agent has no neighbors.
 */
-FVector UFlockTask::GetAlignment(AUSARAgent* agent)
+FVector AUSARAgent::GetAlignment()
 {
-    FVector alignVector = FVector::ZeroVector;
+    FVector alVec = FVector::ZeroVector;
 
-    TArray<AUSARAgent*> neighbors = agent->GetNeighbors();
+    TArray<AUSARAgent*> neighbors = GetNeighbors();
 
     for (AUSARAgent* boid : neighbors) {
         if (boid) {
-            alignVector += boid->GetVelocity();
+            alVec += boid->GetVelocity();
         }
     }
-    alignVector /= neighbors.Num();
+    alVec /= neighbors.Num();
 
     /*DEBUGGING*/
-    agent->alignVector = alignVector;
+    alignVector = alVec;
     /*DEBUGGING*/
 
-    return alignVector;
+    return alVec;
 }
 
 /**
@@ -63,21 +55,21 @@ FVector UFlockTask::GetAlignment(AUSARAgent* agent)
 *   @param agent Agent to calculate cohesion vector for.
 *   @return Vector pointing to center mass of agent's neighbors. Returns zero if agent has no neighbors.
 */
-FVector UFlockTask::GetCohesion(AUSARAgent* agent)
+FVector AUSARAgent::GetCohesion()
 {
     FVector centerMass = FVector::ZeroVector;
 
-    TArray<AUSARAgent*> neighbors = agent->GetNeighbors();
+    TArray<AUSARAgent*> neighbors = GetNeighbors();
     for (AUSARAgent* boid : neighbors) {
         if (boid) {
             centerMass += boid->GetActorLocation();
         }
     }
     centerMass /= neighbors.Num();
-    centerMass -= agent->GetActorLocation();
+    centerMass -= GetActorLocation();
 
     /*DEBUGGING*/
-    agent->flockCenter = centerMass;
+    flockCenter = centerMass;
     /*DEBUGGING*/
 
     return centerMass;
@@ -89,12 +81,12 @@ FVector UFlockTask::GetCohesion(AUSARAgent* agent)
 *   @param agent Agent to calculate separation vector for.
 *   @return Vector pointing away from neighbors.
 */
-FVector UFlockTask::GetSeparation(AUSARAgent* agent)
+FVector AUSARAgent::GetSeparation()
 {
     FVector sepDir = FVector::ZeroVector;
 
-    TArray<AUSARAgent*> neighbors = agent->GetNeighbors();
-    FVector agentLoc = agent->GetActorLocation();
+    TArray<AUSARAgent*> neighbors = GetNeighbors();
+    FVector agentLoc = GetActorLocation();
     FVector boidLoc, separation;
     for (AUSARAgent* n : neighbors) {
         if (n) {
@@ -103,7 +95,7 @@ FVector UFlockTask::GetSeparation(AUSARAgent* agent)
 
             float sepFactor = 0;
             float dist = separation.Size();
-            float spacing = agent->agentSpacing;
+            float spacing = agentSpacing;
             if (dist < spacing) {
                 sepFactor = -5 * FMath::Loge(dist) + 28.5;     // zeroed for spacing == 300
             }
@@ -120,7 +112,7 @@ FVector UFlockTask::GetSeparation(AUSARAgent* agent)
     }
 
     /*DEBUGGING*/
-    agent->sepVector = sepDir;
+    sepVector = sepDir;
     /*DEBUGGING*/
 
     return sepDir;
@@ -135,7 +127,7 @@ FVector UFlockTask::GetSeparation(AUSARAgent* agent)
 *   @param sepFactor Separation factor.
 *   @return Velocity vector.
 */
-FVector UFlockTask::CalcNewVector(AUSARAgent* agent, FVector alignFactor, FVector cohFactor, FVector sepFactor)
+FVector AUSARAgent::CalcNewVector(FVector alignFactor, FVector cohFactor, FVector sepFactor)
 {
     return alignFactor + cohFactor + sepFactor;
 }

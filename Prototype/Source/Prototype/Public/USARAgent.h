@@ -190,6 +190,18 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
 		USphereComponent* visionSphere;
 
+	// Timers for behavior modules
+	UPROPERTY()
+		FTimerHandle timerAvoidTask;
+	UPROPERTY()
+		FTimerHandle timerSearchTask;
+	UPROPERTY()
+		FTimerHandle timerHeightTask;
+	UPROPERTY()
+		FTimerHandle timerFlockTask;
+	UPROPERTY()
+		FTimerHandle timerMoveTask;
+
 	UPROPERTY()
         TArray<AUSARAgent*> neighborAgents = TArray<AUSARAgent*>();
 	UPROPERTY()
@@ -240,6 +252,29 @@ protected:
 		bool FlockReadyToMove();
 	UFUNCTION()
 		int CheckDetections();
+
+	// obstacle avoidance behavior
+	void ObstAvoidTask();
+	TArray<FVector> LookAhead(FVector vel, bool& obstructed);
+	bool CheckVector(FVector vector);
+	bool FindClearVector(FVector& targetVec, int fidelity);
+	FVector TransformToWorld(FVector vector);
+
+	// active search behavior
+	void ActiveSearchTask();
+
+	// height maintenance behavior
+	void HeightTask();
+
+	// flocking behavior
+	void FlockTask();
+	FVector GetAlignment();			// Get average velocity of neighbor agents
+	FVector GetCohesion();			// Get vector pointing to center of mass of neighbor agents
+	FVector GetSeparation();		// Calculate vector pointing away from neighbor agents
+	FVector CalcNewVector(FVector alignFactor, FVector cohFactor, FVector sepFactor);	// Calculate new vector for agent based on alignment, cohesion, and separation factors
+
+	// move-to-waypoint behavior
+	void MoveToWPTask();
 
 private:
 	int numSearchRadii;
