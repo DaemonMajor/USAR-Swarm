@@ -241,12 +241,12 @@ void AUSARAgent::OnNeighborEnter(UPrimitiveComponent* agentSensor, AActor* neigh
 	bool senseNeighborBody = !(neighborBody->GetName().Compare("AgentBody"));
 
 	if (eventFromSensor && senseNeighborBody) {
-		AUSARAgent* boid = Cast<AUSARAgent>(neighbor);
+		AUSARAgent* n = Cast<AUSARAgent>(neighbor);
 
-		if (boid && (boid != this)) {
-			if (flockID == boid->flockID) {
-				if (!neighborAgents.Contains(boid)) {
-					neighborAgents.Add(boid);
+		if (n && (n != this) && !n->statusStuck) {
+			if (flockID == n->flockID) {
+				if (!neighborAgents.Contains(n)) {
+					neighborAgents.Add(n);
 				}
 			}
 		}
@@ -259,9 +259,9 @@ void AUSARAgent::OnNeighborLeave(UPrimitiveComponent* agentSensor, AActor* neigh
 	bool senseNeighborBody = !(neighborBody->GetName().Compare("AgentBody"));
 
 	if (eventFromSensor && senseNeighborBody) {
-		if (AUSARAgent* boid = Cast<AUSARAgent>(neighbor)) {
-			if (flockID == boid->flockID) {
-				neighborAgents.Remove(boid);
+		if (AUSARAgent* n = Cast<AUSARAgent>(neighbor)) {
+			if (flockID == n->flockID) {
+				neighborAgents.Remove(n);
 			}
 		}
 	}
@@ -368,7 +368,8 @@ void AUSARAgent::SetVelocity()
 		heightVector = FVector::ZeroVector;
 	}
 	else if (statusClimbing) {
-		newVel = FVector(0, 0, heightVector.Z);
+		newVel = flockVector + flockWPVector;
+		newVel.Z += heightVector.Z;
 	}
 	else {
 		newVel = flockVector + flockWPVector;
@@ -516,6 +517,10 @@ void AUSARAgent::SetStatusStuck()
 	statusDirectMove = false;
 	statusClimbing = false;
 	statusTraveling = false;
+
+	for (AUSARAgent* agent : neighborAgents) {
+		agent->neighborAgents.Remove(this);
+	}
 }
 
 /* Determines if the flock is ready to enter search behavior by checking if all neighbors' statusReadyToSearch.

@@ -28,7 +28,7 @@ ASwarmWP::ASwarmWP()
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> wpCylinder(TEXT("/Game/StarterContent/Shapes/Shape_Cylinder.Shape_Cylinder"));
 	if (wpCylinder.Succeeded()) {
 		wpArea->SetStaticMesh(wpCylinder.Object);
-		wpArea->SetRelativeScale3D(FVector(15, 15, 5.5));	// 15 m diameter, 5.5 m height
+		wpArea->SetRelativeScale3D(FVector(25, 25, 10));	// 25 m diameter, 10 m height
 		wpArea->SetVisibility(false);
 	}
 }
