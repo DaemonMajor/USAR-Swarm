@@ -9,7 +9,6 @@
 #include "Components/ArrowComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "Kismet/KismetSystemLibrary.h"
-#include "DrawDebugHelpers.h"
 
 // Sets default values
 AUSARAgent::AUSARAgent()

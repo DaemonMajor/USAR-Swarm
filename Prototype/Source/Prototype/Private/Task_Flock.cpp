@@ -25,8 +25,9 @@ void AUSARAgent::FlockTask()
     /*DEBUGGING*/
 
     /*DEBUGGING*/
-    //FString statusText = FString::Printf(TEXT("Agent %d flocking."), agent->agentID);
-    //GEngine->AddOnScreenDebugMessage(INDEX_NONE, 1.0f, FColor::Yellow, statusText , true);
+    if (showDebug) {
+        DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + flockVector, 10.f, FColor::Turquoise, false, 0.15, 0, 1.f);
+    }
     /*DEBUGGING*/
 }
 
@@ -104,12 +105,7 @@ FVector AUSARAgent::GetSeparation()
             float dist = separation.Size();
             float spacing = agentSpacing;
             if (dist < spacing) {
-                if (sepWeight == SEPARATION_WEIGHT) {
-                    sepFactor = -5 * FMath::Loge(dist) + 28.5;      // zeroed for spacing == 300
-                }
-                else {
-                    sepFactor = -5 * FMath::Loge(dist) + 34.5;      // zeroed for spacing == 1000
-                }
+                sepFactor = -5 * (FMath::Loge(dist) - FMath::Loge(agentSpacing));
             }
 
             sepDir += sepFactor * separation;

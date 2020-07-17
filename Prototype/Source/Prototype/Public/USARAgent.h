@@ -9,6 +9,7 @@
 #include "USAR_Constants.h"
 #include "SwarmWP.h"
 #include "VictimActor.h"
+#include "DrawDebugHelpers.h"
 #include "USARAgent.generated.h"
 
 UCLASS()

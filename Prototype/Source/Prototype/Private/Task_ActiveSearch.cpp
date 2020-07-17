@@ -2,7 +2,6 @@
 
 
 #include "USARAgent.h"
-#include "DrawDebugHelpers.h"
 
 void AUSARAgent::ActiveSearchHandle()
 {
