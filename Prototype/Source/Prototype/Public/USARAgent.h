@@ -90,40 +90,19 @@ public:
 		bool statusTraveling;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float maxSpeed;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float searchSpeed;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float bodySize;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float neighborRadius;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float visionRadius;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float obstacleAvoidDist;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float targetHeight;			// height to maintain
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float heightVariance;		// variance allowed between agent height and target height
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float maxSearchHeight;		
+		float alignWeight;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float searchRadiusPerAgent;	// multiplied by number of neighbors to determine how far to expand search radius in search behavior
+		float cohWeight;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float sepWeight;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		float searchRadius;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float alignmentWeight;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float cohesionWeight;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-		float separationWeight;
+		float agentSpacing;			// how far apart agents should be spaced
 	
-	const float agentSpacing = 300;	// how far apart agents should be spaced
-
 	UFUNCTION()
 		int GetID();
 	UFUNCTION()
@@ -196,6 +175,8 @@ protected:
 		FTimerHandle timerAvoidTask;
 	UPROPERTY()
 		FTimerHandle timerSearchTask;
+	UPROPERTY()
+		FTimerHandle timerSearchExpand;
 	UPROPERTY()
 		FTimerHandle timerHeightTask;
 	UPROPERTY()
@@ -270,6 +251,7 @@ protected:
 
 	// active search behavior
 	void ActiveSearchTask();
+	void ExpandSearch();
 
 	// height maintenance behavior
 	void MaintainHeightTask();

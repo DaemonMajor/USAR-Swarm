@@ -77,7 +77,7 @@ void AUSARAgent::ObstAvoidTask()
         if (statusAvoiding) {
             statusDirectMove = true;
 
-            FVector goToVec = rawVelocity.GetClampedToSize(0, obstacleAvoidDist);
+            FVector goToVec = rawVelocity.GetClampedToSize(0, OBSTACLE_AVOID_DIST);
             SetDirectMoveLoc(goToVec + GetActorLocation());
         }
 
@@ -105,7 +105,7 @@ TArray<FVector> AUSARAgent::LookAhead(FVector vel, bool& obstructed)
     rayEndPts.Add(targetVector);
 
     //float degStep = 15;  // decrease to increase fidelity of raycast cylinders. recommend factor of 360
-    //for (int circle = 5; circle <= agent->bodySize; circle += 5) {
+    //for (int circle = 5; circle <= agent->BODY_SIZE; circle += 5) {
     //    FVector offset = FVector(0, circle, 0);
 
     //    for (float deg = 0; deg < 360; deg += degStep) {
@@ -120,7 +120,7 @@ TArray<FVector> AUSARAgent::LookAhead(FVector vel, bool& obstructed)
 
     //        /*DEBUGGING*/
     //        if (agent->showDebug) {
-    //            if (circle == agent->bodySize) {
+    //            if (circle == agent->BODY_SIZE) {
     //                DrawDebugLine(GetWorld(), agent->GetActorLocation() + offset, targetVector + offset, FColor::Orange, false, 0.01, 0, 1);
     //            }
     //        }
@@ -181,7 +181,7 @@ bool AUSARAgent::FindClearVector(FVector& targetVec, int fidelity) {
         float y = FMath::Sin(inclination) * FMath::Cos(-azimuth);
         float z = FMath::Sin(-azimuth);
 
-        FVector checkVec = obstacleAvoidDist * FVector(x, y, z) + GetActorLocation();
+        FVector checkVec = OBSTACLE_AVOID_DIST * FVector(x, y, z) + GetActorLocation();
         FHitResult hitResult;
         FCollisionQueryParams queryParams;
         queryParams.AddIgnoredActor(this);
@@ -220,7 +220,7 @@ bool AUSARAgent::FindClearVector(FVector& targetVec, int fidelity) {
 bool AUSARAgent::CheckVector(FVector vector)
 {
     float degStep = 6;  // increase to increase fidelity of raycast cylinders
-    for (int circle = 1; circle < bodySize; circle++) {
+    for (int circle = 1; circle < BODY_SIZE; circle++) {
         FVector endPt = FVector(circle, 0, 0);
 
         for (int deg = 0; deg < 360; deg += degStep) {

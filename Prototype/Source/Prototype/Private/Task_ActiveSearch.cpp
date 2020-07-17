@@ -2,6 +2,7 @@
 
 
 #include "USARAgent.h"
+#include "DrawDebugHelpers.h"
 
 void AUSARAgent::ActiveSearchHandle()
 {
@@ -17,43 +18,32 @@ void AUSARAgent::ActiveSearchTask()
         FVector toCenter = centerPt - GetActorLocation();
         toCenter.Z = 0;
 
-        FRotator rot90Deg = FRotator(0, 90, 0);
-        FVector moveVec = rot90Deg.RotateVector(toCenter);
+        FRotator rot = FRotator(0, 90, 0);
+        FVector moveVec = rot.RotateVector(toCenter);
 
         searchVector = moveVec.GetClampedToSize(SEARCH_SPEED, SEARCH_SPEED);
 
-        separationWeight += 0.1;
-    }
-
-    if (separationWeight > MAX_SEPARATION_WEIGHT) {
-        statusActiveSearch = false;
-        flockWPs.RemoveAt(0);
+        /*DEBUGGING*/
+        if (showDebug) {
+            DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + searchVector, 10.f, FColor::Orange, false, 0.25, 0, 1.f);
+        }
+        /*DEBUGGING*/
     }
 }
 
-//void AUSARAgent::ActiveSearchTask()
-//{
-//    FVector waypoint;
-//    GetSearchWP(waypoint);
-//    
-//    if (FVector::PointsAreNear(GetActorLocation(), waypoint, 5)) {
-//        RemoveSearchWP();
-//        
-//        if (!GetSearchWP(waypoint)) {
-//            waypoint = GetActorLocation();
-//            statusActiveSearch = false;
-//        }
-//
-//        /*DEBUGGING*/
-//        //if (showDebug) {
-//        //    FString wpRemovedText = FString::Printf(TEXT("Agent %d reached search waypoint."), agentID);
-//        //    GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Yellow, wpRemovedText, true);
-//        //}
-//        /*DEBUGGING*/
-//    }
-//
-//    FVector targetVector = waypoint - GetActorLocation();
-//    targetVector = targetVector.GetClampedToSize(searchSpeed, searchSpeed);
-//
-//    SetSearchVector(targetVector);
-//}
+void AUSARAgent::ExpandSearch()
+{
+    sepWeight += 5;
+
+    if (sepWeight > MAX_SEPARATION_WEIGHT) {
+        statusActiveSearch = false;
+        flockWPs.RemoveAt(0);
+
+        alignWeight = ALIGNMENT_WEIGHT;
+        cohWeight = COHESION_WEIGHT;
+        sepWeight = SEPARATION_WEIGHT;
+        agentSpacing = AGENT_SPACING;
+
+        GetWorldTimerManager().ClearTimer(timerSearchExpand);
+    }
+}

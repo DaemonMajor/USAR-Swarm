@@ -10,7 +10,7 @@ EBTNodeResult::Type UVectorTest::ExecuteTask(UBehaviorTreeComponent& OwnerComp, 
 
     AUSARAgent* agent = Cast<AUSARAgent>(OwnerComp.GetAIOwner()->GetPawn());
     
-    FVector testVec = FVector(agent->maxSpeed, 0, 0);
+    FVector testVec = FVector(MAX_SPEED, 0, 0);
     FRotator testRot = FRotator(0, 90, 0);
     testVec = testRot.RotateVector(testVec);
 

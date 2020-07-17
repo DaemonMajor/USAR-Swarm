@@ -21,17 +21,13 @@ AUSARAgent::AUSARAgent()
 	// all lengths in cm (UE units)
 	//yawRate			= 45;
 	
-	targetHeight = visionRadius * 0.85;
+	targetHeight = MOVE_HEIGHT;
 	heightVariance = targetHeight * 0.05;
 
-	maxSearchHeight			= 500;
-	searchRadiusPerAgent	= 350;
-	searchRadius			= 0;
-	numSearchRadii			= 0;
-
-	alignmentWeight		= ALIGNMENT_WEIGHT;
-	cohesionWeight		= COHESION_WEIGHT;
-	separationWeight	= SEPARATION_WEIGHT;
+	alignWeight		= ALIGNMENT_WEIGHT;
+	cohWeight		= COHESION_WEIGHT;
+	sepWeight		= SEPARATION_WEIGHT;
+	agentSpacing	= AGENT_SPACING;
 
 	statusStuck			= false;
 	statusAvoiding		= false;
@@ -73,7 +69,7 @@ AUSARAgent::AUSARAgent()
 
 	neighborSphere = CreateDefaultSubobject<USphereComponent>("NeighborSensor");
 	neighborSphere->SetupAttachment(RootComponent);
-	neighborSphere->SetSphereRadius(neighborRadius);
+	neighborSphere->SetSphereRadius(NEIGHBOR_RADIUS);
 	neighborSphere->SetSimulatePhysics(false);
 	neighborSphere->SetGenerateOverlapEvents(true);
 	neighborSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -82,7 +78,7 @@ AUSARAgent::AUSARAgent()
 
 	visionSphere = CreateDefaultSubobject<USphereComponent>("VisionSensor");
 	visionSphere->SetupAttachment(RootComponent);
-	visionSphere->SetSphereRadius(visionRadius);
+	visionSphere->SetSphereRadius(VISION_RADIUS);
 	visionSphere->SetSimulatePhysics(false);
 	visionSphere->SetGenerateOverlapEvents(true);
 	visionSphere->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
@@ -103,7 +99,7 @@ void AUSARAgent::BeginPlay()
 
 void AUSARAgent::EndPlay(const EEndPlayReason::Type EndPlayReason)
 {
-	GetWorldTimerManager().ClearTimer(bootUpDelayTimer);
+	GetWorldTimerManager().ClearAllTimersForObject(this);
 
 	Super::EndPlay(EndPlayReason);
 }
@@ -121,8 +117,15 @@ void AUSARAgent::Tick(float DeltaSeconds)
 
 		if (statusReadyToSearch) {
 			if (FlockReadyToSearch()) {
-				//StartSearchPattern();
+				alignWeight = 0;
+				cohWeight = 0;
+				agentSpacing = MAX_AGENT_SPACING;
+				targetHeight = SEARCH_HEIGHT;
+
+				statusReadyToSearch = false;
 				statusActiveSearch = true;
+
+				GetWorldTimerManager().SetTimer(timerSearchExpand, this, &AUSARAgent::ExpandSearch, 2.5, true);
 			}
 		}
 		else if (statusActiveSearch) {
@@ -177,7 +180,7 @@ void AUSARAgent::BootUpSequence()
 	// initialize neighbor list
 	ScanNeighbors();
 
-	// set up neighbor list to update when agents enter/leave neighborRadius
+	// set up neighbor list to update when agents enter/leave NEIGHBOR_RADIUS
 	neighborSphere->OnComponentBeginOverlap.AddDynamic(this, &AUSARAgent::OnNeighborEnter);
 	neighborSphere->OnComponentEndOverlap.AddDynamic(this, &AUSARAgent::OnNeighborLeave);
 
@@ -189,11 +192,11 @@ void AUSARAgent::BootUpSequence()
 	visionSphere->OnComponentEndOverlap.AddDynamic(this, &AUSARAgent::OnUnDetectHuman);
 
 	// activate behavior modules
-	GetWorldTimerManager().SetTimer(timerAvoidTask, this, &AUSARAgent::ObstAvoidHandle, 0.01, true);		// repeat every 0.01 s
-	GetWorldTimerManager().SetTimer(timerSearchTask, this, &AUSARAgent::ActiveSearchHandle, 0.1, true);		// repeat every 0.1 s
-	GetWorldTimerManager().SetTimer(timerHeightTask, this, &AUSARAgent::MaintainHeightHandle, 0.5, true);	// repeat every 0.5 s
-	GetWorldTimerManager().SetTimer(timerFlockTask, this, &AUSARAgent::FlockHandle, 0.15, true);			// repeat every 0.15 s
-	GetWorldTimerManager().SetTimer(timerMoveTask, this, &AUSARAgent::MoveToWPHandle, 0.25, true);			// repeat every 0.25 s
+	GetWorldTimerManager().SetTimer(timerAvoidTask, this, &AUSARAgent::ObstAvoidHandle, 0.001, true);
+	GetWorldTimerManager().SetTimer(timerSearchTask, this, &AUSARAgent::ActiveSearchHandle, 0.25, true);
+	GetWorldTimerManager().SetTimer(timerHeightTask, this, &AUSARAgent::MaintainHeightHandle, 0.15, true);
+	GetWorldTimerManager().SetTimer(timerFlockTask, this, &AUSARAgent::FlockHandle, 0.15, true);
+	GetWorldTimerManager().SetTimer(timerMoveTask, this, &AUSARAgent::MoveToWPHandle, 0.15, true);
 
 	isInitialized = true;
 
@@ -219,12 +222,12 @@ void AUSARAgent::ScanNeighbors()
 	// list of neighbors found
 	TArray<AActor*> foundNeighbors;
 
-	UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetActorLocation(), neighborRadius, traceObjectTypes, seekClass, ignoreActors, foundNeighbors);
+	UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetActorLocation(), NEIGHBOR_RADIUS, traceObjectTypes, seekClass, ignoreActors, foundNeighbors);
 
 	// filter by distance and cast to AUSARAgent
 	for (AActor* agent : foundNeighbors) {
 		float dist = FVector::Distance(GetActorLocation(), agent->GetActorLocation());
-		if (dist <= neighborRadius) {
+		if (dist <= NEIGHBOR_RADIUS) {
 			if (!neighborAgents.Contains(agent)) {
 				neighborAgents.Add(Cast<AUSARAgent>(agent));
 			}
@@ -340,12 +343,18 @@ FVector AUSARAgent::GetVelocity() const
 
 void AUSARAgent::SetVelocity()
 {
-	rawVelocity = (flockVector + flockWPVector).GetClampedToSize(0, MAX_SPEED);
 	if (statusActiveSearch) {
-		rawVelocity = (rawVelocity.GetClampedToSize(0, SEARCH_SPEED) + searchVector).GetClampedToSize(0, SEARCH_SPEED);
+		rawVelocity = (flockVector.GetClampedToSize(0, SEARCH_SPEED) + searchVector).GetClampedToSize(0, SEARCH_SPEED);
+	}
+	else {
+		rawVelocity = (flockVector + flockWPVector).GetClampedToSize(0, MAX_SPEED);
 	}
 
-	FVector newVel = FVector::ZeroVector;
+	if (statusClimbing) {
+		rawVelocity.Z = heightVector.Z;
+	}
+
+	FVector newVel = rawVelocity;
 	if (statusAvoiding) {
 		newVel = avoidanceVector;
 	}
@@ -358,13 +367,6 @@ void AUSARAgent::SetVelocity()
 		else {
 			newVel *= MAX_SPEED;
 		}
-	}
-	else if (statusClimbing) {
-		newVel = FVector(0, 0, heightVector.Z);
-	}
-	else {
-		newVel = flockVector + flockWPVector;
-		heightVector = FVector::ZeroVector;
 	}
 	
 	agentVelocity = newVel.GetClampedToSize(0, MAX_SPEED);
@@ -528,68 +530,6 @@ bool AUSARAgent::FlockReadyToSearch()
 
 	return ready;
 }
-
-/* Sets waypoints for search pattern based on current waypoint.
-*
-*/
-//void AUSARAgent::StartSearchPattern()
-//{
-//	// safety in case function triggers with no waypoints
-//	if (!flockWPs.Num()) {
-//		return;
-//	}
-//
-//	FVector searchCenter = flockWPs[0];
-//	float maxDist = neighborAgents.Num() * searchRadiusPerAgent;
-//	float dist = 0;
-//
-//	bool goodStart = false;
-//	while (!goodStart) {
-//		dist = maxDist * FMath::SRand();
-//		dist = FMath::Clamp(dist, searchRadiusPerAgent, maxDist);
-//
-//		bool notTooFar = false;
-//		if (dist < maxDist/2) {
-//			notTooFar = true;
-//		}
-//
-//		if (!statusActiveSearch || (statusActiveSearch && notTooFar)) {
-//			goodStart = true;
-//			for (AUSARAgent* n : neighborAgents) {
-//				if (n->searchRadius > 0) {
-//					if (abs(n->searchRadius - dist) < searchRadiusPerAgent/2) {
-//						goodStart = false;
-//					}
-//				}
-//			}
-//		}
-//	}
-//
-//	FVector startVec = FMath::VRand();
-//	startVec.Z = 0;
-//	startVec = dist * startVec.GetSafeNormal();
-//	float searchHeight = FMath::Clamp(FMath::SRand() * maxSearchHeight, targetHeight/2, maxSearchHeight);
-//	startVec.Z = searchHeight;
-//
-//	for (int deg = 0; deg < 180; deg += 10) {
-//		FRotator rot = FRotator(0, deg, 0);
-//		FVector searchLoc = rot.RotateVector(startVec) + searchCenter;
-//
-//		searchWPs.Add(searchLoc);
-//	}
-//
-//	searchRadius = dist;
-//	numSearchRadii++;
-//	statusReadyToSearch = false;
-//	statusActiveSearch = true;
-//
-//	if ((numSearchRadii <= 3) && (searchRadius < maxDist * 0.25)) {
-//		StartSearchPattern();
-//	}
-//	else {
-//		flockWPs.RemoveAt(0);
-//	}
-//}
 
 bool AUSARAgent::FlockReadyToMove()
 {

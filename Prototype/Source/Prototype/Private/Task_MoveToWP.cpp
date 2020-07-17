@@ -18,7 +18,15 @@ void AUSARAgent::MoveToWPTask()
         waypoint.Z = targetHeight;
 
         targetVector = waypoint - GetActorLocation();
-        targetVector = targetVector.GetClampedToSize(maxSpeed * 3, maxSpeed * 3);     // set magnitude so agent doesn't slow down as it nears the waypoint
+        targetVector = targetVector.GetClampedToSize(MAX_SPEED * 3, MAX_SPEED * 3);     // set magnitude so agent doesn't slow down as it nears the waypoint
+    }
+    else {
+        /*DEBUGGING*/
+        if (showDebug) {
+            FString noWPText = FString::Printf(TEXT("Agent %d has no waypoints."), agentID);
+            GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Green, noWPText, true);
+        }
+        /*DEBUGGING*/
     }
 
     SetFlockWPVector(targetVector);

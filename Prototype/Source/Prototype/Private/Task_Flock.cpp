@@ -12,9 +12,9 @@ void AUSARAgent::FlockHandle()
 
 void AUSARAgent::FlockTask()
 {
-    FVector alignFactor = alignmentWeight * GetAlignment();
-    FVector cohFactor = cohesionWeight * GetCohesion();
-    FVector sepFactor = separationWeight * GetSeparation();
+    FVector alignFactor = alignWeight * GetAlignment();
+    FVector cohFactor = cohWeight * GetCohesion();
+    FVector sepFactor = sepWeight * GetSeparation();
 
     flockVector = CalcNewVector(alignFactor, cohFactor, sepFactor);
 
@@ -104,7 +104,12 @@ FVector AUSARAgent::GetSeparation()
             float dist = separation.Size();
             float spacing = agentSpacing;
             if (dist < spacing) {
-                sepFactor = -5 * FMath::Loge(dist) + 28.5;     // zeroed for spacing == 300
+                if (sepWeight == SEPARATION_WEIGHT) {
+                    sepFactor = -5 * FMath::Loge(dist) + 28.5;      // zeroed for spacing == 300
+                }
+                else {
+                    sepFactor = -5 * FMath::Loge(dist) + 34.5;      // zeroed for spacing == 1000
+                }
             }
 
             sepDir += sepFactor * separation;
