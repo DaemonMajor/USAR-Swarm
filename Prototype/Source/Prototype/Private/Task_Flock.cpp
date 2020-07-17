@@ -3,6 +3,13 @@
 
 #include "USARAgent.h"
 
+void AUSARAgent::FlockHandle()
+{
+    if (true) {
+        FlockTask();
+    }
+}
+
 void AUSARAgent::FlockTask()
 {
     FVector alignFactor = alignmentWeight * GetAlignment();

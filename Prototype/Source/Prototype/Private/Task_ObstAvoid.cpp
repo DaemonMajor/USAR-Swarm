@@ -5,6 +5,13 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "DrawDebugHelpers.h"
 
+void AUSARAgent::ObstAvoidHandle()
+{
+    if (!statusStuck) {     // add cases here if obstacle avoidance should be turned off
+        ObstAvoidTask();
+    }
+}
+
 void AUSARAgent::ObstAvoidTask()
 {
     if (statusDirectMove) {

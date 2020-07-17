@@ -3,6 +3,13 @@
 
 #include "USARAgent.h"
 
+void AUSARAgent::MoveToWPHandle()
+{
+    if (!statusActiveSearch) {
+        MoveToWPTask();
+    }
+}
+
 void AUSARAgent::MoveToWPTask()
 {
     FVector waypoint;

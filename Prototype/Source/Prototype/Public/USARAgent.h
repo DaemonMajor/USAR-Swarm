@@ -6,6 +6,7 @@
 #include "GameFramework/Pawn.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "Components/SphereComponent.h"
+#include "USAR_Constants.h"
 #include "SwarmWP.h"
 #include "VictimActor.h"
 #include "USARAgent.generated.h"
@@ -246,12 +247,19 @@ protected:
 
 	UFUNCTION()
 		bool FlockReadyToSearch();
-	UFUNCTION()
-		void StartSearchPattern();
+	//UFUNCTION()
+	//	void StartSearchPattern();
 	UFUNCTION()
 		bool FlockReadyToMove();
 	UFUNCTION()
 		int CheckDetections();
+
+	/*BEHAVIOR MODULES*/
+	void ObstAvoidHandle();
+	void ActiveSearchHandle();
+	void MaintainHeightHandle();
+	void FlockHandle();
+	void MoveToWPHandle();
 
 	// obstacle avoidance behavior
 	void ObstAvoidTask();
@@ -264,7 +272,7 @@ protected:
 	void ActiveSearchTask();
 
 	// height maintenance behavior
-	void HeightTask();
+	void MaintainHeightTask();
 
 	// flocking behavior
 	void FlockTask();
@@ -275,6 +283,7 @@ protected:
 
 	// move-to-waypoint behavior
 	void MoveToWPTask();
+	/*BEHAVIOR MODULES*/
 
 private:
 	int numSearchRadii;

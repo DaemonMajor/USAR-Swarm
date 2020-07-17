@@ -3,7 +3,14 @@
 
 #include "USARAgent.h"
 
-void AUSARAgent::HeightTask()
+void AUSARAgent::MaintainHeightHandle()
+{
+    if (!statusActiveSearch) {
+        MaintainHeightTask();
+    }
+}
+
+void AUSARAgent::MaintainHeightTask()
 {
     float agentHeight = GetActorLocation().Z;
 
