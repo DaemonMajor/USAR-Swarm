@@ -13,7 +13,7 @@ EBTNodeResult::Type USpawnAgentTask::ExecuteTask(UBehaviorTreeComponent& OwnerCo
     static APrototypeGameState* gameState = GetWorld()->GetGameState<APrototypeGameState>();
 
     FVector agentPos = GetRandLoc(spawn);
-    FRotator zeroRot;
+    FRotator zeroRot = FRotator::ZeroRotator;
 
     AUSARAgent* agent = GetWorld()->SpawnActor<AUSARAgent>(agentPos + spawn->GetActorLocation(), zeroRot);
     agent->AssignToFlock(1);

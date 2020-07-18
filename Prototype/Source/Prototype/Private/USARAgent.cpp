@@ -20,8 +20,8 @@ AUSARAgent::AUSARAgent()
 	// all lengths in cm (UE units)
 	//yawRate			= 45;
 	
-	targetHeight = MOVE_HEIGHT;
-	heightVariance = targetHeight * 0.05;
+	targetHeight	= MOVE_HEIGHT;
+	heightVariance	= targetHeight * 0.05;
 
 	alignWeight		= ALIGNMENT_WEIGHT;
 	cohWeight		= COHESION_WEIGHT;
@@ -35,6 +35,8 @@ AUSARAgent::AUSARAgent()
 	statusActiveSearch	= false;
 	statusClimbing		= false;
 	statusTraveling		= false;
+
+	expandingSearch = 0;
 
 	agentVelocity	= FVector::ZeroVector;
 	avoidanceVector = FVector::ZeroVector;
@@ -116,15 +118,7 @@ void AUSARAgent::Tick(float DeltaSeconds)
 
 		if (statusReadyToSearch) {
 			if (FlockReadyToSearch()) {
-				alignWeight = 0;
-				cohWeight = 0;
-				agentSpacing = MAX_AGENT_SPACING;
-				targetHeight = SEARCH_HEIGHT;
-
-				statusReadyToSearch = false;
-				statusActiveSearch = true;
-
-				GetWorldTimerManager().SetTimer(timerSearchExpand, this, &AUSARAgent::ExpandSearch, 2.5, true);
+				BeginSearch();
 			}
 		}
 		else if (statusActiveSearch) {
@@ -143,14 +137,12 @@ void AUSARAgent::Tick(float DeltaSeconds)
 		/*DEBUGGING*/
 
 		if (flockWPs.Num()) {
-			wpLoc = flockWPs[0];
 
 			if (!statusActiveSearch) {
 				statusTraveling = true;
 			}
 		}
 		else {
-			wpLoc = FVector(NULL, NULL, NULL);
 			statusTraveling = false;
 		}
 	}
@@ -183,19 +175,16 @@ void AUSARAgent::BootUpSequence()
 	neighborSphere->OnComponentBeginOverlap.AddDynamic(this, &AUSARAgent::OnNeighborEnter);
 	neighborSphere->OnComponentEndOverlap.AddDynamic(this, &AUSARAgent::OnNeighborLeave);
 
-	// trigger event on reaching a flockWP
-	agentBody->OnComponentBeginOverlap.AddDynamic(this, &AUSARAgent::OnReachWP);
-
 	// trigger event on "seeing" a human
 	visionSphere->OnComponentBeginOverlap.AddDynamic(this, &AUSARAgent::OnDetectHuman);
 	visionSphere->OnComponentEndOverlap.AddDynamic(this, &AUSARAgent::OnUnDetectHuman);
 
 	// activate behavior modules
-	GetWorldTimerManager().SetTimer(timerAvoidTask, this, &AUSARAgent::ObstAvoidHandle, 0.001, true);
-	GetWorldTimerManager().SetTimer(timerSearchTask, this, &AUSARAgent::ActiveSearchHandle, 0.25, true);
-	GetWorldTimerManager().SetTimer(timerHeightTask, this, &AUSARAgent::MaintainHeightHandle, 0.15, true);
-	GetWorldTimerManager().SetTimer(timerFlockTask, this, &AUSARAgent::FlockHandle, 0.15, true);
-	GetWorldTimerManager().SetTimer(timerMoveTask, this, &AUSARAgent::MoveToWPHandle, 0.15, true);
+	GetWorldTimerManager().SetTimer(timerAvoidTask, this, &AUSARAgent::ObstAvoidHandle, RATE_AVOID_TASK, true);
+	GetWorldTimerManager().SetTimer(timerSearchTask, this, &AUSARAgent::ActiveSearchHandle, RATE_SEARCH_TASK, true);
+	GetWorldTimerManager().SetTimer(timerHeightTask, this, &AUSARAgent::MaintainHeightHandle, RATE_HEIGHT_TASK, true);
+	GetWorldTimerManager().SetTimer(timerFlockTask, this, &AUSARAgent::FlockHandle, RATE_FLOCK_TASK, true);
+	GetWorldTimerManager().SetTimer(timerMoveTask, this, &AUSARAgent::MoveToWPHandle, RATE_WP_TASK, true);
 
 	isInitialized = true;
 
@@ -264,27 +253,6 @@ void AUSARAgent::OnNeighborLeave(UPrimitiveComponent* agentSensor, AActor* neigh
 				neighborAgents.Remove(boid);
 			}
 		}
-	}
-}
-
-void AUSARAgent::OnReachWP(UPrimitiveComponent* body, AActor* swarmWP, UPrimitiveComponent* wpArea, int32 neighborIndex,
-			   bool bFromSweep, const FHitResult& SweepResult)
-{
-	bool eventFromBody = !(body->GetName().Compare("AgentBody"));
-	bool senseWP = !(wpArea->GetName().Compare("WPArea"));
-
-	if (eventFromBody && senseWP) {
-		AUSARAgent* agent = Cast<AUSARAgent>(body->GetOwner());
-
-		if (statusTraveling) {
-			agent->statusReadyToSearch	= true;
-			agent->statusTraveling		= false;
-		}
-
-		/*DEBUGGING*/
-		//FString reachedWPText = FString::Printf(TEXT("Agent %d reached waypoint."), agentID);
-		//GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Green, reachedWPText, true);
-		/*DEBUGGING*/
 	}
 }
 
@@ -379,17 +347,6 @@ void AUSARAgent::SetAvoidanceVector(FVector rawVector)
 FVector AUSARAgent::GetDirectMoveLoc()
 {
 	return directMoveLoc;
-}
-
-bool AUSARAgent::GetSearchWP(FVector& vec)
-{
-	if (searchWPs.Num()) {
-		vec = searchWPs[0];
-
-		return true;
-	}
-
-	return false;
 }
 
 void AUSARAgent::SetDirectMoveLoc(FVector loc)
@@ -491,14 +448,6 @@ void AUSARAgent::RemoveFlockWP(FVector wp)
 	flockWPs.Remove(wp);
 }
 
-/* Pops top search waypoint off the stack.
-*
-*/
-void AUSARAgent::RemoveSearchWP()
-{
-	searchWPs.RemoveAt(0);
-}
-
 /* Set agent status to stuck and power down non-vital systems.
 *
 */
@@ -512,22 +461,6 @@ void AUSARAgent::SetStatusStuck()
 
 	// clear timer handles for behavior modules
 	GetWorldTimerManager().ClearAllTimersForObject(this);
-}
-
-/* Determines if the flock is ready to enter search behavior by checking if all neighbors' statusReadyToSearch.
-*
-*/
-bool AUSARAgent::FlockReadyToSearch()
-{
-	bool ready = true;
-
-	for (AUSARAgent* n : neighborAgents) {
-		if (!(n->statusReadyToSearch || n->statusActiveSearch)) {
-			ready = false;
-		}
-	}
-
-	return ready;
 }
 
 bool AUSARAgent::FlockReadyToMove()

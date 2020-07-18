@@ -51,8 +51,6 @@ public:
 		FVector flockVector;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FVector flockWPVector;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		FVector wpLoc;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		float alignmentFactor = 0;
@@ -146,11 +144,6 @@ public:
 		bool GetCurrFlockWP(FVector& wp);				// fetch current waypoint
 
 	UFUNCTION()
-		void RemoveSearchWP();
-	UFUNCTION()
-		bool GetSearchWP(FVector& vec);
-
-	UFUNCTION()
 		void SetStatusStuck();
 
 protected:
@@ -171,20 +164,6 @@ protected:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
 		USphereComponent* visionSphere;
 
-	// Timers for behavior modules
-	UPROPERTY()
-		FTimerHandle timerAvoidTask;
-	UPROPERTY()
-		FTimerHandle timerSearchTask;
-	UPROPERTY()
-		FTimerHandle timerSearchExpand;
-	UPROPERTY()
-		FTimerHandle timerHeightTask;
-	UPROPERTY()
-		FTimerHandle timerFlockTask;
-	UPROPERTY()
-		FTimerHandle timerMoveTask;
-
 	UPROPERTY()
         TArray<AUSARAgent*> neighborAgents = TArray<AUSARAgent*>();
 	UPROPERTY()
@@ -195,6 +174,9 @@ protected:
 		TArray<FVector> searchWPs = TArray<FVector>();
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FVector directMoveLoc;
+
+	UPROPERTY()
+		int expandingSearch;
 	
 	//UPROPERTY()
 		TArray<AVictimActor*> detectedVictims = TArray<AVictimActor*>();
@@ -213,9 +195,6 @@ protected:
 							 bool bFromSweep, const FHitResult &SweepResult);
 	UFUNCTION()
 		void OnNeighborLeave(UPrimitiveComponent* agentSensor, AActor* neighbor, UPrimitiveComponent* neighborBody, int32 neighborIndex);
-	UFUNCTION()
-		void OnReachWP(UPrimitiveComponent* body, AActor* swarmWP, UPrimitiveComponent* wpArea, int32 neighborIndex,
-					   bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 		void OnDetectHuman(UPrimitiveComponent* agentSensor, AActor* victim, UPrimitiveComponent* humanBody, int32 neighborIndex,
 						   bool bFromSweep, const FHitResult& SweepResult);
@@ -236,7 +215,7 @@ protected:
 	UFUNCTION()
 		int CheckDetections();
 
-	/*BEHAVIOR MODULES*/
+	/***BEHAVIOR MODULES***/
 	void ObstAvoidHandle();
 	void ActiveSearchHandle();
 	void MaintainHeightHandle();
@@ -244,6 +223,7 @@ protected:
 	void MoveToWPHandle();
 
 	// obstacle avoidance behavior
+	FTimerHandle timerAvoidTask;
 	void ObstAvoidTask();
 	TArray<FVector> LookAhead(FVector vel, bool& obstructed);
 	bool CheckVector(FVector vector);
@@ -251,13 +231,18 @@ protected:
 	FVector TransformToWorld(FVector vector);
 
 	// active search behavior
+	FTimerHandle timerSearchTask;
+	FTimerHandle timerSearchExpand;
 	void ActiveSearchTask();
+	void BeginSearch();
 	void ExpandSearch();
-
+	
 	// height maintenance behavior
+	FTimerHandle timerHeightTask;
 	void MaintainHeightTask();
 
 	// flocking behavior
+	FTimerHandle timerFlockTask;
 	void FlockTask();
 	FVector GetAlignment();			// Get average velocity of neighbor agents
 	FVector GetCohesion();			// Get vector pointing to center of mass of neighbor agents
@@ -265,8 +250,10 @@ protected:
 	FVector CalcNewVector(FVector alignFactor, FVector cohFactor, FVector sepFactor);	// Calculate new vector for agent based on alignment, cohesion, and separation factors
 
 	// move-to-waypoint behavior
+	FTimerHandle timerMoveTask;
 	void MoveToWPTask();
-	/*BEHAVIOR MODULES*/
+	void CheckAtWP();
+	/***BEHAVIOR MODULES***/
 
 private:
 	int numSearchRadii;

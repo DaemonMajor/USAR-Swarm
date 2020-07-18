@@ -7,6 +7,10 @@ void AUSARAgent::MoveToWPHandle()
 {
     if (!statusActiveSearch) {
         MoveToWPTask();
+
+        if (statusTraveling) {
+            CheckAtWP();
+        }
     }
 }
 
@@ -30,4 +34,19 @@ void AUSARAgent::MoveToWPTask()
     }
 
     SetFlockWPVector(targetVector);
+}
+
+void AUSARAgent::CheckAtWP()
+{
+    float minDist = MIN_WP_ERR + sqrtf(neighborAgents.Num()) * AGENT_SPACING;
+    FVector agentLoc = GetActorLocation();
+    agentLoc.Z = 0;
+    FVector wpLoc = flockWPs[0];
+    wpLoc.Z = 0;
+
+    float distToWP = abs((agentLoc - wpLoc).Size());
+
+    if (distToWP <= minDist) {
+        statusReadyToSearch = true;
+    }
 }
