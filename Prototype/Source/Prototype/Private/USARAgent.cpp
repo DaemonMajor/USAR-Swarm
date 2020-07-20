@@ -18,7 +18,7 @@ AUSARAgent::AUSARAgent()
 	showDebug = false;
 
 	// all lengths in cm (UE units)
-	//yawRate			= 45;
+	//yawRate		= 45;
 	
 	targetHeight	= MOVE_HEIGHT;
 	heightVariance	= targetHeight * 0.05;
@@ -47,6 +47,7 @@ AUSARAgent::AUSARAgent()
 
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
+	/*Set up physical body, sensors*/
 	agentRoot = CreateDefaultSubobject<UStaticMeshComponent>("AgentRoot");
 	SetRootComponent(agentRoot);
 	agentRoot->SetSimulatePhysics(false);
@@ -194,6 +195,9 @@ void AUSARAgent::BootUpSequence()
 	/*DEBUGGING*/
 }
 
+/* Add all nearby neighbors to neighbor list. Should be called on agent bootup.
+*
+*/
 void AUSARAgent::ScanNeighbors()
 {
 	// filter by collision channel
@@ -223,6 +227,9 @@ void AUSARAgent::ScanNeighbors()
 	}
 }
 
+/* Adds an agent to neighbor list on detection.
+*
+*/
 void AUSARAgent::OnNeighborEnter(UPrimitiveComponent* agentSensor, AActor* neighbor, UPrimitiveComponent* neighborBody, int32 neighborIndex,
 								 bool bFromSweep, const FHitResult& SweepResult)
 {
@@ -242,6 +249,9 @@ void AUSARAgent::OnNeighborEnter(UPrimitiveComponent* agentSensor, AActor* neigh
 	}
 }
 
+/* Removes an agent from neighbor list on detection.
+*
+*/
 void AUSARAgent::OnNeighborLeave(UPrimitiveComponent* agentSensor, AActor* neighbor, UPrimitiveComponent* neighborBody, int32 neighborIndex)
 {
 	bool eventFromSensor = !(agentSensor->GetName().Compare("NeighborSensor"));
@@ -256,6 +266,9 @@ void AUSARAgent::OnNeighborLeave(UPrimitiveComponent* agentSensor, AActor* neigh
 	}
 }
 
+/* Agent behavior when a victim is detected.
+*
+*/
 void AUSARAgent::OnDetectHuman(UPrimitiveComponent* agentSensor, AActor* victim, UPrimitiveComponent* humanBody, int32 neighborIndex,
 							   bool bFromSweep, const FHitResult& SweepResult)
 {
@@ -267,6 +280,9 @@ void AUSARAgent::OnDetectHuman(UPrimitiveComponent* agentSensor, AActor* victim,
 	}
 }
 
+/* Agent behavior when a victim leaves the range of agent's sensors.
+*
+*/
 void AUSARAgent::OnUnDetectHuman(UPrimitiveComponent* agentSensor, AActor* victim, UPrimitiveComponent* humanBody, int32 neighborIndex)
 {
 	bool eventFromSensor = !(agentSensor->GetName().Compare("VisionSensor"));
@@ -277,21 +293,38 @@ void AUSARAgent::OnUnDetectHuman(UPrimitiveComponent* agentSensor, AActor* victi
 	}
 }
 
+/* Retrieves the agent's unique ID.
+*
+*	@return Unique integer ID.
+*/
 int AUSARAgent::GetID()
 {
 	return agentID;
 }
 
+/* Sets the agent's unique ID.
+*
+*	@param id Integer to set the agent's ID to.
+*/
 void AUSARAgent::SetID(int id)
 {
 	agentID = id;
 }
 
+/* Retrieves the current list of the agent's neighbors.
+*
+*	@return Array of neighbor agents.
+*/
 TArray<AUSARAgent*> AUSARAgent::GetNeighbors()
 {
 	return neighborAgents;
 }
 
+/* Retrieves the current waypoint being traveled to.
+*
+*	@param wp Vector reference to write the waypoint location to.
+*	@return True if a waypoint is set, false otherwise.
+*/
 bool AUSARAgent::GetCurrFlockWP(FVector& wp)
 {
 	if (flockWPs.Num()) {
@@ -303,11 +336,18 @@ bool AUSARAgent::GetCurrFlockWP(FVector& wp)
 	return false;
 }
 
+/* Retrieves the agent's current velocity.
+*
+*	@return Vector denoting the velocity.
+*/
 FVector AUSARAgent::GetVelocity() const
 {
 	return agentVelocity;
 }
 
+/* Updates the agent's velocity based on current agent status.
+*
+*/
 void AUSARAgent::SetVelocity()
 {
 	if (statusActiveSearch) {
@@ -384,6 +424,10 @@ void AUSARAgent::SetHeightVariance(float var)
 	heightVariance = var;
 }
 
+/* Handles agent movement. Should be called every tick.
+*
+*	@param deltaSec Time in seconds since last call.
+*/
 void AUSARAgent::MoveAgent(float deltaSec)
 {
 	//FRotator turn = FaceDirection(agentVelocity, deltaSec).GetInverse();
@@ -463,6 +507,10 @@ void AUSARAgent::SetStatusStuck()
 	GetWorldTimerManager().ClearAllTimersForObject(this);
 }
 
+/* Determines if the flock is ready to move to the next waypoint as a group.
+*
+*	@return True if the flock is ready, false if not.
+*/
 bool AUSARAgent::FlockReadyToMove()
 {
 	bool ready = true;
@@ -475,6 +523,10 @@ bool AUSARAgent::FlockReadyToMove()
 	return ready;
 }
 
+/* Checks detected actors for victims
+*
+*	@return The number of victims detected.
+*/
 int AUSARAgent::CheckDetections()
 {
 	int numPosIDs = 0;

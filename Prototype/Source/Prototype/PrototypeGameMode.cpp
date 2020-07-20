@@ -11,7 +11,7 @@ APrototypeGameMode::APrototypeGameMode()
 	GameStateClass = APrototypeGameState::StaticClass();
 
 	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> playerPawn(TEXT("/Game/TopDownCPP/Blueprints/PrototypeCharacterBP"));
+	static ConstructorHelpers::FClassFinder<APawn> playerPawn(TEXT("/Game/Behaviors/PrototypeCharacterBP"));
 	if (playerPawn.Class != NULL)
 	{
 		DefaultPawnClass = playerPawn.Class;
