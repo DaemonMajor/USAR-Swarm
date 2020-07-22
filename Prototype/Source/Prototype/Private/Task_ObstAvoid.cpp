@@ -34,7 +34,7 @@ void AUSARAgent::ObstAvoidTask()
 
         if (!statusAvoiding) {
             FVector clearVec;
-            if (FindClearVector(clearVec, 5000)) {
+            if (FindClearVector(clearVec, FIB_SPHERE_FIDELITY)) {
                 SetAvoidanceVector(clearVec);
             }
             else {
@@ -52,7 +52,7 @@ void AUSARAgent::ObstAvoidTask()
 
             if (obstructed) {
                 FVector clearVec;
-                if (FindClearVector(clearVec, 5000)) {
+                if (FindClearVector(clearVec, FIB_SPHERE_FIDELITY)) {
                     SetAvoidanceVector(clearVec);
 
                     /*DEBUGGING*/
@@ -86,7 +86,7 @@ void AUSARAgent::ObstAvoidTask()
     }
 }
 
-/* Raycast in a cylinder in the direction of the agent's velocity to look for obstacles. Sets the agent status to avoiding if obstacle is detected.
+/* Look for obstacles in the given direction. Sets the agent status to avoiding if an obstacle is detected.
 *  Returns array of "safe" vectors.
 *
 *   @return Array of obstacle-free vectors.
@@ -94,7 +94,7 @@ void AUSARAgent::ObstAvoidTask()
 TArray<FVector> AUSARAgent::LookAhead(FVector vel, bool& obstructed)
 {
     // Transform agent velocity from local to world coordinates
-    FVector targetVector = vel;
+    FVector targetVector = vel.GetClampedToSize(0, OBSTACLE_AVOID_DIST);
     FRotator velRot = UKismetMathLibrary::FindLookAtRotation(FVector::ZeroVector, targetVector);
     targetVector = TransformToWorld(targetVector);
 
@@ -104,29 +104,29 @@ TArray<FVector> AUSARAgent::LookAhead(FVector vel, bool& obstructed)
     TArray<FVector> rayEndPts;
     rayEndPts.Add(targetVector);
 
-    //float degStep = 15;  // decrease to increase fidelity of raycast cylinders. recommend factor of 360
-    //for (int circle = 5; circle <= agent->BODY_SIZE; circle += 5) {
-    //    FVector offset = FVector(0, circle, 0);
+    float degStep = 45;  // decrease to increase fidelity of raycast cylinders. recommend factor of 360
+    for (int circle = BODY_SIZE; circle <= BODY_SIZE; circle += 5) {
+        FVector offset = FVector(0, circle, 0);
 
-    //    for (float deg = 0; deg < 360; deg += degStep) {
-    //        //offset = velRot.RotateVector(offset);
-    //        FRotator rotRoll = FRotator(0, 0, deg);
-    //        offset = rotRoll.RotateVector(offset);
-    //        
-    //        rayStartPts.Add(agent->GetActorLocation() + offset);
-    //        rayEndPts.Add(targetVector + offset);
+        for (float deg = 0; deg < 360; deg += degStep) {
+            FRotator rotRoll = FRotator(0, 0, deg);
+            offset = rotRoll.RotateVector(offset);
+            offset = velRot.RotateVector(offset);
+            
+            rayStartPts.Add(GetActorLocation() + offset);
+            rayEndPts.Add(targetVector + offset);
 
-    //        deg += degStep;
+            deg += degStep;
 
-    //        /*DEBUGGING*/
-    //        if (agent->showDebug) {
-    //            if (circle == agent->BODY_SIZE) {
-    //                DrawDebugLine(GetWorld(), agent->GetActorLocation() + offset, targetVector + offset, FColor::Orange, false, 0.01, 0, 1);
-    //            }
-    //        }
-    //        /*DEBUGGING*/
-    //    }
-    //}
+            /*DEBUGGING*/
+            if (showDebug) {
+                if (circle == BODY_SIZE) {
+                    DrawDebugLine(GetWorld(), GetActorLocation() + offset, targetVector + offset, FColor::Orange, false, 0.01, 0, 1);
+                }
+            }
+            /*DEBUGGING*/
+        }
+    }
 
     FHitResult hitResult;
     FCollisionObjectQueryParams objectParams;
@@ -161,12 +161,8 @@ TArray<FVector> AUSARAgent::LookAhead(FVector vel, bool& obstructed)
 *   @param fidelity Number of points to check.
 *   @return The first vector that hits no obstacles in a LineTraceSingleByChannel call. Returns null vector if no clear vector found.
 */
-bool AUSARAgent::FindClearVector(FVector& targetVec, int fidelity) {
-    /*DEBUGGING*/
-    //FString checkSurroundingsText = FString::Printf(TEXT("Agent %d checking surroundings."), agentID);
-    //GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Yellow, checkSurroundingsText, true);
-    /*DEBUGGING*/
-
+bool AUSARAgent::FindClearVector(FVector& targetVec, int fidelity)
+{
     bool foundClearVec = false;
 
     // Fibonacci sphere
@@ -177,11 +173,13 @@ bool AUSARAgent::FindClearVector(FVector& targetVec, int fidelity) {
         float azimuth = FMath::Asin(-1.f + 2.f * float(i) / (fidelity + 1));
         float inclination = gAngle * i;
 
-        float x = FMath::Cos(inclination)* FMath::Cos(-azimuth);
+        float z = FMath::Cos(inclination)* FMath::Cos(-azimuth);
         float y = FMath::Sin(inclination) * FMath::Cos(-azimuth);
-        float z = FMath::Sin(-azimuth);
+        float x = FMath::Sin(-azimuth);
 
-        FVector checkVec = OBSTACLE_AVOID_DIST * FVector(x, y, z) + GetActorLocation();
+        FVector tmpVec = agentVelocity.Rotation().RotateVector(FVector(x, y, z));   // remove this once agent turning is in place
+        FVector checkVec = OBSTACLE_AVOID_DIST * tmpVec + GetActorLocation();       // check vectors closest to agent velocity first
+
         FHitResult hitResult;
         FCollisionQueryParams queryParams;
         queryParams.AddIgnoredActor(this);
@@ -204,7 +202,9 @@ bool AUSARAgent::FindClearVector(FVector& targetVec, int fidelity) {
         }
         else {
             /*DEBUGGING*/
-            //DrawDebugPoint(GetWorld(), checkVec, 5, FColor::Magenta, false, 0.01);
+            if (showDebug) {
+                DrawDebugPoint(GetWorld(), checkVec, 5, FColor::Magenta, false, 0.1);
+            }
             /*DEBUGGING*/
         }
     }

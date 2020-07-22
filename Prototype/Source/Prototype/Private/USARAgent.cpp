@@ -18,8 +18,6 @@ AUSARAgent::AUSARAgent()
 	showDebug = false;
 
 	// all lengths in cm (UE units)
-	//yawRate		= 45;
-	
 	targetHeight	= MOVE_HEIGHT;
 	heightVariance	= targetHeight * 0.05;
 
@@ -35,6 +33,7 @@ AUSARAgent::AUSARAgent()
 	statusActiveSearch	= false;
 	statusClimbing		= false;
 	statusTraveling		= false;
+	statusLoitering		= false;
 
 	expandingSearch = 0;
 
@@ -59,7 +58,7 @@ AUSARAgent::AUSARAgent()
 	agentBody->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	agentBody->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
 	agentBody->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldStatic, ECollisionResponse::ECR_Block);
-	agentBody->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);		// channel used for waypoints
+	agentBody->SetCollisionResponseToChannel(ECollisionChannel::ECC_WorldDynamic, ECollisionResponse::ECR_Overlap);
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> droneVisualAsset(TEXT("/Game/StarterContent/Shapes/Shape_Cylinder.Shape_Cylinder"));
 	if (droneVisualAsset.Succeeded()) {
@@ -93,9 +92,6 @@ void AUSARAgent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	/*FOR PREPLACED AGENTS*/
-	//AssignToFlock(1);
-
 	GetWorldTimerManager().SetTimer(bootUpDelayTimer, this, &AUSARAgent::BootUpSequence, bootUpDelay, false);
 }
 
@@ -112,46 +108,21 @@ void AUSARAgent::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	if (statusStuck) {
-		// emit low-power signal
+		// emit low-power signal, etc
+		
+		DrawDebugPoint(GetWorld(), GetActorLocation(), 15.f, FColor::Red, false, 0.1f);
 	}
 	else {
 		CheckDetections();
 
-		if (statusReadyToSearch) {
-			if (FlockReadyToSearch()) {
-				BeginSearch();
-			}
-		}
-		else if (statusActiveSearch) {
-			statusTraveling = FlockReadyToMove();
-		}
-
 		SetVelocity();
 		MoveAgent(DeltaSeconds);
 
-		speed = agentVelocity.Size();
 		numNeighbors = neighborAgents.Num();
 
-		/*DEBUGGING*/
+		// show direction of movement
 		DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + agentVelocity, 10.f, FColor::Blue, false, 0.01, 0, 2.5);
 		DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + rawVelocity, 5.f, FColor::Purple, false, 0.01, 0, 2.5);
-		/*DEBUGGING*/
-
-		if (flockWPs.Num()) {
-
-			if (!statusActiveSearch) {
-				statusTraveling = true;
-			}
-		}
-		else {
-			statusTraveling = false;
-		}
-	}
-
-	if (showDebug) {
-		for (FVector point : searchWPs) {
-			DrawDebugPoint(GetWorld(), point, 15, FColor::Blue, false, 0.01);
-		}
 	}
 }
 
@@ -182,12 +153,12 @@ void AUSARAgent::BootUpSequence()
 
 	// activate behavior modules
 	GetWorldTimerManager().SetTimer(timerAvoidTask, this, &AUSARAgent::ObstAvoidHandle, RATE_AVOID_TASK, true);
-	GetWorldTimerManager().SetTimer(timerSearchTask, this, &AUSARAgent::ActiveSearchHandle, RATE_SEARCH_TASK, true);
 	GetWorldTimerManager().SetTimer(timerHeightTask, this, &AUSARAgent::MaintainHeightHandle, RATE_HEIGHT_TASK, true);
 	GetWorldTimerManager().SetTimer(timerFlockTask, this, &AUSARAgent::FlockHandle, RATE_FLOCK_TASK, true);
-	GetWorldTimerManager().SetTimer(timerMoveTask, this, &AUSARAgent::MoveToWPHandle, RATE_WP_TASK, true);
+	GetWorldTimerManager().SetTimer(timerCheckMoveReady, this, &AUSARAgent::FlockReadyToMove, 1.f, true);
 
 	isInitialized = true;
+	statusLoitering = true;
 
 	/*DEBUGGING*/
 	FString bootUpCompleteText = FString::Printf(TEXT("Agent %d boot sequence complete."), agentID);
@@ -505,22 +476,37 @@ void AUSARAgent::SetStatusStuck()
 
 	// clear timer handles for behavior modules
 	GetWorldTimerManager().ClearAllTimersForObject(this);
-}
 
-/* Determines if the flock is ready to move to the next waypoint as a group.
-*
-*	@return True if the flock is ready, false if not.
-*/
-bool AUSARAgent::FlockReadyToMove()
-{
-	bool ready = true;
-	for (AUSARAgent* n : neighborAgents) {
-		if (n->statusActiveSearch) {
-			ready = false;
+	/*DEBUGGING*/
+	const float gRatio = (sqrt(5.f) + 1.f) / 2.f;   // golden ratio
+	const float gAngle = 180 * (3.f - sqrt(5.f));   // golden angle in degrees
+
+	for (int i = 1; i <= FIB_SPHERE_FIDELITY; i++) {
+		float azimuth = FMath::Asin(-1.f + 2.f * float(i) / (FIB_SPHERE_FIDELITY + 1));
+		float inclination = gAngle * i;
+
+		float z = FMath::Cos(inclination)* FMath::Cos(-azimuth);
+		float y = FMath::Sin(inclination) * FMath::Cos(-azimuth);
+		float x = FMath::Sin(-azimuth);
+
+		FVector tmpVec = agentVelocity.Rotation().RotateVector(FVector(x, y, z));   // remove this once agent turning is in place
+		FVector checkVec = OBSTACLE_AVOID_DIST * tmpVec + GetActorLocation();       // check vectors closest to agent velocity first
+
+		FHitResult hitResult;
+		FCollisionQueryParams queryParams;
+		queryParams.AddIgnoredActor(this);
+		FCollisionResponseParams responseParams;
+
+		if (!GetWorld()->LineTraceSingleByChannel(hitResult, GetActorLocation(), checkVec, ECC_WorldStatic, queryParams, responseParams)) {
+			DrawDebugPoint(GetWorld(), checkVec, 1, FColor::Green, true, 300.f);
+		}
+		else {
+			DrawDebugPoint(GetWorld(), hitResult.ImpactPoint, 1, FColor::Red, false, 300.f);
 		}
 	}
 
-	return ready;
+	DrawDebugPoint(GetWorld(), GetActorLocation(), 1, FColor::Yellow, false, 300.f);
+	/*DEBUGGING*/
 }
 
 /* Checks detected actors for victims

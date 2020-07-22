@@ -17,9 +17,9 @@ void AUSARAgent::ActiveSearchTask()
         FVector toCenter = centerPt - GetActorLocation();
         toCenter.Z = 0;
 
-        FRotator rot = FRotator(0, 90, 0);
+        FRotator rot = FRotator(0, 120, 0);
         if (expandingSearch < 0) {
-            rot = FRotator(0, 75, 0);
+            rot = FRotator(0, 60, 0);
         }
 
         FVector moveVec = rot.RotateVector(toCenter);
@@ -37,26 +37,28 @@ void AUSARAgent::ActiveSearchTask()
 /* Determines if the flock is ready to enter search behavior by checking if all neighbors' statusReadyToSearch.
 *
 */
-bool AUSARAgent::FlockReadyToSearch()
+void AUSARAgent::FlockReadyToSearch()
 {
-    bool ready = true;
-
     for (AUSARAgent* n : neighborAgents) {
         if (!(n->statusReadyToSearch || n->statusActiveSearch)) {
-            ready = false;
+            return;
         }
     }
 
-    return ready;
+    GetWorldTimerManager().ClearTimer(timerCheckSearchReady);
+    GetWorldTimerManager().ClearTimer(timerMoveTask);
+    GetWorldTimerManager().SetTimer(timerSearchTask, this, &AUSARAgent::ActiveSearchHandle, RATE_SEARCH_TASK, true);
+
+    BeginSearch();
 }
 
 /* Initiates search behavior.
 *
 */
 void AUSARAgent::BeginSearch() {
+    flockSize = 1;
     alignWeight = 0;
     cohWeight = 0;
-    agentSpacing = MAX_AGENT_SPACING;
     targetHeight = SEARCH_HEIGHT;
 
     statusReadyToSearch = false;
@@ -71,29 +73,70 @@ void AUSARAgent::BeginSearch() {
 */
 void AUSARAgent::ExpandSearch()
 {
+    FVector toCenter = flockWPs[0] - GetActorLocation();
+    toCenter.Z = 0;
+    float distToCtr = toCenter.Size();
+
+    /*DEBUGGING*/
+    if (showDebug) {
+        FString searchRadText = FString::Printf(TEXT("Agent %d [%f] from wp."), agentID, distToCtr);
+        GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Yellow, searchRadText, true);
+    }
+    /*DEBUGGING*/
+
+
     if (expandingSearch > 0) {
         sepWeight += 5;
+        agentSpacing += 50;
 
-        if (sepWeight >= MAX_SEPARATION_WEIGHT) {
+        if(sepWeight > MAX_SEPARATION_WEIGHT) {
+        //if (distToCtr > MAX_SEARCH_RAD) {
             expandingSearch = -1;
 
             agentSpacing = AGENT_SPACING;
         }
     }
     else if (expandingSearch < 0) {
-        sepWeight -= 5;
+        if (sepWeight > SEPARATION_WEIGHT) {
+            sepWeight -= 5;
+        }
+        if (agentSpacing > AGENT_SPACING) {
+            agentSpacing -= 50;
+        }
 
-        if (sepWeight <= SEPARATION_WEIGHT) {
+        //int readyNeighbors = 1;     //include self
+        //for (AUSARAgent* n : neighborAgents) {
+        //    if (!n->statusActiveSearch) {
+        //        readyNeighbors++;
+        //    }
+        //}
+
+        if (sepWeight < SEPARATION_WEIGHT) {
+        //if (distToCtr < 100 * sqrt(10 * (readyNeighbors))) {
             alignWeight  = ALIGNMENT_WEIGHT;
             cohWeight    = COHESION_WEIGHT;
             sepWeight    = SEPARATION_WEIGHT;
             targetHeight = MOVE_HEIGHT;
 
-            statusActiveSearch = false;
+            expandingSearch = 0;
+
+            statusActiveSearch  = false;
+            statusLoitering     = true;
             flockWPs.RemoveAt(0);
 
-            expandingSearch = 0;
+            GetWorldTimerManager().ClearTimer(timerSearchTask);
             GetWorldTimerManager().ClearTimer(timerSearchExpand);
+            GetWorldTimerManager().SetTimer(timerCheckMoveReady, this, &AUSARAgent::FlockReadyToMove, 1.f, true, CalcWaitTime());
         }
     }
+}
+
+float AUSARAgent::CalcWaitTime()
+{
+    float waitTime = 15;
+    if (numNeighbors < flockSize - 1) {
+        waitTime += WAIT_FACTOR * sqrt(flockSize - numNeighbors);
+    }
+
+    return waitTime;
 }

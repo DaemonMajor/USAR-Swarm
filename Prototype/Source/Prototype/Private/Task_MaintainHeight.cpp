@@ -5,24 +5,22 @@
 
 void AUSARAgent::MaintainHeightHandle()
 {
-    if (true) {
-        float agentHeight = GetActorLocation().Z;
-        float minHeight = targetHeight - heightVariance;
-        float maxHeight = targetHeight + heightVariance;
+    float agentHeight = GetActorLocation().Z;
+    float minHeight = targetHeight - heightVariance;
+    float maxHeight = targetHeight + heightVariance;
 
-        bool isInRange = (minHeight < agentHeight) && (agentHeight < maxHeight);
-        if (!isInRange) {
-            MaintainHeightTask();
+    bool isInRange = (minHeight < agentHeight) && (agentHeight < maxHeight);
+    if (!isInRange) {
+        MaintainHeightTask();
 
-            if (!statusAvoiding && !statusAvoiding) {
-                statusClimbing = true;
-            }
+        if (!statusAvoiding && !statusAvoiding) {
+            statusClimbing = true;
         }
-        else {
-            heightVector = FVector::ZeroVector;
+    }
+    else {
+        SetHeightVector(FVector::ZeroVector);
 
-            statusClimbing = false;
-        }
+        statusClimbing = false;
     }
 }
 
@@ -39,9 +37,4 @@ void AUSARAgent::MaintainHeightTask()
     }
 
     SetHeightVector(correctionVector);
-
-    /*DEBUGGING*/
-    //FString statusText = FString::Printf(TEXT("Agent %d maintaining height."), agent->agentID);
-    //GEngine->AddOnScreenDebugMessage(INDEX_NONE, 5.0f, FColor::Yellow, statusText, true);
-    /*DEBUGGING*/
 }

@@ -47,6 +47,29 @@ void AUSARAgent::CheckAtWP()
     float distToWP = abs((agentLoc - wpLoc).Size());
 
     if (distToWP <= minDist) {
+        statusTraveling = false;
         statusReadyToSearch = true;
+
+        GetWorldTimerManager().SetTimer(timerCheckSearchReady, this, &AUSARAgent::FlockReadyToSearch, 1.f, true);
     }
+}
+
+/* Determines if the flock is ready to move to the next waypoint as a group.
+*
+*	@return True if the flock is ready, false if not.
+*/
+void AUSARAgent::FlockReadyToMove()
+{
+    bool ready = true;
+    for (AUSARAgent* n : neighborAgents) {
+        if (!(n->statusLoitering || n->statusTraveling)) {
+            return;
+        }
+    }
+
+    statusLoitering = false;
+    statusTraveling = true;
+
+    GetWorldTimerManager().ClearTimer(timerCheckMoveReady);
+    GetWorldTimerManager().SetTimer(timerMoveTask, this, &AUSARAgent::MoveToWPHandle, RATE_WP_TASK, true);
 }

@@ -30,12 +30,14 @@ public:
 	/* FOR DEBUGGING ONLY */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool showDebug;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		float speed = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool showFibSphere = false;
+		int fibSpherePt = 1;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		int numNeighbors = 0;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		int flockSize = 1;		// only set before entering search behavior
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FVector agentVelocity;	// velocity in local coordinates
@@ -87,6 +89,8 @@ public:
 		bool statusClimbing;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		bool statusTraveling;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		bool statusLoitering;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float targetHeight;			// height to maintain
@@ -207,12 +211,6 @@ protected:
 	//	FRotator FaceDirection(FVector dir, float deltaSec);	// Rotate agent on z-axis to face specified direction.
 
 	UFUNCTION()
-		bool FlockReadyToSearch();
-	//UFUNCTION()
-	//	void StartSearchPattern();
-	UFUNCTION()
-		bool FlockReadyToMove();
-	UFUNCTION()
 		int CheckDetections();
 
 	/***BEHAVIOR MODULES***/
@@ -233,9 +231,12 @@ protected:
 	// active search behavior
 	FTimerHandle timerSearchTask;
 	FTimerHandle timerSearchExpand;
+	FTimerHandle timerCheckSearchReady;
 	void ActiveSearchTask();
 	void BeginSearch();
 	void ExpandSearch();
+	void FlockReadyToSearch();
+	float CalcWaitTime();
 	
 	// height maintenance behavior
 	FTimerHandle timerHeightTask;
@@ -244,15 +245,17 @@ protected:
 	// flocking behavior
 	FTimerHandle timerFlockTask;
 	void FlockTask();
-	FVector GetAlignment();			// Get average velocity of neighbor agents
-	FVector GetCohesion();			// Get vector pointing to center of mass of neighbor agents
-	FVector GetSeparation();		// Calculate vector pointing away from neighbor agents
+	FVector GetAlignment();																// Get average velocity of neighbor agents
+	FVector GetCohesion();																// Get vector pointing to center of mass of neighbor agents
+	FVector GetSeparation();															// Calculate vector pointing away from neighbor agents
 	FVector CalcNewVector(FVector alignFactor, FVector cohFactor, FVector sepFactor);	// Calculate new vector for agent based on alignment, cohesion, and separation factors
 
 	// move-to-waypoint behavior
 	FTimerHandle timerMoveTask;
+	FTimerHandle timerCheckMoveReady;
 	void MoveToWPTask();
 	void CheckAtWP();
+	void FlockReadyToMove();
 	/***BEHAVIOR MODULES***/
 
 private:
