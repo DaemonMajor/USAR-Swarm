@@ -30,7 +30,7 @@ inline constexpr float ALIGNMENT_WEIGHT         = 0.1;
 inline constexpr float COHESION_WEIGHT          = 1.5;
 inline constexpr float MAX_COHESION_WEIGHT      = 25;
 inline constexpr float SEPARATION_WEIGHT        = 3.5;
-inline constexpr float MAX_SEPARATION_WEIGHT    = 300;
+inline constexpr float MAX_SEPARATION_WEIGHT    = 100;
 inline constexpr float AGENT_SPACING            = 300;
 inline constexpr float MAX_AGENT_SPACING        = 1000;
 

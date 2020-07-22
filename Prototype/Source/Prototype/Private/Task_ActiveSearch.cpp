@@ -17,9 +17,9 @@ void AUSARAgent::ActiveSearchTask()
         FVector toCenter = centerPt - GetActorLocation();
         toCenter.Z = 0;
 
-        FRotator rot = FRotator(0, 120, 0);
+        FRotator rot = FRotator(0, 105, 0);
         if (expandingSearch < 0) {
-            rot = FRotator(0, 60, 0);
+            rot = FRotator(0, 75, 0);
         }
 
         FVector moveVec = rot.RotateVector(toCenter);
@@ -89,7 +89,7 @@ void AUSARAgent::ExpandSearch()
         sepWeight += 5;
         agentSpacing += 50;
 
-        if(sepWeight > MAX_SEPARATION_WEIGHT) {
+        if(sepWeight >= MAX_SEPARATION_WEIGHT) {
         //if (distToCtr > MAX_SEARCH_RAD) {
             expandingSearch = -1;
 
@@ -111,7 +111,7 @@ void AUSARAgent::ExpandSearch()
         //    }
         //}
 
-        if (sepWeight < SEPARATION_WEIGHT) {
+        if (sepWeight <= SEPARATION_WEIGHT) {
         //if (distToCtr < 100 * sqrt(10 * (readyNeighbors))) {
             alignWeight  = ALIGNMENT_WEIGHT;
             cohWeight    = COHESION_WEIGHT;
