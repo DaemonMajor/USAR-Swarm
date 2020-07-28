@@ -9,6 +9,7 @@
 #include "USAR_Constants.h"
 #include "SwarmWP.h"
 #include "VictimActor.h"
+#include "LocGridStruct.h"
 #include "DrawDebugHelpers.h"
 #include "USARAgent.generated.h"
 
@@ -18,10 +19,8 @@ class PROTOTYPE_API AUSARAgent : public APawn
 	GENERATED_BODY()
 
 public:
-	// Sets default values for this pawn's properties
 	AUSARAgent();
 
-	// Called every frame
 	virtual void Tick(float DeltaSeconds) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
@@ -105,7 +104,7 @@ public:
 		float sepWeight;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		float agentSpacing;			// how far apart agents should be spaced
-	
+
 	UFUNCTION()
 		int GetID();
 	UFUNCTION()
@@ -119,27 +118,10 @@ public:
 	UFUNCTION()
 		FVector GetDirectMoveLoc();
 	
-	UFUNCTION()
-		void SetTargetHeight(float height);
-	UFUNCTION()
-		void SetHeightVariance(float var);
-	
-	UFUNCTION()
-		void SetAvoidanceVector(FVector rawVector);
-	UFUNCTION()
-		void SetDirectMoveLoc(FVector loc);
-	UFUNCTION()
-		void SetSearchVector(FVector rawVector);
-	UFUNCTION()
-		void SetHeightVector(FVector rawVector);
-	UFUNCTION()
-		void SetFlockVector(FVector rawVector);
-	UFUNCTION()
-		void SetFlockWPVector(FVector rawVector);
+	virtual FVector GetVelocity() const override;		// get agent velocity in local coordinates (bypasses built-in component velocity because documentation is unclear)
 	UFUNCTION()
 		void SetVelocity();								// set new velocity based on component vectors (avoidanceVector, flockVector, flockWPVector)
-	virtual FVector GetVelocity() const override;		// get agent velocity in local coordinates (bypasses built-in component velocity because documentation is unclear)
-
+	
 	UFUNCTION()
 		void AddFlockWP(FVector wp, bool atEnd = true);	// append waypoint to list of target waypoints
 	UFUNCTION()
@@ -149,6 +131,9 @@ public:
 
 	UFUNCTION()
 		void SetStatusStuck();
+
+	UFUNCTION()
+		void TakeMapData(const TArray<FLocGridStruct> sharedMap);
 
 protected:
 	virtual void BeginPlay() override;
@@ -182,7 +167,11 @@ protected:
 	UPROPERTY()
 		int expandingSearch;
 	
-	//UPROPERTY()
+	UPROPERTY()
+		TArray<FLocGridStruct> envMap;
+	UPROPERTY()
+		TArray<FLocGridStruct> envMapInBuffer;
+	UPROPERTY()
 		TArray<AVictimActor*> detectedVictims = TArray<AVictimActor*>();
 
 	UPROPERTY()
@@ -228,6 +217,10 @@ protected:
 	bool FindClearVector(FVector& targetVec, int fidelity);
 	FVector TransformToWorld(FVector vector);
 
+	// survivor detection behavior
+	FTimerHandle timerDetectionTask;
+	void DetectionTask();
+
 	// active search behavior
 	FTimerHandle timerSearchTask;
 	FTimerHandle timerSearchExpand;
@@ -256,6 +249,12 @@ protected:
 	void MoveToWPTask();
 	void CheckAtWP();
 	void FlockReadyToMove();
+
+	// update map behavior
+	FTimerHandle timerMapUpdate;
+	FTimerHandle timerMapShare;
+	void UpdateMap();
+	void ShareMap();
 	/***BEHAVIOR MODULES***/
 
 private:

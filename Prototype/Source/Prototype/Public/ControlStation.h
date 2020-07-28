@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "LocGridStruct.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "ControlStation.generated.h"
@@ -11,19 +12,29 @@ class PROTOTYPE_API AControlStation : public AActor
 {
 	GENERATED_BODY()
 	
-public:	
-	// Sets default values for this actor's properties
+public:
 	AControlStation();
-
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool showMap;
+
+	UFUNCTION()
+		void UpdateMap(const TArray<FLocGridStruct> agentMap);
+
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	UPROPERTY()
+		TArray<FLocGridStruct> envMap;	// global map constructed from agent-provided maps
+
+	UPROPERTY()
 		FTimerHandle bootUpDelayTimer;	// timer handle for waypoints that exist on world start
+	UPROPERTY()
+		FTimerHandle mapDisplayTimer;	// timer handle for refreshing map display
 
 	UFUNCTION()
 		void InitWaypoints();	// activate preplaced waypoints
+	UFUNCTION()
+		void DisplayMap();
 };

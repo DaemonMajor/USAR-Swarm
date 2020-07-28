@@ -113,7 +113,7 @@ void AUSARAgent::Tick(float DeltaSeconds)
 		DrawDebugPoint(GetWorld(), GetActorLocation(), 15.f, FColor::Red, false, 0.1f);
 	}
 	else {
-		CheckDetections();
+		//CheckDetections();
 
 		SetVelocity();
 		MoveAgent(DeltaSeconds);
@@ -156,6 +156,9 @@ void AUSARAgent::BootUpSequence()
 	GetWorldTimerManager().SetTimer(timerHeightTask, this, &AUSARAgent::MaintainHeightHandle, RATE_HEIGHT_TASK, true);
 	GetWorldTimerManager().SetTimer(timerFlockTask, this, &AUSARAgent::FlockHandle, RATE_FLOCK_TASK, true);
 	GetWorldTimerManager().SetTimer(timerCheckMoveReady, this, &AUSARAgent::FlockReadyToMove, 1.f, true);
+	GetWorldTimerManager().SetTimer(timerDetectionTask, this, &AUSARAgent::DetectionTask, RATE_IMAGE_SCAN, true);
+	GetWorldTimerManager().SetTimer(timerMapUpdate, this, &AUSARAgent::UpdateMap, RATE_MAP_UPDATE, true);
+	GetWorldTimerManager().SetTimer(timerMapShare, this, &AUSARAgent::ShareMap, RATE_MAP_SHARE, true);
 
 	isInitialized = true;
 	statusLoitering = true;
@@ -350,49 +353,9 @@ void AUSARAgent::SetVelocity()
 	agentVelocity = newVel.GetClampedToSize(0, MAX_SPEED);
 }
 
-void AUSARAgent::SetAvoidanceVector(FVector rawVector)
-{
-	avoidanceVector = rawVector;
-}
-
 FVector AUSARAgent::GetDirectMoveLoc()
 {
 	return directMoveLoc;
-}
-
-void AUSARAgent::SetDirectMoveLoc(FVector loc)
-{
-	directMoveLoc = loc;
-}
-
-void AUSARAgent::SetSearchVector(FVector rawVector)
-{
-	searchVector = rawVector;
-}
-
-void AUSARAgent::SetHeightVector(FVector rawVector)
-{
-	heightVector = rawVector;
-}
-
-void AUSARAgent::SetFlockVector(FVector rawVector)
-{
-	flockVector = rawVector;
-}
-
-void AUSARAgent::SetFlockWPVector(FVector rawVector)
-{
-	flockWPVector = rawVector;
-}
-
-void AUSARAgent::SetTargetHeight(float height)
-{
-	targetHeight = height;
-}
-
-void AUSARAgent::SetHeightVariance(float var)
-{
-	heightVariance = var;
 }
 
 /* Handles agent movement. Should be called every tick.
@@ -471,6 +434,7 @@ void AUSARAgent::SetStatusStuck()
 	statusStuck = true;
 	statusAvoiding = false;
 	statusDirectMove = false;
+	statusActiveSearch = false;
 	statusClimbing = false;
 	statusTraveling = false;
 
@@ -507,32 +471,4 @@ void AUSARAgent::SetStatusStuck()
 
 	DrawDebugPoint(GetWorld(), GetActorLocation(), 1, FColor::Yellow, false, 300.f);
 	/*DEBUGGING*/
-}
-
-/* Checks detected actors for victims
-*
-*	@return The number of victims detected.
-*/
-int AUSARAgent::CheckDetections()
-{
-	int numPosIDs = 0;
-
-	FHitResult hitResult;
-	FCollisionQueryParams queryParams;
-	queryParams.AddIgnoredActor(this);
-	FCollisionResponseParams responseParams;
-
-	for (AVictimActor* vic : victimsInRange) {
-		if (GetWorld()->LineTraceSingleByChannel(hitResult, GetActorLocation(), vic->GetActorLocation(), ECC_Pawn, queryParams, responseParams)) {
-			if (hitResult.GetActor()->IsA(AVictimActor::StaticClass())) {
-				numPosIDs++;
-
-				/*DEBUGGING*/
-				DrawDebugPoint(GetWorld(), vic->GetActorLocation(), 25, FColor::Emerald, true, 1.f);
-				/*DEBUGGING*/
-			}
-		}
-	}
-
-	return numPosIDs;
 }

@@ -17,7 +17,7 @@ void AUSARAgent::ObstAvoidTask()
     if (statusDirectMove) {
         if (GetActorLocation().Equals(GetDirectMoveLoc(), 1)) {
             statusDirectMove = false;
-            SetDirectMoveLoc(FVector::ZeroVector);
+            directMoveLoc = FVector::ZeroVector;
         }
 
         return;
@@ -35,7 +35,7 @@ void AUSARAgent::ObstAvoidTask()
         if (!statusAvoiding) {
             FVector clearVec;
             if (FindClearVector(clearVec, FIB_SPHERE_FIDELITY)) {
-                SetAvoidanceVector(clearVec);
+                avoidanceVector = clearVec;
             }
             else {
                 SetStatusStuck();
@@ -53,7 +53,7 @@ void AUSARAgent::ObstAvoidTask()
             if (obstructed) {
                 FVector clearVec;
                 if (FindClearVector(clearVec, FIB_SPHERE_FIDELITY)) {
-                    SetAvoidanceVector(clearVec);
+                    avoidanceVector = clearVec;
 
                     /*DEBUGGING*/
                     //FString safeVectorFoundText = FString::Printf(TEXT("Agent %d found safe vector."), agentID);
@@ -78,11 +78,11 @@ void AUSARAgent::ObstAvoidTask()
             statusDirectMove = true;
 
             FVector goToVec = rawVelocity.GetClampedToSize(0, OBSTACLE_AVOID_DIST);
-            SetDirectMoveLoc(goToVec + GetActorLocation());
+            directMoveLoc = goToVec + GetActorLocation();
         }
 
         statusAvoiding = false;
-        SetAvoidanceVector(FVector::ZeroVector);
+        avoidanceVector = FVector::ZeroVector;
     }
 }
 

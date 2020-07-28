@@ -33,7 +33,7 @@ void AUSARAgent::MoveToWPTask()
         /*DEBUGGING*/
     }
 
-    SetFlockWPVector(targetVector);
+    flockWPVector = targetVector;
 }
 
 void AUSARAgent::CheckAtWP()

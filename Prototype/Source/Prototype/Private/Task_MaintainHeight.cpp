@@ -18,7 +18,7 @@ void AUSARAgent::MaintainHeightHandle()
         }
     }
     else {
-        SetHeightVector(FVector::ZeroVector);
+        heightVector = FVector::ZeroVector;
 
         statusClimbing = false;
     }
@@ -36,5 +36,5 @@ void AUSARAgent::MaintainHeightTask()
         correctionVector.Z = -(MAX_SPEED/2);   // fly down at half max thrust
     }
 
-    SetHeightVector(correctionVector);
+    heightVector = correctionVector;
 }
