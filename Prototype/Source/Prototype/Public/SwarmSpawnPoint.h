@@ -2,6 +2,8 @@
 
 #pragma once
 
+#include "USAR_Constants.h"
+#include "USARAgent.h"
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "SwarmSpawnPoint.generated.h"
@@ -11,9 +13,13 @@ class PROTOTYPE_API ASwarmSpawnPoint : public APawn
 {
 	GENERATED_BODY()
 	
-public:	
-	// Sets default values for this actor's properties
+public:
 	ASwarmSpawnPoint();
+
+	UFUNCTION()
+		TArray<AUSARAgent*> SpawnAgents();
+
+protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		UStaticMeshComponent* spawnRoot;
@@ -29,4 +35,6 @@ public:
 
 	UFUNCTION()
 		void Init(float numAgents, int flock, float timing, float radius);
+	UFUNCTION()
+		FVector GetRandLoc();
 };

@@ -12,16 +12,8 @@ class PROTOTYPE_API ASwarmWP : public AActor
 	GENERATED_BODY()
 	
 public:	
-	// Sets default values for this actor's properties
+	virtual void Tick(float DeltaSeconds) override;
 	ASwarmWP();
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		int wpID = -1;		// Unique waypoint ID. Value of -1 sets waypoint as inactive.
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		int flockID = -1;		// Flock assigned to this waypoint.
-
-	UFUNCTION()
-		void Init();
 
 	UFUNCTION()
 		int GetID();
@@ -35,9 +27,9 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-	
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
-		UStaticMeshComponent* wpRoot;
-	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
-		UStaticMeshComponent* wpArea;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		int wpID = -1;			// Unique waypoint ID. Value of -1 sets waypoint as inactive.
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		int flockID = -1;		// Flock assigned to this waypoint.
 };

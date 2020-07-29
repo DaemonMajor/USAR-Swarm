@@ -3,23 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "FlockStruct.h"
+#include "ControlStation.h"
 #include "USARAgent.h"
 #include "SwarmWP.h"
 #include "GameFramework/GameStateBase.h"
 #include "PrototypeGameState.generated.h"
 
-USTRUCT()
-struct Flock
-{
-	GENERATED_BODY()
-
-	UPROPERTY()
-		int flockID;
-	UPROPERTY()
-		TArray<AUSARAgent*> agents;
-	UPROPERTY()
-		TArray<ASwarmWP*> waypoints;
-};
 
 /**
  * 
@@ -32,16 +22,18 @@ class PROTOTYPE_API APrototypeGameState : public AGameStateBase
 public:
 	APrototypeGameState();
 
+	UPROPERTY()
+		AControlStation* station;
+
 	UFUNCTION()
-		Flock AddAgent(AUSARAgent* agent, int flockID);	// Give the passed agent a unique ID and assign to specified flock. Returns flock data.
-	UFUNCTION()
-		int AddWaypoint(ASwarmWP* waypoint, int flockID);	// Give the passed waypoint a unique ID and assign to specified flock. Returns waypoint ID.
-	UFUNCTION()
-		void RemoveWaypoint(ASwarmWP* waypoint);			// Unassign the waypoint.
+		void SetControlStation(AControlStation* cs);
 
 protected:
-	TArray<Flock*> flockData;	// Tracker for active flocks.
+	virtual void BeginPlay() override;
 
-	int numAgents;	// Number of active agents.
-	int numWP;		// Number of active waypoints.
+	UPROPERTY()
+		FTimerHandle timerEndSim;
+
+	UFUNCTION()
+		void EndSim();
 };

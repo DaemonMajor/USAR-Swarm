@@ -36,6 +36,7 @@ AUSARAgent::AUSARAgent()
 	statusLoitering		= false;
 
 	expandingSearch = 0;
+	gridsExplored	= 0;
 
 	agentVelocity	= FVector::ZeroVector;
 	avoidanceVector = FVector::ZeroVector;
@@ -126,18 +127,6 @@ void AUSARAgent::Tick(float DeltaSeconds)
 	}
 }
 
-void AUSARAgent::AssignToFlock(int flock)
-{
-	APrototypeGameState* gameState = GetWorld()->GetGameState<APrototypeGameState>();
-
-	Flock assignedFlock = gameState->AddAgent(this, flock);
-
-	flockID = assignedFlock.flockID;
-	for (ASwarmWP* wp : assignedFlock.waypoints) {
-		flockWPs.Add(wp->GetActorLocation());
-	}
-}
-
 void AUSARAgent::BootUpSequence()
 {
 	// initialize neighbor list
@@ -160,13 +149,33 @@ void AUSARAgent::BootUpSequence()
 	GetWorldTimerManager().SetTimer(timerMapUpdate, this, &AUSARAgent::UpdateMap, RATE_MAP_UPDATE, true);
 	GetWorldTimerManager().SetTimer(timerMapShare, this, &AUSARAgent::ShareMap, RATE_MAP_SHARE, true);
 
-	isInitialized = true;
+	isInitialized	= true;
 	statusLoitering = true;
 
 	/*DEBUGGING*/
-	FString bootUpCompleteText = FString::Printf(TEXT("Agent %d boot sequence complete."), agentID);
-	GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Green, bootUpCompleteText, true);
+	if (showDebug) {
+		FString bootUpCompleteText = FString::Printf(TEXT("Agent %d boot sequence complete."), agentID);
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Green, bootUpCompleteText, true);
+	}
 	/*DEBUGGING*/
+}
+
+/* Called by control station on simulation end to deactivate the agent.
+*/
+void AUSARAgent::PowerDown()
+{
+	GetWorldTimerManager().ClearAllTimersForObject(this);
+
+	flockWPs.Empty();
+
+	statusStuck			= false;
+	statusAvoiding		= false;
+	statusDirectMove	= false;
+	statusReadyToSearch = false;
+	statusActiveSearch	= false;
+	statusClimbing		= false;
+	statusTraveling		= false;
+	statusLoitering		= false;
 }
 
 /* Add all nearby neighbors to neighbor list. Should be called on agent bootup.
@@ -424,6 +433,14 @@ void AUSARAgent::AddFlockWP(FVector wp, bool atEnd)
 void AUSARAgent::RemoveFlockWP(FVector wp)
 {
 	flockWPs.Remove(wp);
+}
+
+/* Clear all waypoints from the agent's list of target flockWPs.
+*
+*/
+void AUSARAgent::ClearFlockWPs()
+{
+	flockWPs.Empty();
 }
 
 /* Set agent status to stuck and power down non-vital systems.

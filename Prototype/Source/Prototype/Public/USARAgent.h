@@ -66,6 +66,9 @@ public:
 		FVector flockCenter;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FVector sepVector;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		int gridsExplored;
 	/* =============== */
 
 	/*MOVE TO PROTECTED AFTER DEBUGGING*/
@@ -109,8 +112,6 @@ public:
 		int GetID();
 	UFUNCTION()
 		void SetID(int id);
-	UFUNCTION()
-		void AssignToFlock(int flock);
 
 	UFUNCTION()
 		TArray<AUSARAgent*> GetNeighbors();
@@ -127,6 +128,8 @@ public:
 	UFUNCTION()
 		void RemoveFlockWP(FVector wp);					// remove waypoint from list of target waypoints
 	UFUNCTION()
+		void ClearFlockWPs();
+	UFUNCTION()
 		bool GetCurrFlockWP(FVector& wp);				// fetch current waypoint
 
 	UFUNCTION()
@@ -134,6 +137,11 @@ public:
 
 	UFUNCTION()
 		void TakeMapData(const TArray<FLocGridStruct> sharedMap);
+	UFUNCTION()
+		TArray<FLocGridStruct> UploadMap();
+
+	UFUNCTION()
+		void PowerDown();
 
 protected:
 	virtual void BeginPlay() override;
@@ -169,8 +177,6 @@ protected:
 	
 	UPROPERTY()
 		TArray<FLocGridStruct> envMap;
-	UPROPERTY()
-		TArray<FLocGridStruct> envMapInBuffer;
 	UPROPERTY()
 		TArray<AVictimActor*> detectedVictims = TArray<AVictimActor*>();
 

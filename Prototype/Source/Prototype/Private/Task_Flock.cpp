@@ -12,17 +12,22 @@ void AUSARAgent::FlockHandle()
 
 void AUSARAgent::FlockTask()
 {
-    FVector alignFactor = alignWeight * GetAlignment();
-    FVector cohFactor = cohWeight * GetCohesion();
-    FVector sepFactor = sepWeight * GetSeparation();
+    if (flockSize == 1) {
+        flockVector = FVector::ZeroVector;
+    }
+    else {
+        FVector alignFactor = alignWeight * GetAlignment();
+        FVector cohFactor = cohWeight * GetCohesion();
+        FVector sepFactor = sepWeight * GetSeparation();
 
-    flockVector = CalcNewVector(alignFactor, cohFactor, sepFactor);
+        flockVector = CalcNewVector(alignFactor, cohFactor, sepFactor);
 
-    /*DEBUGGING*/
-    alignmentFactor = alignFactor.Size();
-    cohesionFactor = cohFactor.Size();
-    separationFactor = sepFactor.Size();
-    /*DEBUGGING*/
+        /*DEBUGGING*/
+        alignmentFactor = alignFactor.Size();
+        cohesionFactor = cohFactor.Size();
+        separationFactor = sepFactor.Size();
+        /*DEBUGGING*/
+    }
 
     /*DEBUGGING*/
     if (showDebug) {

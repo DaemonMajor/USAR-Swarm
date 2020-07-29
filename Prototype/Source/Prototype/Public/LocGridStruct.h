@@ -28,17 +28,16 @@ public:
 	{
 	}
 
-	FLocGridStruct(int xPos, int yPos, float time) :
+	FLocGridStruct(int xPos, int yPos, float conf, float time) :
 		x(xPos),
 		y(yPos),
-		confidence(CONF_INCR),
+		confidence(conf),
 		lastUpdated(time)
-	{
-	}
+	{}
 
 	/* Sorted insert of the grid into an environment map.
 	*	@param map Environment map to add the grid to.
-	*	@param idx Writes the index of the array the grid is inserted at.
+	*	@param idx Writes the index of the array the grid is inserted at, or the index at which the grid is found, if it already exists.
 	*	@return Returns true if the grid is a new addition to the map, false otherwise.
 	*/
 	bool InsertInMap(TArray<FLocGridStruct>& map, int& idx)

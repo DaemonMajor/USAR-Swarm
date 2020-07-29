@@ -10,9 +10,16 @@ void AUSARAgent::DetectionTask()
 		if (didDetect <= DETECTION_ACC) {
 			FVector vicLoc = victim->GetActorLocation();
 			FVector currLoc = GetActorLocation();
-			FLocGridStruct grid = FLocGridStruct(currLoc.X, currLoc.Y, GetWorld()->GetTimeSeconds());
+			float conf = CONF_INCR * FVector::DistXY(vicLoc, currLoc);
 
-			int idx = envMap.AddUnique(grid);
+			FLocGridStruct grid = FLocGridStruct(currLoc.X, currLoc.Y, conf, GetWorld()->GetTimeSeconds());
+
+			int idx;
+			bool isNewGrid = grid.InsertInMap(envMap, idx);
+			if (!isNewGrid) {
+				envMap[idx].confidence = FMath::Clamp(envMap[idx].confidence + conf, 0.f, 1.f);
+			}
+
 			envMap[idx].survivors.AddUnique(vicLoc);
 		}
 	}

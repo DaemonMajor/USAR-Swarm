@@ -38,6 +38,10 @@ void AUSARAgent::MoveToWPTask()
 
 void AUSARAgent::CheckAtWP()
 {
+    if (!flockWPs.Num()) {
+        return;
+    }
+
     float minDist = MIN_WP_ERR + sqrtf(neighborAgents.Num()) * AGENT_SPACING;
     FVector agentLoc = GetActorLocation();
     agentLoc.Z = 0;
