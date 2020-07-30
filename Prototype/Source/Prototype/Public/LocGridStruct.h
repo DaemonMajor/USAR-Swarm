@@ -14,9 +14,13 @@ public:
 		int x;
 	UPROPERTY()
 		int y;
+	UPROPERTY()
+		int z;
 
 	UPROPERTY()
 		float confidence;
+	UPROPERTY()
+		bool occupied;
 
 	UPROPERTY()
 		TArray<FVector> survivors;
@@ -28,10 +32,12 @@ public:
 	{
 	}
 
-	FLocGridStruct(int xPos, int yPos, float conf, float time) :
+	FLocGridStruct(int xPos, int yPos, int zPos, float conf, float time) :
 		x(xPos),
 		y(yPos),
+		z(zPos),
 		confidence(conf),
+		occupied(false),
 		lastUpdated(time)
 	{}
 
@@ -56,29 +62,48 @@ public:
 			}
 
 			map.Insert(*this, i);
+			idx = i;
 			newGrid = true;
 		}
 
 		return newGrid;
 	}
 
-	FORCEINLINE bool operator==(const FLocGridStruct& loc) const
+	/* Compiles the grid data to a string for saving to a .csv file. Does not include survivor data.
+	*/
+	FString ToString()
 	{
-		if ((x == loc.x) && (y == loc.y)) {
+		FString sep			= FString(TEXT(", "));
+		FString xString		= FString::FromInt(x);
+		FString yString		= FString::FromInt(y);
+		FString zString		= FString::FromInt(z);
+		FString confString	= FString::SanitizeFloat(confidence);
+
+		return xString + sep + yString + sep + zString + sep + confString;
+	}
+
+	FORCEINLINE bool operator==(const FLocGridStruct& grid) const
+	{
+		if ((x == grid.x) && (y == grid.y) && (z == grid.z)) {
 			return true;
 		}
 		
 		return false;
 	}
 
-	FORCEINLINE bool operator<(const FLocGridStruct& loc) const
+	FORCEINLINE bool operator<(const FLocGridStruct& grid) const
 	{
-		if (x < loc.x) {
+		if (z < grid.z) {
 			return true;
 		}
-		else if (x == loc.x) {
-			if (y < loc.y) {
+		else if (z == grid.z) {
+			if (x < grid.x) {
 				return true;
+			}
+			else if (x == grid.x) {
+				if (y < grid.y) {
+					return true;
+				}
 			}
 		}
 

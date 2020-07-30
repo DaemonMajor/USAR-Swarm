@@ -196,14 +196,23 @@ void AControlStation::DisplayMap()
 	}
 
 	for (FLocGridStruct grid : envMap) {
-		FVector loc = FVector(grid.x, grid.y, 10);
-		FVector boxSize = FVector(1, 1, 1);
+		FVector loc		= FVector(grid.x + GRID_SIZE/2, grid.y + GRID_SIZE/2, grid.z + GRID_SIZE/2);
+		FVector boxSize = FVector(GRID_SIZE/2 * .9, GRID_SIZE/2 * .9, GRID_SIZE/2 * .9);
 		FPlane p	= FPlane(loc, FVector(0, 0, 1));
 		int8 conf	= 255 * grid.confidence;
-		FColor c	= FColor(0, conf, 0);
+		FColor c;
+		if (grid.occupied) {
+			c = FColor(128, 0, 0);
+		}
+		else {
+			c = FColor(0, conf, 0);
+		}
 
 		DrawDebugBox(GetWorld(), loc, boxSize, c, true, -1, '\000', 5);
-		//DrawDebugSolidPlane(GetWorld(), p, loc, GRID_SIZE, c, true, -1);
+		
+		for (FVector s : grid.survivors) {
+			DrawDebugPoint(GetWorld(), s, 15, FColor::Magenta, true, -1);
+		}
 	}
 }
 

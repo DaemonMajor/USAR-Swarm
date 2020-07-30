@@ -53,7 +53,6 @@ void AUSARAgent::FlockReadyToSearch()
 *
 */
 void AUSARAgent::BeginSearch() {
-    flockSize = 1;
     alignWeight = 0;
     cohWeight = 0;
     targetHeight = SEARCH_HEIGHT;
@@ -80,7 +79,6 @@ void AUSARAgent::ExpandSearch()
         GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Yellow, searchRadText, true);
     }
     /*DEBUGGING*/
-
 
     if (expandingSearch > 0) {
         sepWeight += 5;

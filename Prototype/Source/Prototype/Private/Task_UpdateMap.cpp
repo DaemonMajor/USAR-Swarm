@@ -8,47 +8,75 @@ void AUSARAgent::UpdateMap()
 {
     FVector currLoc = GetActorLocation();
 
-    FVector gridLoc = currLoc;
-    gridLoc.X -= VISION_RADIUS;
-    gridLoc.Y -= VISION_RADIUS;
-    //for (; gridLoc.X < currLoc.X + VISION_RADIUS; gridLoc.X += GRID_SIZE) {
-    while(gridLoc.X < currLoc.X + VISION_RADIUS) {
-        //for (; gridLoc.Y < currLoc.Y + VISION_RADIUS; gridLoc.Y += GRID_SIZE) {
-        while(gridLoc.Y < currLoc.Y + VISION_RADIUS) {
-            float dist = FVector::DistXY(currLoc, gridLoc);
+    FVector gridLoc;
+    gridLoc.Z = currLoc.Z + VISION_RADIUS;
 
-            /*DEBUGGING*/
-            if (showDebug) {
-                DrawDebugPoint(GetWorld(), gridLoc, 10, FColor::Blue, false, 1);
+    while (gridLoc.Z >= 0) {
+        gridLoc.X = currLoc.X - VISION_RADIUS;
 
-                FString locText = FString::Printf(TEXT("Loc: [%f, %f],   Grid: [%f, %f]"), currLoc.X, currLoc.Y, gridLoc.X, gridLoc.Y);
-                GEngine->AddOnScreenDebugMessage(INDEX_NONE, 1.5f, FColor::Green, locText, true);
+        while (gridLoc.X < currLoc.X + VISION_RADIUS) {
+            gridLoc.Y = currLoc.Y - VISION_RADIUS;
 
-                FString mapDistText = FString::Printf(TEXT("Dist to grid = %f."), dist);
-                GEngine->AddOnScreenDebugMessage(INDEX_NONE, 1.5f, FColor::Green, mapDistText, true);
-            }
-            /*DEBUGGING*/
+            while (gridLoc.Y < currLoc.Y + VISION_RADIUS) {
+                float dist = FVector::Dist(currLoc, gridLoc);
 
-            if (dist <= VISION_RADIUS) {
-                float conf = CONF_INCR * dist / VISION_RADIUS;
+                if (dist <= VISION_RADIUS) {
+                    FHitResult hitResult;
+                    FCollisionObjectQueryParams objectParams;
+                    objectParams.AddObjectTypesToQuery(ECC_WorldStatic);
+                    FCollisionQueryParams queryParams;
+                    queryParams.AddIgnoredActor(this);
 
-                FLocGridStruct grid = FLocGridStruct(currLoc.X, currLoc.Y, conf, GetWorld()->GetTimeSeconds());
-
-                int idx;
-                bool isNewGrid = grid.InsertInMap(envMap, idx);
-                if (!isNewGrid) {
-                    envMap[idx].confidence = FMath::Clamp(envMap[idx].confidence + conf, 0.f, 1.f);
+                    if (!GetWorld()->LineTraceSingleByObjectType(hitResult, currLoc, gridLoc, objectParams, queryParams)) {
+                        AddGrid(gridLoc, dist);
+                    }
+                    else if (dist == hitResult.Distance) {
+                        int grid = AddGrid(gridLoc, dist);
+                        envMap[grid].occupied = true;
+                    }
                 }
-                else {
-                    gridsExplored = envMap.Num();
-                }
+
+                gridLoc.Y += GRID_SIZE;
             }
 
-            gridLoc.Y += GRID_SIZE;
+            gridLoc.X += GRID_SIZE;
         }
 
-        gridLoc.X += GRID_SIZE;
+        gridLoc.Z -= GRID_SIZE;
     }
+}
+
+/* Adds grid holding location gridLoc into map. Increments confidence value if grid already exists.
+*
+*   @param gridLoc Location to add to map.
+*   @param dist Distance between agent and location to add.
+*/
+int AUSARAgent::AddGrid(FVector gridLoc, float dist)
+{
+    int x = (int)gridLoc.X - (int)gridLoc.X % GRID_SIZE;
+    int y = (int)gridLoc.Y - (int)gridLoc.Y % GRID_SIZE;
+    int z = (int)gridLoc.Z - (int)gridLoc.Z % GRID_SIZE;
+    float conf = CONF_INCR * dist / VISION_RADIUS;
+
+    FLocGridStruct grid = FLocGridStruct(x, y, z, conf, GetWorld()->GetTimeSeconds());
+
+    /*DEBUGGING*/
+    if (showDebug) {
+        FVector dbgPt = FVector(grid.x, grid.y, grid.z);
+        DrawDebugPoint(GetWorld(), dbgPt, 10, FColor::Blue, false, RATE_MAP_UPDATE);
+    }
+    /*DEBUGGING*/
+
+    int idx;
+    bool isNewGrid = grid.InsertInMap(envMap, idx);
+    if (!isNewGrid) {
+        envMap[idx].confidence = FMath::Clamp(envMap[idx].confidence + conf, 0.f, 1.f);
+    }
+    else {
+        gridsExplored = envMap.Num();
+    }
+
+    return idx;
 }
 
 /* Dumps map data.

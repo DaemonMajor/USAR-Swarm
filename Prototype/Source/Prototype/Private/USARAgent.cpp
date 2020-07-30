@@ -119,8 +119,6 @@ void AUSARAgent::Tick(float DeltaSeconds)
 		SetVelocity();
 		MoveAgent(DeltaSeconds);
 
-		numNeighbors = neighborAgents.Num();
-
 		// show direction of movement
 		DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + agentVelocity, 10.f, FColor::Blue, false, 0.01, 0, 2.5);
 		DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + rawVelocity, 5.f, FColor::Purple, false, 0.01, 0, 2.5);
@@ -208,6 +206,9 @@ void AUSARAgent::ScanNeighbors()
 			}
 		}
 	}
+
+	flockSize = neighborAgents.Num() + 1;
+	numNeighbors = neighborAgents.Num();
 }
 
 /* Adds an agent to neighbor list on detection.
@@ -226,6 +227,9 @@ void AUSARAgent::OnNeighborEnter(UPrimitiveComponent* agentSensor, AActor* neigh
 			if (flockID == boid->flockID) {
 				if (!neighborAgents.Contains(boid)) {
 					neighborAgents.Add(boid);
+
+					flockSize++;
+					numNeighbors++;
 				}
 			}
 		}
@@ -244,6 +248,9 @@ void AUSARAgent::OnNeighborLeave(UPrimitiveComponent* agentSensor, AActor* neigh
 		if (AUSARAgent* boid = Cast<AUSARAgent>(neighbor)) {
 			if (flockID == boid->flockID) {
 				neighborAgents.Remove(boid);
+
+				flockSize--;
+				numNeighbors--;
 			}
 		}
 	}

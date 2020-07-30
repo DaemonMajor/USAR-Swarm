@@ -3,7 +3,7 @@
 //#ifndef USAR_CONSTANTS_H
 //#define USAR_CONSTANTS_H
 
-inline constexpr float SIM_LENGTH               = 30;
+inline constexpr float SIM_LENGTH               = 60;
 
 inline constexpr float FLOCK_SIZE               = 15;
 
@@ -50,9 +50,9 @@ inline constexpr float BATTERY_MAX              = 1800;
 inline constexpr float BATTERY_RATE             = 1;
 
 
-inline constexpr float CONF_INCR                = 0.1;
+inline constexpr float CONF_INCR                = 0.01;
 
 
-inline constexpr float GRID_SIZE                = 100;
+inline constexpr int GRID_SIZE                  = 100;
 
 //#endif
