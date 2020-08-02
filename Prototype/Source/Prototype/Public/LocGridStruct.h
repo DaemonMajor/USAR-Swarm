@@ -4,6 +4,7 @@
 #include "Engine.h"
 #include "LocGridStruct.generated.h"
 
+
 USTRUCT()
 struct PROTOTYPE_API FLocGridStruct
 {
@@ -40,6 +41,20 @@ public:
 		occupied(false),
 		lastUpdated(time)
 	{}
+
+	/* Find the grid in a given map.
+	*
+	*	@param map Environment map to search in.
+	*	@return Index at which the grid was found. Returns -1 if not found.
+	*/
+	int FindInMap(TArray<FLocGridStruct>& map)
+	{
+		int idx = -1;
+
+		while (true) {
+
+		}
+	}
 
 	/* Sorted insert of the grid into an environment map.
 	*	@param map Environment map to add the grid to.

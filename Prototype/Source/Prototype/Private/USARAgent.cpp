@@ -198,13 +198,17 @@ void AUSARAgent::ScanNeighbors()
 	UKismetSystemLibrary::SphereOverlapActors(GetWorld(), GetActorLocation(), NEIGHBOR_RADIUS, traceObjectTypes, seekClass, ignoreActors, foundNeighbors);
 
 	// filter by distance and cast to AUSARAgent
-	for (AActor* agent : foundNeighbors) {
-		float dist = FVector::Distance(GetActorLocation(), agent->GetActorLocation());
-		if (dist <= NEIGHBOR_RADIUS) {
-			if (!neighborAgents.Contains(agent)) {
-				neighborAgents.Add(Cast<AUSARAgent>(agent));
+	for (AActor* agentActor : foundNeighbors) {
+		AUSARAgent* agent = Cast<AUSARAgent>(agentActor);
+
+		//if (!agent->statusStuck) {
+			float dist = FVector::Distance(GetActorLocation(), agent->GetActorLocation());
+			if (dist <= NEIGHBOR_RADIUS) {
+				if (!neighborAgents.Contains(agent)) {
+					neighborAgents.Add(agent);
+				}
 			}
-		}
+		//}
 	}
 
 	flockSize = neighborAgents.Num() + 1;
@@ -224,14 +228,16 @@ void AUSARAgent::OnNeighborEnter(UPrimitiveComponent* agentSensor, AActor* neigh
 		AUSARAgent* boid = Cast<AUSARAgent>(neighbor);
 
 		if (boid && (boid != this)) {
-			if (flockID == boid->flockID) {
-				if (!neighborAgents.Contains(boid)) {
-					neighborAgents.Add(boid);
+			//if (!boid->statusStuck) {
+				if (flockID == boid->flockID) {
+					if (!neighborAgents.Contains(boid)) {
+						neighborAgents.Add(boid);
 
-					flockSize++;
-					numNeighbors++;
+						flockSize++;
+						numNeighbors++;
+					}
 				}
-			}
+			//}
 		}
 	}
 }
@@ -246,12 +252,14 @@ void AUSARAgent::OnNeighborLeave(UPrimitiveComponent* agentSensor, AActor* neigh
 
 	if (eventFromSensor && senseNeighborBody) {
 		if (AUSARAgent* boid = Cast<AUSARAgent>(neighbor)) {
-			if (flockID == boid->flockID) {
-				neighborAgents.Remove(boid);
+			//if (!boid->statusStuck) {
+				if (flockID == boid->flockID) {
+					neighborAgents.Remove(boid);
 
-				flockSize--;
-				numNeighbors--;
-			}
+					flockSize--;
+					numNeighbors--;
+				}
+			//}
 		}
 	}
 }
@@ -455,15 +463,20 @@ void AUSARAgent::ClearFlockWPs()
 */
 void AUSARAgent::SetStatusStuck()
 {
-	statusStuck = true;
-	statusAvoiding = false;
-	statusDirectMove = false;
-	statusActiveSearch = false;
-	statusClimbing = false;
-	statusTraveling = false;
+	statusStuck			= true;
+	statusAvoiding		= false;
+	statusDirectMove	= false;
+	statusActiveSearch	= false;
+	statusClimbing		= false;
+	statusTraveling		= false;
 
 	// clear timer handles for behavior modules
 	GetWorldTimerManager().ClearAllTimersForObject(this);
+
+	// remove agent from neighbor's lists
+	for (AUSARAgent* n : neighborAgents) {
+		n->neighborAgents.Remove(this);
+	}
 
 	/*DEBUGGING*/
 	const float gRatio = (sqrt(5.f) + 1.f) / 2.f;   // golden ratio

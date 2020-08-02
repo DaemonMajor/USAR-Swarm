@@ -29,9 +29,10 @@ void AUSARAgent::UpdateMap()
     FVector currLoc = GetActorLocation();
 
     FVector gridLoc;
-    gridLoc.Z = currLoc.Z + VISION_RADIUS;
+    gridLoc.Z = currLoc.Z - VISION_RADIUS;
 
-    while (gridLoc.Z >= currLoc.Z - VISION_RADIUS) {
+    int numGrids = 0;
+    while (gridLoc.Z < currLoc.Z + VISION_RADIUS) {
         gridLoc.X = currLoc.X - VISION_RADIUS;
 
         while (gridLoc.X < currLoc.X + VISION_RADIUS) {
@@ -61,16 +62,8 @@ void AUSARAgent::UpdateMap()
                         float zHit = SnapToGrid(hitResult.ImpactPoint.Z);
                         FVector hitGrid = FVector(xHit, yHit, zHit);
 
-                        int newGrid = AddGrid(hitResult.ImpactPoint, hitResult.Distance, true);
-
-                        //if (grid.Equals(hitGrid, 1)) {
-                            //int newGrid = AddGrid(gridLoc, dist, true);
-                        //}
-                        //else {
-                        //    if (showDebug) {
-                        //        DrawDebugPoint(GetWorld(), grid, 3.5, FColor::Blue, false, RATE_MAP_UPDATE);
-                        //    }
-                        //}
+                        dist = FVector::Dist(GetActorLocation(), hitResult.ImpactPoint);
+                        AddGrid(hitResult.ImpactPoint, dist, true);
 
                         /*DEBUGGING*/
                         if (showDebug) {
@@ -79,6 +72,8 @@ void AUSARAgent::UpdateMap()
                         }
                         /*DEBUGGING*/
                     }
+
+                    numGrids++;
                 }
 
                 gridLoc.Y += GRID_SIZE;
@@ -87,7 +82,7 @@ void AUSARAgent::UpdateMap()
             gridLoc.X += GRID_SIZE;
         }
 
-        gridLoc.Z -= GRID_SIZE;
+        gridLoc.Z += GRID_SIZE;
     }
 }
 

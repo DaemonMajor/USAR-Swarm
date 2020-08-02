@@ -173,9 +173,10 @@ bool AUSARAgent::FindClearVector(FVector& targetVec, int fidelity)
         float azimuth = FMath::Asin(-1.f + 2.f * float(i) / (fidelity + 1));
         float inclination = gAngle * i;
 
-        float z = FMath::Cos(inclination)* FMath::Cos(-azimuth);
+        // set azimuth function to preferred direction of avoidance (x for forward, z for up)
+        float x = FMath::Cos(inclination) * FMath::Cos(-azimuth);
         float y = FMath::Sin(inclination) * FMath::Cos(-azimuth);
-        float x = FMath::Sin(-azimuth);
+        float z = FMath::Sin(-azimuth);
 
         FVector tmpVec = agentVelocity.Rotation().RotateVector(FVector(x, y, z));   // remove this once agent turning is in place
         FVector checkVec = OBSTACLE_AVOID_DIST * tmpVec + GetActorLocation();       // check vectors closest to agent velocity first

@@ -14,8 +14,8 @@ AControlStation::AControlStation()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	simTime		= 60;		// switch to SIM_LENGTH after debug
-	dispMapType = GridDisp::Point;
+	simTime		= 3 * 60;		// switch to SIM_LENGTH after debug
+	dispMapType = GridDisp::Box;
 	showMap		= false;
 }
 
@@ -222,10 +222,10 @@ void AControlStation::DisplayMap(bool showOccupied, bool showEmpty, bool showVic
 			c = FColor(128, 0, 0);
 
 			switch (dispMapType) {
-				case GridDisp::Point:
+				case GridDisp::Point :
 					DrawDebugPoint(GetWorld(), loc, 5, c, true);
 					break;
-				case GridDisp::Box:
+				case GridDisp::Box :
 					DrawDebugBox(GetWorld(), loc, boxSize, c, true, -1, 5);
 					break;
 			}
@@ -235,28 +235,21 @@ void AControlStation::DisplayMap(bool showOccupied, bool showEmpty, bool showVic
 			c = FColor(0, conf, 0);
 
 			switch (dispMapType) {
-				case GridDisp::Point:
+				case GridDisp::Point :
 					DrawDebugPoint(GetWorld(), loc, 5, c, true);
 					break;
-				case GridDisp::Box:
+				case GridDisp::Box :
 					DrawDebugBox(GetWorld(), loc, boxSize, c, true, -1, 5);
 					break;
 			}
 		}
 		
 		if (showVictims) {
-			if (showVictims) {
-				for (FVector s : grid.survivors) {
-					DrawDebugPoint(GetWorld(), s, 15, FColor::Magenta, true, -1);
-				}
+			for (FVector s : grid.survivors) {
+				DrawDebugPoint(GetWorld(), s, 15, FColor::Magenta, true, -1);
 			}
 		}
 	}
-
-	/*DEBUGGING*/
-	FString dispMapText = FString::Printf(TEXT("Map drawn."));
-	GEngine->AddOnScreenDebugMessage(INDEX_NONE, 5.0f, FColor::Green, dispMapText, true);
-	/*DEBUGGING*/
 }
 
 /* Pauses simulation and writes current state of map to a file.

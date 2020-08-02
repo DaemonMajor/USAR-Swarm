@@ -3,8 +3,8 @@
 //#ifndef USAR_CONSTANTS_H
 //#define USAR_CONSTANTS_H
 
-inline constexpr float SIM_LENGTH               = 3 * 60;
-inline constexpr int GRID_SIZE                  = 100;
+inline constexpr float SIM_LENGTH               = 60 * 60;
+inline constexpr int GRID_SIZE                  = 50;
 
 inline constexpr float FLOCK_SIZE               = 15;
 
