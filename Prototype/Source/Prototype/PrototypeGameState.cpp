@@ -17,16 +17,3 @@ void APrototypeGameState::SetControlStation(AControlStation* cs)
 {
 	station = cs;
 }
-
-/* Pauses simulation and writes current state of map to a file.
-*/
-void APrototypeGameState::EndSim()
-{
-	UGameplayStatics::SetGamePaused(GetWorld(), true);
-
-	station->showMap = true;
-	station->DisplayMap();
-
-	// write map data to file
-	// ...
-}

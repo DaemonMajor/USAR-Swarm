@@ -261,7 +261,7 @@ protected:
 	FTimerHandle timerMapShare;
 	void UpdateMap();
 	void ShareMap();
-	int AddGrid(FVector gridLoc, float dist);
+	int AddGrid(FVector gridLoc, float dist, bool occupied);
 	/***BEHAVIOR MODULES***/
 
 private:

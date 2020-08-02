@@ -19,6 +19,11 @@ public:
 	AControlStation();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int simTime;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int dispMapType;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool showMap;
 
 	UFUNCTION()
@@ -26,7 +31,7 @@ public:
 	UFUNCTION()
 		void SaveMap();
 	UFUNCTION()
-		void DisplayMap();
+		void DisplayMap(bool showOccupied, bool showEmpty, bool showVictims);
 
 	UFUNCTION()
 		void AddAgent(AUSARAgent* agent);					// Give the passed agent a unique ID and assign to specified flock. Returns flock data.
@@ -40,6 +45,9 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	UPROPERTY()
+		FString logDir;					// Directory to write map data to
+
 	TArray<Flock*> flockData;			// Tracker for active flocks.
 	UPROPERTY()
 		int numAgents;					// Number of active agents.
@@ -47,19 +55,19 @@ protected:
 		int numWP;						// Number of active waypoints.
 
 	UPROPERTY()
-		TArray<FLocGridStruct> envMap;	// global map constructed from agent-provided maps
+		TArray<FLocGridStruct> envMap;	// Global map constructed from agent-provided maps
 
 	UPROPERTY()
-		FTimerHandle timerBootUpDelay;	// timer handle for waypoints that exist on world start
+		FTimerHandle timerBootUpDelay;	// Timer handle for waypoints that exist on world start
 	UPROPERTY()
-		FTimerHandle timerMapDisplay;	// timer handle for refreshing map display
+		FTimerHandle timerMapDisplay;	// Timer handle for refreshing map display
 	UPROPERTY()
-		FTimerHandle timerEndSim;		// timer handle for countdown until end of simulation
+		FTimerHandle timerEndSim;		// Timer handle for countdown until end of simulation
 
 	UFUNCTION()
 		void SwarmInit();
 	UFUNCTION()
-		void InitWaypoints();			// activate preplaced waypoints
+		void InitWaypoints();			// Activate preplaced waypoints
 	UFUNCTION()
 		void EndSim();
 };

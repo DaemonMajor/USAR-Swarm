@@ -14,7 +14,9 @@ AControlStation::AControlStation()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	showMap = false;
+	simTime		= 60;		// switch to SIM_LENGTH after debug
+	dispMapType = GridDisp::Point;
+	showMap		= false;
 }
 
 // Called when the game starts or when spawned
@@ -25,8 +27,22 @@ void AControlStation::BeginPlay()
 	GetWorld()->GetGameState<APrototypeGameState>()->SetControlStation(this);
 	
 	GetWorldTimerManager().SetTimer(timerBootUpDelay, this, &AControlStation::SwarmInit, 1, false);
-	GetWorldTimerManager().SetTimer(timerMapDisplay, this, &AControlStation::DisplayMap, 5, true);
-	GetWorldTimerManager().SetTimer(timerEndSim, this, &AControlStation::EndSim, SIM_LENGTH, false);
+
+	FTimerDelegate dispMapDel;
+	dispMapDel.BindUFunction(this, FName("DisplayMap"), true, true, true);
+	GetWorldTimerManager().SetTimer(timerMapDisplay, dispMapDel, 5, true);
+	GetWorldTimerManager().SetTimer(timerEndSim, this, &AControlStation::EndSim, simTime, false);
+
+	// Create log directory for maps.
+	logDir = FPaths::ProjectLogDir();
+	logDir.Append("USAR_Simulation_");
+	logDir.Append(FDateTime::Now().ToString());
+	logDir.Append("/");
+
+	IPlatformFile& fManager = FPlatformFileManager::Get().GetPlatformFile();
+	if (!fManager.CreateDirectory(*logDir)) {
+		UE_LOG(LogTemp, Warning, TEXT("Log directory was not created."));
+	}
 }
 
 /* Assign the passed agent a unique ID and add to control station's registry.
@@ -189,7 +205,7 @@ void AControlStation::UpdateMap(const TArray<FLocGridStruct> agentMap)
 
 /* Refreshes displayed global map when showMap is enabled.
 */
-void AControlStation::DisplayMap()
+void AControlStation::DisplayMap(bool showOccupied, bool showEmpty, bool showVictims)
 {
 	if (!showMap) {
 		return;
@@ -201,25 +217,54 @@ void AControlStation::DisplayMap()
 		FPlane p	= FPlane(loc, FVector(0, 0, 1));
 		int8 conf	= 255 * grid.confidence;
 		FColor c;
-		if (grid.occupied) {
+
+		if (showOccupied && grid.occupied) {
 			c = FColor(128, 0, 0);
-		}
-		else {
-			c = FColor(0, conf, 0);
+
+			switch (dispMapType) {
+				case GridDisp::Point:
+					DrawDebugPoint(GetWorld(), loc, 5, c, true);
+					break;
+				case GridDisp::Box:
+					DrawDebugBox(GetWorld(), loc, boxSize, c, true, -1, 5);
+					break;
+			}
 		}
 
-		DrawDebugBox(GetWorld(), loc, boxSize, c, true, -1, '\000', 5);
+		if (showEmpty && !grid.occupied) {
+			c = FColor(0, conf, 0);
+
+			switch (dispMapType) {
+				case GridDisp::Point:
+					DrawDebugPoint(GetWorld(), loc, 5, c, true);
+					break;
+				case GridDisp::Box:
+					DrawDebugBox(GetWorld(), loc, boxSize, c, true, -1, 5);
+					break;
+			}
+		}
 		
-		for (FVector s : grid.survivors) {
-			DrawDebugPoint(GetWorld(), s, 15, FColor::Magenta, true, -1);
+		if (showVictims) {
+			if (showVictims) {
+				for (FVector s : grid.survivors) {
+					DrawDebugPoint(GetWorld(), s, 15, FColor::Magenta, true, -1);
+				}
+			}
 		}
 	}
+
+	/*DEBUGGING*/
+	FString dispMapText = FString::Printf(TEXT("Map drawn."));
+	GEngine->AddOnScreenDebugMessage(INDEX_NONE, 5.0f, FColor::Green, dispMapText, true);
+	/*DEBUGGING*/
 }
 
 /* Pauses simulation and writes current state of map to a file.
 */
 void AControlStation::SaveMap()
 {
+	static int save = 1;
+
 	// grab map data from flocks
 	// remove after implementing flock return/map dump behavior
 	for (Flock* f : flockData) {
@@ -236,7 +281,40 @@ void AControlStation::SaveMap()
 	}
 
 	// write map data to file
-	// ...
+	FString mapFile = logDir;
+	mapFile += "Map_";
+	mapFile += FString::FromInt(save);
+	mapFile += ".csv";
+
+	FString vicFile = logDir;
+	vicFile += "Victims_";
+	vicFile += FString::FromInt(save);
+	vicFile += ".csv";
+
+	FString mapData = "";
+	FString vicData = "";
+	for (FLocGridStruct grid : envMap) {
+		FString gridData = grid.ToString();
+		gridData += LINE_TERMINATOR;
+		mapData += gridData;
+
+		FString locData = "";
+		for (FVector vicLoc : grid.survivors) {
+			locData += FString::SanitizeFloat(vicLoc.X);
+			locData += ", ";
+			locData += FString::SanitizeFloat(vicLoc.Y);
+			locData += ", ";
+			locData += FString::SanitizeFloat(vicLoc.Z);
+			locData += LINE_TERMINATOR;
+
+			vicData += locData;
+		}
+	}
+
+	FFileHelper::SaveStringToFile(mapData, *mapFile);
+	FFileHelper::SaveStringToFile(vicData, *vicFile);
+
+	save++;
 }
 
 /* Ends the simulation and saves the environment map to a file.
@@ -247,7 +325,7 @@ void AControlStation::EndSim()
 	SaveMap();
 
 	showMap = true;
-	DisplayMap();
+	DisplayMap(true, false, true);
 
 	GetWorldTimerManager().ClearAllTimersForObject(this);
 

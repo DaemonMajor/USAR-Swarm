@@ -3,7 +3,8 @@
 //#ifndef USAR_CONSTANTS_H
 //#define USAR_CONSTANTS_H
 
-inline constexpr float SIM_LENGTH               = 60;
+inline constexpr float SIM_LENGTH               = 3 * 60;
+inline constexpr int GRID_SIZE                  = 100;
 
 inline constexpr float FLOCK_SIZE               = 15;
 
@@ -23,14 +24,14 @@ inline constexpr float RATE_HEIGHT_TASK         = 0.25;
 inline constexpr float RATE_FLOCK_TASK          = 0.15;
 inline constexpr float RATE_WP_TASK             = 0.30;
 inline constexpr float RATE_MAP_UPDATE          = 0.25;
-inline constexpr float RATE_MAP_SHARE           = 3.f;
+inline constexpr float RATE_MAP_SHARE           = 1.f;
 
 inline constexpr float WAIT_FACTOR              = 5;
 
 inline constexpr float MOVE_HEIGHT              = VISION_RADIUS * 0.85;
 inline constexpr float SEARCH_HEIGHT            = 100;
 
-inline constexpr float MIN_WP_ERR               = 25;
+inline constexpr float WP_TOLERANCE             = 25;
 
 inline constexpr float ALIGNMENT_WEIGHT         = 0.1;
 inline constexpr float COHESION_WEIGHT          = 1.5;
@@ -53,6 +54,8 @@ inline constexpr float BATTERY_RATE             = 1;
 inline constexpr float CONF_INCR                = 0.01;
 
 
-inline constexpr int GRID_SIZE                  = 100;
-
+enum GridDisp {
+    Point,
+    Box
+};
 //#endif

@@ -26,10 +26,8 @@ void AUSARAgent::MoveToWPTask()
     }
     else {
         /*DEBUGGING*/
-        if (showDebug) {
-            FString noWPText = FString::Printf(TEXT("Agent %d has no waypoints."), agentID);
-            GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Green, noWPText, true);
-        }
+        FString noWPText = FString::Printf(TEXT("Agent %d has no waypoints."), agentID);
+        GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Yellow, noWPText, true);
         /*DEBUGGING*/
     }
 
@@ -41,21 +39,22 @@ void AUSARAgent::CheckAtWP()
     if (!flockWPs.Num()) {
         return;
     }
-
-    float minDist = MIN_WP_ERR + sqrtf(neighborAgents.Num()) * AGENT_SPACING;
-    FVector agentLoc = GetActorLocation();
-    agentLoc.Z = 0;
-    FVector wpLoc = flockWPs[0];
-    wpLoc.Z = 0;
-
-    float distToWP = abs((agentLoc - wpLoc).Size());
-
-    if (distToWP <= minDist) {
+    
+    float dist = FVector::DistXY(flockCenter, flockWPs[0]);
+    float wpTol = 5 * numNeighbors + WP_TOLERANCE;
+    if (dist < wpTol) {
         statusTraveling = false;
         statusReadyToSearch = true;
 
         GetWorldTimerManager().SetTimer(timerCheckSearchReady, this, &AUSARAgent::FlockReadyToSearch, 1.f, true);
     }
+
+    /*DEBUGGING*/
+    if (showDebug) {
+        //FString atWPText = FString::Printf(TEXT("Flock %f from waypoint."), dist);
+        //GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Green, atWPText, true);
+    }
+    /*DEBUGGING*/
 }
 
 /* Determines if the flock is ready to move to the next waypoint as a group.

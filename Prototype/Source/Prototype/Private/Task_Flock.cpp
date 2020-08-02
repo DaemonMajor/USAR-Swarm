@@ -82,7 +82,7 @@ FVector AUSARAgent::GetCohesion()
     centerMass -= GetActorLocation();
 
     /*DEBUGGING*/
-    flockCenter = centerMass;
+    flockCenter = centerMass + GetActorLocation();
     /*DEBUGGING*/
 
     return centerMass;

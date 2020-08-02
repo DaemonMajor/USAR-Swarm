@@ -2,6 +2,26 @@
 #include "Misc/CoreMiscDefines.h"
 #include "Math/UnrealMathUtility.h"
 
+
+/* Utility function to help translate coordinate to a grid.
+*
+*   @param pt Number to Snap.
+*   @return Number Snaped to the nearest GRID_SIZE
+*/
+float SnapToGrid(float pt) {
+    int tmpPt = static_cast<int>(pt);
+
+    if (pt > 0) {
+        return static_cast<float>(tmpPt - abs(tmpPt) % GRID_SIZE);
+    }
+    else if (pt < 0) {
+        return static_cast<float>(tmpPt - (GRID_SIZE - abs(tmpPt) % GRID_SIZE));
+    }
+    else {
+        return 0;
+    }
+}
+
 /* Update the agent's onboard map from sensor data.
 */
 void AUSARAgent::UpdateMap()
@@ -11,7 +31,7 @@ void AUSARAgent::UpdateMap()
     FVector gridLoc;
     gridLoc.Z = currLoc.Z + VISION_RADIUS;
 
-    while (gridLoc.Z >= 0) {
+    while (gridLoc.Z >= currLoc.Z - VISION_RADIUS) {
         gridLoc.X = currLoc.X - VISION_RADIUS;
 
         while (gridLoc.X < currLoc.X + VISION_RADIUS) {
@@ -28,11 +48,36 @@ void AUSARAgent::UpdateMap()
                     queryParams.AddIgnoredActor(this);
 
                     if (!GetWorld()->LineTraceSingleByObjectType(hitResult, currLoc, gridLoc, objectParams, queryParams)) {
-                        AddGrid(gridLoc, dist);
+                        AddGrid(gridLoc, dist, false);
                     }
-                    else if (dist == hitResult.Distance) {
-                        int grid = AddGrid(gridLoc, dist);
-                        envMap[grid].occupied = true;
+                    else {
+                        float xGrid = SnapToGrid(gridLoc.X);
+                        float yGrid = SnapToGrid(gridLoc.Y);
+                        float zGrid = SnapToGrid(gridLoc.Z);
+                        FVector grid = FVector(xGrid, yGrid, zGrid);
+
+                        float xHit = SnapToGrid(hitResult.ImpactPoint.X);
+                        float yHit = SnapToGrid(hitResult.ImpactPoint.Y);
+                        float zHit = SnapToGrid(hitResult.ImpactPoint.Z);
+                        FVector hitGrid = FVector(xHit, yHit, zHit);
+
+                        int newGrid = AddGrid(hitResult.ImpactPoint, hitResult.Distance, true);
+
+                        //if (grid.Equals(hitGrid, 1)) {
+                            //int newGrid = AddGrid(gridLoc, dist, true);
+                        //}
+                        //else {
+                        //    if (showDebug) {
+                        //        DrawDebugPoint(GetWorld(), grid, 3.5, FColor::Blue, false, RATE_MAP_UPDATE);
+                        //    }
+                        //}
+
+                        /*DEBUGGING*/
+                        if (showDebug) {
+                            DrawDebugPoint(GetWorld(), hitResult.ImpactPoint, 5, FColor::Red, false, RATE_MAP_UPDATE);
+                            DrawDebugLine(GetWorld(), hitResult.ImpactPoint, hitGrid, FColor::Orange, false, RATE_MAP_UPDATE, 3.5);
+                        }
+                        /*DEBUGGING*/
                     }
                 }
 
@@ -50,20 +95,30 @@ void AUSARAgent::UpdateMap()
 *
 *   @param gridLoc Location to add to map.
 *   @param dist Distance between agent and location to add.
+*   @return The map index the grid was added to or found at.
 */
-int AUSARAgent::AddGrid(FVector gridLoc, float dist)
+int AUSARAgent::AddGrid(FVector gridLoc, float dist, bool occupied)
 {
-    int x = (int)gridLoc.X - (int)gridLoc.X % GRID_SIZE;
-    int y = (int)gridLoc.Y - (int)gridLoc.Y % GRID_SIZE;
-    int z = (int)gridLoc.Z - (int)gridLoc.Z % GRID_SIZE;
+    float x = SnapToGrid(gridLoc.X);
+    float y = SnapToGrid(gridLoc.Y);
+    float z = SnapToGrid(gridLoc.Z);
     float conf = CONF_INCR * dist / VISION_RADIUS;
 
     FLocGridStruct grid = FLocGridStruct(x, y, z, conf, GetWorld()->GetTimeSeconds());
+    grid.occupied = occupied;
 
     /*DEBUGGING*/
     if (showDebug) {
         FVector dbgPt = FVector(grid.x, grid.y, grid.z);
-        DrawDebugPoint(GetWorld(), dbgPt, 10, FColor::Blue, false, RATE_MAP_UPDATE);
+        float ptSize = 3.5;
+        FColor c = FColor::Green;
+        
+        if (occupied) {
+            ptSize = 7;
+            c = FColor::Orange;
+        }
+
+        DrawDebugPoint(GetWorld(), dbgPt, ptSize, c, false, RATE_MAP_UPDATE);
     }
     /*DEBUGGING*/
 
@@ -71,6 +126,10 @@ int AUSARAgent::AddGrid(FVector gridLoc, float dist)
     bool isNewGrid = grid.InsertInMap(envMap, idx);
     if (!isNewGrid) {
         envMap[idx].confidence = FMath::Clamp(envMap[idx].confidence + conf, 0.f, 1.f);
+
+        if (occupied) {
+            envMap[idx].occupied = true;
+        }
     }
     else {
         gridsExplored = envMap.Num();

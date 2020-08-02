@@ -30,10 +30,4 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
-	UPROPERTY()
-		FTimerHandle timerEndSim;
-
-	UFUNCTION()
-		void EndSim();
 };

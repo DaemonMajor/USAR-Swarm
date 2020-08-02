@@ -78,8 +78,9 @@ public:
 		FString yString		= FString::FromInt(y);
 		FString zString		= FString::FromInt(z);
 		FString confString	= FString::SanitizeFloat(confidence);
+		FString occString	= (occupied ? "occupied" : "empty");
 
-		return xString + sep + yString + sep + zString + sep + confString;
+		return xString + sep + yString + sep + zString + sep + confString + sep + occString;
 	}
 
 	FORCEINLINE bool operator==(const FLocGridStruct& grid) const
