@@ -9,7 +9,7 @@
 #include "USAR_Constants.h"
 #include "SwarmWP.h"
 #include "VictimActor.h"
-#include "LocGridStruct.h"
+#include "GridStruct.h"
 #include "DrawDebugHelpers.h"
 #include "USARAgent.generated.h"
 
@@ -136,9 +136,9 @@ public:
 		void SetStatusStuck();
 
 	UFUNCTION()
-		void TakeMapData(const TArray<FLocGridStruct> sharedMap);
+		void TakeMapData(const TArray<FGridStruct> sharedMap);
 	UFUNCTION()
-		TArray<FLocGridStruct> UploadMap();
+		TSet<FGridStruct> UploadMap();
 
 	UFUNCTION()
 		void PowerDown();
@@ -175,8 +175,7 @@ protected:
 	UPROPERTY()
 		int expandingSearch;
 	
-	UPROPERTY()
-		TArray<FLocGridStruct> envMap;
+	TSet<FGridStruct> envMap;
 	UPROPERTY()
 		TArray<AVictimActor*> detectedVictims = TArray<AVictimActor*>();
 
@@ -261,7 +260,7 @@ protected:
 	FTimerHandle timerMapShare;
 	void UpdateMap();
 	void ShareMap();
-	int AddGrid(FVector gridLoc, float dist, bool occupied);
+	FGridStruct* AddGrid(FVector loc, bool occupied);
 	/***BEHAVIOR MODULES***/
 
 private:

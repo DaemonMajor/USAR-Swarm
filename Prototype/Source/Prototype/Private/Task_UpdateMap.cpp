@@ -12,7 +12,7 @@ float SnapToGrid(float pt) {
     int tmpPt = static_cast<int>(pt);
 
     if (pt > 0) {
-        return static_cast<float>(tmpPt - abs(tmpPt) % GRID_SIZE);
+        return static_cast<float>(tmpPt - tmpPt % GRID_SIZE);
     }
     else if (pt < 0) {
         return static_cast<float>(tmpPt - (GRID_SIZE - abs(tmpPt) % GRID_SIZE));
@@ -28,17 +28,21 @@ void AUSARAgent::UpdateMap()
 {
     FVector currLoc = GetActorLocation();
 
-    FVector gridLoc;
-    gridLoc.Z = currLoc.Z - VISION_RADIUS;
+    float xMax = currLoc.X + VISION_RADIUS;
+    float yMax = currLoc.Y + VISION_RADIUS;
+    float zMax = currLoc.Z + VISION_RADIUS;
 
-    int numGrids = 0;
-    while (gridLoc.Z < currLoc.Z + VISION_RADIUS) {
-        gridLoc.X = currLoc.X - VISION_RADIUS;
+    float gridZ = currLoc.Z - VISION_RADIUS;
 
-        while (gridLoc.X < currLoc.X + VISION_RADIUS) {
-            gridLoc.Y = currLoc.Y - VISION_RADIUS;
+    while (gridZ <= zMax) {
+        float gridX = currLoc.X - VISION_RADIUS;
 
-            while (gridLoc.Y < currLoc.Y + VISION_RADIUS) {
+        while (gridX <= xMax) {
+            float gridY = currLoc.Y - VISION_RADIUS;
+
+            while (gridY <= yMax) {
+                FVector gridLoc = FVector(gridX, gridY, gridZ);
+
                 float dist = FVector::Dist(currLoc, gridLoc);
 
                 if (dist <= VISION_RADIUS) {
@@ -49,40 +53,33 @@ void AUSARAgent::UpdateMap()
                     queryParams.AddIgnoredActor(this);
 
                     if (!GetWorld()->LineTraceSingleByObjectType(hitResult, currLoc, gridLoc, objectParams, queryParams)) {
-                        AddGrid(gridLoc, dist, false);
+                        AddGrid(gridLoc, false);
                     }
                     else {
-                        float xGrid = SnapToGrid(gridLoc.X);
-                        float yGrid = SnapToGrid(gridLoc.Y);
-                        float zGrid = SnapToGrid(gridLoc.Z);
-                        FVector grid = FVector(xGrid, yGrid, zGrid);
-
-                        float xHit = SnapToGrid(hitResult.ImpactPoint.X);
-                        float yHit = SnapToGrid(hitResult.ImpactPoint.Y);
-                        float zHit = SnapToGrid(hitResult.ImpactPoint.Z);
+                        FVector hitLoc = hitResult.ImpactPoint;
+                        float xHit = SnapToGrid(hitLoc.X);
+                        float yHit = SnapToGrid(hitLoc.Y);
+                        float zHit = SnapToGrid(hitLoc.Z);
                         FVector hitGrid = FVector(xHit, yHit, zHit);
 
-                        dist = FVector::Dist(GetActorLocation(), hitResult.ImpactPoint);
-                        AddGrid(hitResult.ImpactPoint, dist, true);
+                        dist = FVector::Dist(GetActorLocation(), hitLoc);
+                        AddGrid(hitLoc, true);
 
                         /*DEBUGGING*/
                         if (showDebug) {
-                            DrawDebugPoint(GetWorld(), hitResult.ImpactPoint, 5, FColor::Red, false, RATE_MAP_UPDATE);
-                            DrawDebugLine(GetWorld(), hitResult.ImpactPoint, hitGrid, FColor::Orange, false, RATE_MAP_UPDATE, 3.5);
+                            DrawDebugPoint(GetWorld(), hitGrid, 5, FColor::Orange, false, RATE_MAP_UPDATE);
                         }
                         /*DEBUGGING*/
                     }
-
-                    numGrids++;
                 }
 
-                gridLoc.Y += GRID_SIZE;
+                gridY += GRID_SIZE;
             }
 
-            gridLoc.X += GRID_SIZE;
+            gridX += GRID_SIZE;
         }
 
-        gridLoc.Z += GRID_SIZE;
+        gridZ += GRID_SIZE;
     }
 }
 
@@ -92,22 +89,31 @@ void AUSARAgent::UpdateMap()
 *   @param dist Distance between agent and location to add.
 *   @return The map index the grid was added to or found at.
 */
-int AUSARAgent::AddGrid(FVector gridLoc, float dist, bool occupied)
+FGridStruct* AUSARAgent::AddGrid(FVector loc, bool occupied)
 {
-    float x = SnapToGrid(gridLoc.X);
-    float y = SnapToGrid(gridLoc.Y);
-    float z = SnapToGrid(gridLoc.Z);
-    float conf = CONF_INCR * dist / VISION_RADIUS;
+    float x = SnapToGrid(loc.X);
+    float y = SnapToGrid(loc.Y);
+    float z = SnapToGrid(loc.Z);
+    float conf = CONF_INCR * FVector::Dist(GetActorLocation(), loc) / VISION_RADIUS;
 
-    FLocGridStruct grid = FLocGridStruct(x, y, z, conf, GetWorld()->GetTimeSeconds());
-    grid.occupied = occupied;
+    FGridStruct gridToAdd = FGridStruct(x, y, z, conf, GetWorld()->GetTimeSeconds());
+    gridToAdd.occupied = occupied;
+
+    bool isNewGrid;
+    FGridStruct* grid = gridToAdd.InsertInMap(envMap, isNewGrid);
+    if (!isNewGrid) {
+        grid->Combine(gridToAdd);
+    }
+    else {
+        gridsExplored = envMap.Num();
+    }
 
     /*DEBUGGING*/
     if (showDebug) {
-        FVector dbgPt = FVector(grid.x, grid.y, grid.z);
+        FVector dbgPt = FVector(grid->x, grid->y, grid->z);
         float ptSize = 3.5;
         FColor c = FColor::Green;
-        
+
         if (occupied) {
             ptSize = 7;
             c = FColor::Orange;
@@ -117,27 +123,14 @@ int AUSARAgent::AddGrid(FVector gridLoc, float dist, bool occupied)
     }
     /*DEBUGGING*/
 
-    int idx;
-    bool isNewGrid = grid.InsertInMap(envMap, idx);
-    if (!isNewGrid) {
-        envMap[idx].confidence = FMath::Clamp(envMap[idx].confidence + conf, 0.f, 1.f);
-
-        if (occupied) {
-            envMap[idx].occupied = true;
-        }
-    }
-    else {
-        gridsExplored = envMap.Num();
-    }
-
-    return idx;
+    return grid;
 }
 
 /* Dumps map data.
 *
 *   @return Agent's current map representation.
 */
-TArray<FLocGridStruct> AUSARAgent::UploadMap()
+TSet<FGridStruct> AUSARAgent::UploadMap()
 {
     return envMap;
 }
@@ -148,10 +141,10 @@ TArray<FLocGridStruct> AUSARAgent::UploadMap()
 void AUSARAgent::ShareMap()
 {
     float currTime = GetWorld()->GetTimeSeconds();
-    TArray<FLocGridStruct> map;
+    TArray<FGridStruct> map;
 
     // only share recently updated grids
-    for (FLocGridStruct grid : envMap) {
+    for (FGridStruct grid : envMap) {
         if (currTime - grid.lastUpdated < RATE_MAP_SHARE) {
             map.AddUnique(grid);
         }
@@ -164,13 +157,14 @@ void AUSARAgent::ShareMap()
 
 /* Merges given map data with onboard map.
 */
-void AUSARAgent::TakeMapData(const TArray<FLocGridStruct> sharedMap)
+void AUSARAgent::TakeMapData(const TArray<FGridStruct> sharedMap)
 {
-    for (FLocGridStruct grid : sharedMap) {
-        int idx;
-        bool isNewGrid = grid.InsertInMap(envMap, idx);
+    for (FGridStruct sharedGrid : sharedMap) {
+        bool isNewGrid;
+        FGridStruct* grid = sharedGrid.InsertInMap(envMap, isNewGrid);
+
         if (!isNewGrid) {
-            envMap[idx].confidence = FMath::Clamp(envMap[idx].confidence + grid.confidence, 0.f, 1.f);
+            grid->Combine(sharedGrid);
         }
     }
 }

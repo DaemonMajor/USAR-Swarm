@@ -2,7 +2,6 @@
 
 
 #include "ControlStation.h"
-#include "FlockStruct.h"
 #include "SwarmWP.h"
 #include "SwarmSpawnPoint.h"
 #include "../PrototypeGameState.h"
@@ -15,7 +14,8 @@ AControlStation::AControlStation()
 	PrimaryActorTick.bCanEverTick = false;
 
 	simTime		= 3 * 60;		// switch to SIM_LENGTH after debug
-	dispMapType = GridDisp::Box;
+	dispMapType = GridDisp::Point;
+	dispFloor   = false;
 	showMap		= false;
 }
 
@@ -192,13 +192,13 @@ void AControlStation::SwarmInit()
 
 /* Called by agents to update the global environment map.
 */
-void AControlStation::UpdateMap(const TArray<FLocGridStruct> agentMap)
+void AControlStation::UpdateMap(const TArray<FGridStruct> agentMap)
 {
-	for (FLocGridStruct grid : agentMap) {
-		int idx;
-		bool isNewGrid = grid.InsertInMap(envMap, idx);
+	for (FGridStruct sharedGrid : agentMap) {
+		bool isNewGrid;
+		FGridStruct* grid = sharedGrid.InsertInMap(envMap, isNewGrid);
 		if (!isNewGrid) {
-			envMap[idx].confidence = FMath::Clamp(envMap[idx].confidence + grid.confidence, 0.f, 1.f);
+			grid->Combine(sharedGrid);
 		}
 	}
 }
@@ -211,7 +211,7 @@ void AControlStation::DisplayMap(bool showOccupied, bool showEmpty, bool showVic
 		return;
 	}
 
-	for (FLocGridStruct grid : envMap) {
+	for (FGridStruct grid : envMap) {
 		FVector loc		= FVector(grid.x + GRID_SIZE/2, grid.y + GRID_SIZE/2, grid.z + GRID_SIZE/2);
 		FVector boxSize = FVector(GRID_SIZE/2 * .9, GRID_SIZE/2 * .9, GRID_SIZE/2 * .9);
 		FPlane p	= FPlane(loc, FVector(0, 0, 1));
@@ -223,10 +223,26 @@ void AControlStation::DisplayMap(bool showOccupied, bool showEmpty, bool showVic
 
 			switch (dispMapType) {
 				case GridDisp::Point :
-					DrawDebugPoint(GetWorld(), loc, 5, c, true);
+					if (dispFloor) {
+						DrawDebugPoint(GetWorld(), loc, 5, c, true);
+					}
+					else {
+						if (grid.z > 0) {
+							DrawDebugPoint(GetWorld(), loc, 5, c, true);
+						}
+					}
+
 					break;
 				case GridDisp::Box :
-					DrawDebugBox(GetWorld(), loc, boxSize, c, true, -1, 5);
+					if (dispFloor) {
+						DrawDebugBox(GetWorld(), loc, boxSize, c, true, -1, 5);
+					}
+					else {
+						if (grid.z > 0) {
+							DrawDebugBox(GetWorld(), loc, boxSize, c, true, -1, 5);
+						}
+					}
+
 					break;
 			}
 		}
@@ -236,10 +252,26 @@ void AControlStation::DisplayMap(bool showOccupied, bool showEmpty, bool showVic
 
 			switch (dispMapType) {
 				case GridDisp::Point :
-					DrawDebugPoint(GetWorld(), loc, 5, c, true);
+					if (dispFloor) {
+						DrawDebugPoint(GetWorld(), loc, 5, c, true);
+					}
+					else {
+						if (grid.z > 0) {
+							DrawDebugPoint(GetWorld(), loc, 5, c, true);
+						}
+					}
+
 					break;
 				case GridDisp::Box :
-					DrawDebugBox(GetWorld(), loc, boxSize, c, true, -1, 5);
+					if (dispFloor) {
+						DrawDebugBox(GetWorld(), loc, boxSize, c, true, -1, 5);
+					}
+					else {
+						if (grid.z > 0) {
+							DrawDebugBox(GetWorld(), loc, boxSize, c, true, -1, 5);
+						}
+					}
+
 					break;
 			}
 		}
@@ -261,14 +293,14 @@ void AControlStation::SaveMap()
 	// grab map data from flocks
 	// remove after implementing flock return/map dump behavior
 	for (Flock* f : flockData) {
-		AUSARAgent* agent = f->agents[0];
-
-		TArray<FLocGridStruct> map = agent->UploadMap();
-		for (FLocGridStruct grid : map) {
-			int idx;
-			bool isNewGrid = grid.InsertInMap(envMap, idx);
-			if (!isNewGrid) {
-				envMap[idx].confidence = FMath::Clamp(envMap[idx].confidence + grid.confidence, 0.f, 1.f);
+		for (AUSARAgent* agent : f->agents) {
+			TSet<FGridStruct> map = agent->UploadMap();
+			for (FGridStruct agentGrid : map) {
+				bool isNewGrid;
+				FGridStruct* grid = agentGrid.InsertInMap(envMap, isNewGrid);
+				if (!isNewGrid) {
+					grid->Combine(agentGrid);
+				}
 			}
 		}
 	}
@@ -286,7 +318,7 @@ void AControlStation::SaveMap()
 
 	FString mapData = "";
 	FString vicData = "";
-	for (FLocGridStruct grid : envMap) {
+	for (FGridStruct grid : envMap) {
 		FString gridData = grid.ToString();
 		gridData += LINE_TERMINATOR;
 		mapData += gridData;
