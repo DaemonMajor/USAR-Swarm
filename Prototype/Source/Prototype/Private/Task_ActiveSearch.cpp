@@ -2,12 +2,65 @@
 
 void AUSARAgent::ActiveSearchHandle()
 {
-    if (statusActiveSearch) {
-        ActiveSearchTask();
+    alignWeight  = 0;
+    cohWeight    = 0;
+    targetHeight = SEARCH_HEIGHT;
+
+    switch (searchBehaviorType) {
+        case SearchBehavior::BehaviorBased : {
+            expandingSearch = 1;
+
+            GetWorldTimerManager().SetTimer(timerBBSearchRevolve, this, &AUSARAgent::BBSearch_Revolve, RATE_BBSEARCH_R, true);
+            GetWorldTimerManager().SetTimer(timerBBSearchExpand, this, &AUSARAgent::BBSearch_Expand, RATE_BBSEARCH_E, true);
+                
+            break;
+        }
+        case SearchBehavior::RandomWalk : {
+            FRotator turnDeg = FRotator(0, FMath::RandRange(0, 360), 0);
+            searchVector = FVector(SEARCH_SPEED, 0, 0);
+            searchVector = turnDeg.RotateVector(searchVector);
+
+            GetWorldTimerManager().SetTimer(timerRandWalkSearchStep, this, &AUSARAgent::RandWalkSearchStep, RATE_RWSEARCH, true);
+
+            FTimerHandle timerRWSearch;
+            GetWorldTimerManager().SetTimer(timerRWSearch, this, &AUSARAgent::RandWalkSearch_End, RWSEARCH_LENGTH, false);
+
+            break;
+        }
+        default :
+            statusReadyToSearch = false;
+            statusLoitering     = true;
+            flockWPs.RemoveAt(0);
     }
 }
 
-void AUSARAgent::ActiveSearchTask()
+/* Determines if the flock is ready to enter search behavior by checking if all neighbors' statusReadyToSearch.
+*
+*/
+void AUSARAgent::FlockReadyToSearch()
+{
+    for (AUSARAgent* n : neighborAgents) {
+        if (!(n->statusReadyToSearch || n->statusActiveSearch)) {
+            return;
+        }
+    }
+
+    GetWorldTimerManager().ClearTimer(timerCheckSearchReady);
+    
+    statusReadyToSearch = false;
+    statusActiveSearch = true;
+
+    ActiveSearchHandle();
+
+    /*DEBUGGING*/
+    if (showDebug) {
+        FString searchDbgTxt = FString::Printf(TEXT("Agent %d ready to search."), agentID);
+        GEngine->AddOnScreenDebugMessage(INDEX_NONE, 2.5f, FColor::Yellow, searchDbgTxt, true);
+    }
+    /*DEBUGGING*/
+}
+
+void AUSARAgent::BBSearch_Revolve()
 {
     FVector centerPt;
     if (GetCurrFlockWP(centerPt)) {
@@ -25,60 +78,20 @@ void AUSARAgent::ActiveSearchTask()
 
         /*DEBUGGING*/
         if (showDebug) {
-            DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + searchVector, 10.f, FColor::Orange, false, 0.25, 0, 1.f);
+            DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + searchVector, 10.f, FColor::Yellow, false, 0.25, 0, 1.f);
         }
         /*DEBUGGING*/
     }
 }
 
-/* Determines if the flock is ready to enter search behavior by checking if all neighbors' statusReadyToSearch.
-*
-*/
-void AUSARAgent::FlockReadyToSearch()
-{
-    for (AUSARAgent* n : neighborAgents) {
-        if (!(n->statusReadyToSearch || n->statusActiveSearch)) {
-            return;
-        }
-    }
-
-    GetWorldTimerManager().ClearTimer(timerCheckSearchReady);
-    GetWorldTimerManager().ClearTimer(timerMoveTask);
-    GetWorldTimerManager().SetTimer(timerSearchTask, this, &AUSARAgent::ActiveSearchHandle, RATE_SEARCH_TASK, true);
-
-    BeginSearch();
-}
-
-/* Initiates search behavior.
-*
-*/
-void AUSARAgent::BeginSearch() {
-    alignWeight = 0;
-    cohWeight = 0;
-    targetHeight = SEARCH_HEIGHT;
-
-    statusReadyToSearch = false;
-    statusActiveSearch = true;
-
-    expandingSearch = 1;
-    GetWorldTimerManager().SetTimer(timerSearchExpand, this, &AUSARAgent::ExpandSearch, 2.5, true);
-}
-
 /* Expands then contracts search area covered by flock. Exits search behavior when done.
 *
 */
-void AUSARAgent::ExpandSearch()
+void AUSARAgent::BBSearch_Expand()
 {
     FVector toCenter = flockWPs[0] - GetActorLocation();
     toCenter.Z = 0;
     float distToCtr = toCenter.Size();
-
-    /*DEBUGGING*/
-    if (showDebug) {
-        FString searchRadText = FString::Printf(TEXT("Agent %d [%f] from wp."), agentID, distToCtr);
-        GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Yellow, searchRadText, true);
-    }
-    /*DEBUGGING*/
 
     if (expandingSearch > 0) {
         sepWeight += 5;
@@ -95,18 +108,7 @@ void AUSARAgent::ExpandSearch()
         if (sepWeight > SEPARATION_WEIGHT) {
             sepWeight -= 5;
         }
-        if (agentSpacing > AGENT_SPACING) {
-            agentSpacing -= 50;
-        }
-
-        //int readyNeighbors = 1;     //include self
-        //for (AUSARAgent* n : neighborAgents) {
-        //    if (!n->statusActiveSearch) {
-        //        readyNeighbors++;
-        //    }
-        //}
-
-        if (sepWeight <= SEPARATION_WEIGHT) {
+        else {
         //if (distToCtr < 100 * sqrt(10 * (readyNeighbors))) {
             alignWeight  = ALIGNMENT_WEIGHT;
             cohWeight    = COHESION_WEIGHT;
@@ -115,15 +117,39 @@ void AUSARAgent::ExpandSearch()
 
             expandingSearch = 0;
 
-            statusActiveSearch  = false;
-            statusLoitering     = true;
+            statusActiveSearch = false;
+            statusLoitering    = true;
             flockWPs.RemoveAt(0);
 
-            GetWorldTimerManager().ClearTimer(timerSearchTask);
-            GetWorldTimerManager().ClearTimer(timerSearchExpand);
+            GetWorldTimerManager().ClearTimer(timerBBSearchExpand);
+            GetWorldTimerManager().ClearTimer(timerBBSearchRevolve);
             GetWorldTimerManager().SetTimer(timerCheckMoveReady, this, &AUSARAgent::FlockReadyToMove, 1.f, true, CalcWaitTime());
         }
     }
+}
+
+/* Random walk based search behavior.
+*/
+void AUSARAgent::RandWalkSearchStep()
+{
+    float bNewDir = FMath::FRand();
+
+    if (bNewDir > RW_MOMENTUM) {
+        FRotator turnDeg = FRotator(0, FMath::RandRange(-90, 90), 0);
+        searchVector = turnDeg.RotateVector(searchVector);
+    }
+}
+
+void AUSARAgent::RandWalkSearch_End()
+{
+    alignWeight  = ALIGNMENT_WEIGHT;
+    cohWeight    = COHESION_WEIGHT;
+    sepWeight    = SEPARATION_WEIGHT;
+    targetHeight = MOVE_HEIGHT;
+
+    GetWorldTimerManager().SetTimer(timerMoveTask, this, &AUSARAgent::MoveToWPHandle, RATE_WP_TASK, true);
+
+    GetWorldTimerManager().ClearTimer(timerRandWalkSearchStep);
 }
 
 float AUSARAgent::CalcWaitTime()

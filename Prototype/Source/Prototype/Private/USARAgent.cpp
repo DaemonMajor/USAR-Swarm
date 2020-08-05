@@ -17,6 +17,8 @@ AUSARAgent::AUSARAgent()
 
 	showDebug = false;
 
+	searchBehaviorType = SearchBehavior::BehaviorBased;
+
 	// all lengths in cm (UE units)
 	targetHeight	= MOVE_HEIGHT;
 	heightVariance	= targetHeight * 0.05;
@@ -143,7 +145,6 @@ void AUSARAgent::BootUpSequence()
 	GetWorldTimerManager().SetTimer(timerHeightTask, this, &AUSARAgent::MaintainHeightHandle, RATE_HEIGHT_TASK, true);
 	GetWorldTimerManager().SetTimer(timerFlockTask, this, &AUSARAgent::FlockHandle, RATE_FLOCK_TASK, true);
 	GetWorldTimerManager().SetTimer(timerCheckMoveReady, this, &AUSARAgent::FlockReadyToMove, 1.f, true);
-	GetWorldTimerManager().SetTimer(timerDetectionTask, this, &AUSARAgent::DetectionTask, RATE_IMAGE_SCAN, true);
 	GetWorldTimerManager().SetTimer(timerMapUpdate, this, &AUSARAgent::UpdateMap, RATE_MAP_UPDATE, true);
 	GetWorldTimerManager().SetTimer(timerMapShare, this, &AUSARAgent::ShareMap, RATE_MAP_SHARE, true);
 
@@ -201,14 +202,14 @@ void AUSARAgent::ScanNeighbors()
 	for (AActor* agentActor : foundNeighbors) {
 		AUSARAgent* agent = Cast<AUSARAgent>(agentActor);
 
-		//if (!agent->statusStuck) {
+		if (!agent->statusStuck) {
 			float dist = FVector::Distance(GetActorLocation(), agent->GetActorLocation());
 			if (dist <= NEIGHBOR_RADIUS) {
 				if (!neighborAgents.Contains(agent)) {
 					neighborAgents.Add(agent);
 				}
 			}
-		//}
+		}
 	}
 
 	flockSize = neighborAgents.Num() + 1;
@@ -228,7 +229,7 @@ void AUSARAgent::OnNeighborEnter(UPrimitiveComponent* agentSensor, AActor* neigh
 		AUSARAgent* boid = Cast<AUSARAgent>(neighbor);
 
 		if (boid && (boid != this)) {
-			//if (!boid->statusStuck) {
+			if (!boid->statusStuck) {
 				if (flockID == boid->flockID) {
 					if (!neighborAgents.Contains(boid)) {
 						neighborAgents.Add(boid);
@@ -237,7 +238,7 @@ void AUSARAgent::OnNeighborEnter(UPrimitiveComponent* agentSensor, AActor* neigh
 						numNeighbors++;
 					}
 				}
-			//}
+			}
 		}
 	}
 }
@@ -252,42 +253,15 @@ void AUSARAgent::OnNeighborLeave(UPrimitiveComponent* agentSensor, AActor* neigh
 
 	if (eventFromSensor && senseNeighborBody) {
 		if (AUSARAgent* boid = Cast<AUSARAgent>(neighbor)) {
-			//if (!boid->statusStuck) {
+			if (!boid->statusStuck) {
 				if (flockID == boid->flockID) {
 					neighborAgents.Remove(boid);
 
 					flockSize--;
 					numNeighbors--;
 				}
-			//}
+			}
 		}
-	}
-}
-
-/* Agent behavior when a victim is detected.
-*
-*/
-void AUSARAgent::OnDetectHuman(UPrimitiveComponent* agentSensor, AActor* victim, UPrimitiveComponent* humanBody, int32 neighborIndex,
-							   bool bFromSweep, const FHitResult& SweepResult)
-{
-	bool eventFromSensor = !(agentSensor->GetName().Compare("VisionSensor"));
-	bool senseVictim = victim->IsA(AVictimActor::StaticClass());
-
-	if (eventFromSensor && senseVictim) {
-		victimsInRange.AddUnique(Cast<AVictimActor>(victim));
-	}
-}
-
-/* Agent behavior when a victim leaves the range of agent's sensors.
-*
-*/
-void AUSARAgent::OnUnDetectHuman(UPrimitiveComponent* agentSensor, AActor* victim, UPrimitiveComponent* humanBody, int32 neighborIndex)
-{
-	bool eventFromSensor = !(agentSensor->GetName().Compare("VisionSensor"));
-	bool senseVictim = victim->IsA(AVictimActor::StaticClass());
-
-	if (eventFromSensor && senseVictim) {
-		victimsInRange.Remove(Cast<AVictimActor>(victim));
 	}
 }
 
@@ -427,6 +401,15 @@ void AUSARAgent::MoveAgent(float deltaSec)
 //	return deltaTurn;
 //}
 
+/* Sets the base station location. The agent will return to this location when out of waypoints.
+*
+*	@param stationLoc The location of the station.
+*/
+void AUSARAgent::SetBaseStation(FVector stationLoc)
+{
+	baseStation = stationLoc;
+}
+
 /* Add a waypoint to the agent's list of target flockWPs.
 *
 *	@param wp WP to add.
@@ -476,6 +459,8 @@ void AUSARAgent::SetStatusStuck()
 	// remove agent from neighbor's lists
 	for (AUSARAgent* n : neighborAgents) {
 		n->neighborAgents.Remove(this);
+		n->numNeighbors--;
+		n->flockSize--;
 	}
 
 	/*DEBUGGING*/

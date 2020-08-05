@@ -17,22 +17,22 @@ void AUSARAgent::FlockTask()
     }
     else {
         FVector alignFactor = alignWeight * GetAlignment();
-        FVector cohFactor = cohWeight * GetCohesion();
-        FVector sepFactor = sepWeight * GetSeparation();
+        FVector cohFactor   = cohWeight * GetCohesion();
+        FVector sepFactor   = sepWeight * GetSeparation();
 
         flockVector = CalcNewVector(alignFactor, cohFactor, sepFactor);
 
         /*DEBUGGING*/
-        alignmentFactor = alignFactor.Size();
-        cohesionFactor = cohFactor.Size();
+        alignmentFactor  = alignFactor.Size();
+        cohesionFactor   = cohFactor.Size();
         separationFactor = sepFactor.Size();
         /*DEBUGGING*/
     }
 
     /*DEBUGGING*/
-    if (showDebug) {
-        DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + flockVector, 10.f, FColor::Turquoise, false, 0.15, 0, 1.f);
-    }
+    //if (showDebug) {
+    //    DrawDebugDirectionalArrow(GetWorld(), GetActorLocation(), GetActorLocation() + flockVector, 10.f, FColor::Turquoise, false, 0.15, 0, 1.f);
+    //}
     /*DEBUGGING*/
 }
 
@@ -70,19 +70,24 @@ FVector AUSARAgent::GetAlignment()
 */
 FVector AUSARAgent::GetCohesion()
 {
+    float fSize = static_cast<float>(flockSize);
+
     FVector centerMass = FVector::ZeroVector;
 
-    TArray<AUSARAgent*> neighbors = GetNeighbors();
-    for (AUSARAgent* boid : neighbors) {
-        if (boid) {
-            centerMass += boid->GetActorLocation();
-        }
+    for (AUSARAgent* boid : neighborAgents) {
+        centerMass += boid->GetActorLocation();
     }
-    centerMass /= neighbors.Num();
-    centerMass -= GetActorLocation();
-
-    /*DEBUGGING*/
+    
     flockCenter = centerMass + GetActorLocation();
+    flockCenter /= fSize;
+
+    centerMass /= fSize - 1;
+    centerMass -= GetActorLocation();
+    
+    /*DEBUGGING*/
+    if (showDebug) {
+        DrawDebugPoint(GetWorld(), flockCenter, 25, FColor::Purple, false, RATE_FLOCK_TASK);
+    }
     /*DEBUGGING*/
 
     return centerMass;

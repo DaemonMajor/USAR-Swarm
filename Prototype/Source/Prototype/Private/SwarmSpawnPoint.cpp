@@ -35,6 +35,7 @@ TArray<AUSARAgent*> ASwarmSpawnPoint::SpawnAgents()
 		FVector agentPos = GetRandLoc();
 
 		AUSARAgent* agent = GetWorld()->SpawnActor<AUSARAgent>(agentPos + GetActorLocation(), FRotator::ZeroRotator);
+		agent->SetBaseStation(GetActorLocation());
 		swarm.Add(agent);
 
 		numAgentsToSpawn--;

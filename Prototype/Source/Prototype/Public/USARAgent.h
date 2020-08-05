@@ -26,6 +26,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		bool isInitialized = false;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int searchBehaviorType;
+
 	/* FOR DEBUGGING ONLY */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool showDebug;
@@ -36,7 +39,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		int numNeighbors = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		int flockSize = 1;		// only set before entering search behavior
+		int flockSize = 1;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FVector agentVelocity;	// velocity in local coordinates
@@ -124,6 +127,8 @@ public:
 		void SetVelocity();								// set new velocity based on component vectors (avoidanceVector, flockVector, flockWPVector)
 	
 	UFUNCTION()
+		void SetBaseStation(FVector stationLoc);
+	UFUNCTION()
 		void AddFlockWP(FVector wp, bool atEnd = true);	// append waypoint to list of target waypoints
 	UFUNCTION()
 		void RemoveFlockWP(FVector wp);					// remove waypoint from list of target waypoints
@@ -165,10 +170,12 @@ protected:
         TArray<AUSARAgent*> neighborAgents = TArray<AUSARAgent*>();
 	UPROPERTY()
 		TArray<AVictimActor*> victimsInRange = TArray<AVictimActor*>();
+
 	UPROPERTY()
 		TArray<FVector> flockWPs = TArray<FVector>();
 	UPROPERTY()
-		TArray<FVector> searchWPs = TArray<FVector>();
+		FVector baseStation;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FVector directMoveLoc;
 
@@ -204,9 +211,7 @@ protected:
 	//UFUNCTION()
 	//	FRotator FaceDirection(FVector dir, float deltaSec);	// Rotate agent on z-axis to face specified direction.
 
-	UFUNCTION()
-		int CheckDetections();
-
+	
 	/***BEHAVIOR MODULES***/
 	void ObstAvoidHandle();
 	void ActiveSearchHandle();
@@ -226,16 +231,18 @@ protected:
 	FTimerHandle timerDetectionTask;
 	void DetectionTask();
 
-	// active search behavior
-	FTimerHandle timerSearchTask;
-	FTimerHandle timerSearchExpand;
+	// search behavior
 	FTimerHandle timerCheckSearchReady;
-	void ActiveSearchTask();
-	void BeginSearch();
-	void ExpandSearch();
+	FTimerHandle timerBBSearchRevolve;
+	FTimerHandle timerBBSearchExpand;
+	FTimerHandle timerRandWalkSearchStep;
 	void FlockReadyToSearch();
 	float CalcWaitTime();
-	
+	void BBSearch_Revolve();
+	void BBSearch_Expand();
+	void RandWalkSearchStep();
+	void RandWalkSearch_End();
+
 	// height maintenance behavior
 	FTimerHandle timerHeightTask;
 	void MaintainHeightTask();
@@ -254,7 +261,7 @@ protected:
 	void MoveToWPTask();
 	void CheckAtWP();
 	void FlockReadyToMove();
-
+	
 	// update map behavior
 	FTimerHandle timerMapUpdate;
 	FTimerHandle timerMapShare;

@@ -27,14 +27,9 @@ void AUSARAgent::MaintainHeightHandle()
 void AUSARAgent::MaintainHeightTask()
 {
     float agentHeight = GetActorLocation().Z;
-
+    
     FVector correctionVector = FVector::ZeroVector;
-    if (agentHeight < targetHeight) {
-        correctionVector.Z = MAX_SPEED/2;   // fly up at half max thrust
-    }
-    else if (agentHeight > targetHeight) {
-        correctionVector.Z = -(MAX_SPEED/2);   // fly down at half max thrust
-    }
-
+    correctionVector.Z = FMath::Clamp(targetHeight - agentHeight, -MAX_SPEED, MAX_SPEED);
+    
     heightVector = correctionVector;
 }

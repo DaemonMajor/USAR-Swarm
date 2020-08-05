@@ -21,6 +21,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int simTime;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int searchBehaviorType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		int dispMapType;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool dispFloor;

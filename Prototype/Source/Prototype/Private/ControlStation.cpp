@@ -13,10 +13,11 @@ AControlStation::AControlStation()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	simTime		= 3 * 60;		// switch to SIM_LENGTH after debug
-	dispMapType = GridDisp::Point;
-	dispFloor   = false;
-	showMap		= false;
+	simTime				= 5 * 60;		// switch to SIM_LENGTH after debug
+	searchBehaviorType	= SearchBehavior::BehaviorBased;
+	dispMapType			= GridDisp::Point;
+	dispFloor			= false;
+	showMap				= false;
 }
 
 // Called when the game starts or when spawned
@@ -34,7 +35,8 @@ void AControlStation::BeginPlay()
 	GetWorldTimerManager().SetTimer(timerEndSim, this, &AControlStation::EndSim, simTime, false);
 
 	// Create log directory for maps.
-	logDir = FPaths::ProjectLogDir();
+	logDir = FString(LOG_DIR);
+	logDir.Append("Env_Map_Results/");
 	logDir.Append("USAR_Simulation_");
 	logDir.Append(FDateTime::Now().ToString());
 	logDir.Append("/");
@@ -52,7 +54,9 @@ void AControlStation::BeginPlay()
 void AControlStation::AddAgent(AUSARAgent* agent)
 {
 	agent->SetID(numAgents);
-	numAgents++;
+	agent->searchBehaviorType = searchBehaviorType;
+
+	numAgents++
 }
 
 /* Assigns the passed agent to the specified flock. A new flock with flockID will be formed if one does not exist.

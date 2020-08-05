@@ -5,13 +5,8 @@
 
 void AUSARAgent::MoveToWPHandle()
 {
-    if (!statusActiveSearch) {
-        MoveToWPTask();
-
-        if (statusTraveling) {
-            CheckAtWP();
-        }
-    }
+    MoveToWPTask();
+    CheckAtWP();
 }
 
 void AUSARAgent::MoveToWPTask()
@@ -43,21 +38,32 @@ void AUSARAgent::CheckAtWP()
     float dist = FVector::DistXY(flockCenter, flockWPs[0]);
     float wpTol = 5 * numNeighbors + WP_TOLERANCE;
     if (dist < wpTol) {
-        statusTraveling = false;
-        statusReadyToSearch = true;
+        GetWorldTimerManager().ClearTimer(timerMoveTask);
 
-        GetWorldTimerManager().SetTimer(timerCheckSearchReady, this, &AUSARAgent::FlockReadyToSearch, 1.f, true);
+        if (statusActiveSearch) {
+            statusActiveSearch = false;
+            statusLoitering    = true;
+            flockWPs.RemoveAt(0);
+
+            GetWorldTimerManager().SetTimer(timerCheckMoveReady, this, &AUSARAgent::FlockReadyToMove, 1.f, true, CalcWaitTime());
+        }
+        else {
+            statusTraveling     = false;
+            statusReadyToSearch = true;
+
+            GetWorldTimerManager().SetTimer(timerCheckSearchReady, this, &AUSARAgent::FlockReadyToSearch, 1.f, true);
+        }
     }
 
     /*DEBUGGING*/
     if (showDebug) {
-        //FString atWPText = FString::Printf(TEXT("Flock %f from waypoint."), dist);
-        //GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Green, atWPText, true);
+        FString atWPText = FString::Printf(TEXT("Flock %d [%f] from waypoint (tol: %f)."), flockID, dist, wpTol);
+        GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Yellow, atWPText, true);
     }
     /*DEBUGGING*/
 }
 
-/* Determines if the flock is ready to move to the next waypoint as a group.
+/* Determines if the flock is ready to move to the next waypoint as a group. If no waypoints exist, the control station is set as the waypoint.
 *
 *	@return True if the flock is ready, false if not.
 */
@@ -68,6 +74,10 @@ void AUSARAgent::FlockReadyToMove()
         if (!(n->statusLoitering || n->statusTraveling)) {
             return;
         }
+    }
+
+    if (!flockWPs.Num()) {
+        flockWPs.Add(baseStation);
     }
 
     statusLoitering = false;

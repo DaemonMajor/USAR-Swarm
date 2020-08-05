@@ -3,6 +3,8 @@
 //#ifndef USAR_CONSTANTS_H
 //#define USAR_CONSTANTS_H
 
+inline constexpr char* LOG_DIR                  = "B:/Documents/Strathclyde/Master's Thesis/USAR_Swarm/";
+
 inline constexpr float SIM_LENGTH               = 60 * 60;
 inline constexpr int GRID_SIZE                  = 50;
 
@@ -18,13 +20,17 @@ inline constexpr float VISION_RADIUS            = 500;
 inline constexpr float OBSTACLE_AVOID_DIST      = 100;
 
 inline constexpr float RATE_AVOID_TASK          = 0.005;
-inline constexpr float RATE_IMAGE_SCAN          = 0.1;
-inline constexpr float RATE_SEARCH_TASK         = 0.15;
 inline constexpr float RATE_HEIGHT_TASK         = 0.25;
 inline constexpr float RATE_FLOCK_TASK          = 0.15;
 inline constexpr float RATE_WP_TASK             = 0.30;
 inline constexpr float RATE_MAP_UPDATE          = 0.25;
 inline constexpr float RATE_MAP_SHARE           = 1.f;
+
+inline constexpr float RATE_BBSEARCH_R          = 0.15;
+inline constexpr float RATE_BBSEARCH_E          = 3;
+inline constexpr float RATE_RWSEARCH            = 0.15;
+inline constexpr float RWSEARCH_LENGTH          = 60;
+inline constexpr float RW_MOMENTUM              = 0.5;
 
 inline constexpr float WAIT_FACTOR              = 5;
 
@@ -34,7 +40,7 @@ inline constexpr float SEARCH_HEIGHT            = 100;
 inline constexpr float WP_TOLERANCE             = 25;
 
 inline constexpr float ALIGNMENT_WEIGHT         = 0.1;
-inline constexpr float COHESION_WEIGHT          = 1.5;
+inline constexpr float COHESION_WEIGHT          = 0.75;
 inline constexpr float MAX_COHESION_WEIGHT      = 25;
 inline constexpr float SEPARATION_WEIGHT        = 3.5;
 inline constexpr float MAX_SEPARATION_WEIGHT    = 100;
@@ -58,4 +64,12 @@ enum GridDisp {
     Point,
     Box
 };
+
+enum SearchBehavior {
+    None,
+    BehaviorBased,
+    RandomWalk,
+    Frontier
+};
+
 //#endif

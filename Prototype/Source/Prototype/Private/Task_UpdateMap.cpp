@@ -81,6 +81,8 @@ void AUSARAgent::UpdateMap()
 
         gridZ += GRID_SIZE;
     }
+
+    DetectionTask();
 }
 
 /* Adds grid holding location gridLoc into map. Increments confidence value if grid already exists.
