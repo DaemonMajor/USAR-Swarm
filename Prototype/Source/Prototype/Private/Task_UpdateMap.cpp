@@ -66,9 +66,9 @@ void AUSARAgent::UpdateMap()
                         AddGrid(hitLoc, true);
 
                         /*DEBUGGING*/
-                        if (showDebug) {
-                            DrawDebugPoint(GetWorld(), hitGrid, 5, FColor::Orange, false, RATE_MAP_UPDATE);
-                        }
+                        //if (showDebug) {
+                        //    DrawDebugPoint(GetWorld(), hitGrid, 5, FColor::Orange, false, RATE_MAP_UPDATE);
+                        //}
                         /*DEBUGGING*/
                     }
                 }
@@ -111,18 +111,18 @@ FGridStruct* AUSARAgent::AddGrid(FVector loc, bool occupied)
     }
 
     /*DEBUGGING*/
-    if (showDebug) {
-        FVector dbgPt = FVector(grid->x, grid->y, grid->z);
-        float ptSize = 3.5;
-        FColor c = FColor::Green;
+    //if (showDebug) {
+    //    FVector dbgPt = FVector(grid->x, grid->y, grid->z);
+    //    float ptSize = 3.5;
+    //    FColor c = FColor::Green;
 
-        if (occupied) {
-            ptSize = 7;
-            c = FColor::Orange;
-        }
+    //    if (occupied) {
+    //        ptSize = 7;
+    //        c = FColor::Orange;
+    //    }
 
-        DrawDebugPoint(GetWorld(), dbgPt, ptSize, c, false, RATE_MAP_UPDATE);
-    }
+    //    DrawDebugPoint(GetWorld(), dbgPt, ptSize, c, false, RATE_MAP_UPDATE);
+    //}
     /*DEBUGGING*/
 
     return grid;

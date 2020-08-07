@@ -71,6 +71,8 @@ public:
 		FVector sepVector;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		float distToWP;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		int gridsExplored;
 	/* =============== */
 
@@ -96,6 +98,8 @@ public:
 		bool statusTraveling;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		bool statusLoitering;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+		bool statusRTB;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		float targetHeight;			// height to maintain
@@ -170,7 +174,11 @@ protected:
         TArray<AUSARAgent*> neighborAgents = TArray<AUSARAgent*>();
 	UPROPERTY()
 		TArray<AVictimActor*> victimsInRange = TArray<AVictimActor*>();
+	UPROPERTY()
+		TArray<AVictimActor*> locatedVictims = TArray<AVictimActor*>();
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly)
+		int numWPs;
 	UPROPERTY()
 		TArray<FVector> flockWPs = TArray<FVector>();
 	UPROPERTY()
@@ -221,6 +229,7 @@ protected:
 
 	// obstacle avoidance behavior
 	FTimerHandle timerAvoidTask;
+	void MaintainPersonalSpace(int numPoints);
 	void ObstAvoidTask();
 	TArray<FVector> LookAhead(FVector vel, bool& obstructed);
 	bool CheckVector(FVector vector);
@@ -230,6 +239,7 @@ protected:
 	// survivor detection behavior
 	FTimerHandle timerDetectionTask;
 	void DetectionTask();
+	void ReceiveVictimData(AVictimActor* vic);
 
 	// search behavior
 	FTimerHandle timerCheckSearchReady;
@@ -240,8 +250,10 @@ protected:
 	float CalcWaitTime();
 	void BBSearch_Revolve();
 	void BBSearch_Expand();
+	void MoveToVictim(AVictimActor* vic);
 	void RandWalkSearchStep();
 	void RandWalkSearch_End();
+	bool investigatingVic;
 
 	// height maintenance behavior
 	FTimerHandle timerHeightTask;
@@ -259,6 +271,7 @@ protected:
 	FTimerHandle timerMoveTask;
 	FTimerHandle timerCheckMoveReady;
 	void MoveToWPTask();
+	void FollowBestNeighbor();
 	void CheckAtWP();
 	void FlockReadyToMove();
 	

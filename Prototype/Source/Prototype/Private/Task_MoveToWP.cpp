@@ -2,10 +2,13 @@
 
 
 #include "USARAgent.h"
+#include "../PrototypeGameState.h"
+
 
 void AUSARAgent::MoveToWPHandle()
 {
     MoveToWPTask();
+    FollowBestNeighbor();
     CheckAtWP();
 }
 
@@ -29,6 +32,24 @@ void AUSARAgent::MoveToWPTask()
     flockWPVector = targetVector;
 }
 
+/* Moves toward the neighbor closest to the waypoint (chance-based).
+*/
+void AUSARAgent::FollowBestNeighbor()
+{
+    distToWP = FVector::DistXY(GetActorLocation(), flockWPs[0]);
+
+    if (FMath::FRand() < CHANCE_FOLLOW) {
+        AUSARAgent* agentToFollow = this;
+        for (AUSARAgent* n : neighborAgents) {
+            if (n->distToWP < agentToFollow->distToWP) {
+                agentToFollow = n;
+            }
+        }
+
+        flockWPVector += agentToFollow->GetActorLocation() - GetActorLocation();
+    }
+}
+
 void AUSARAgent::CheckAtWP()
 {
     if (!flockWPs.Num()) {
@@ -40,10 +61,18 @@ void AUSARAgent::CheckAtWP()
     if (dist < wpTol) {
         GetWorldTimerManager().ClearTimer(timerMoveTask);
 
-        if (statusActiveSearch) {
+        flockWPVector = FVector::ZeroVector;
+
+        if (statusRTB) {
+            GetWorld()->GetGameState<APrototypeGameState>()->station->UpdateMap(envMap);
+
+            PowerDown();
+        }
+        else if (statusActiveSearch) {
             statusActiveSearch = false;
             statusLoitering    = true;
             flockWPs.RemoveAt(0);
+            numWPs--;
 
             GetWorldTimerManager().SetTimer(timerCheckMoveReady, this, &AUSARAgent::FlockReadyToMove, 1.f, true, CalcWaitTime());
         }
@@ -78,6 +107,9 @@ void AUSARAgent::FlockReadyToMove()
 
     if (!flockWPs.Num()) {
         flockWPs.Add(baseStation);
+        numWPs++;
+
+        statusRTB = true;
     }
 
     statusLoitering = false;

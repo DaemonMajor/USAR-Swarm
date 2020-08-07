@@ -16,8 +16,11 @@ AUSARAgent::AUSARAgent()
  	PrimaryActorTick.bCanEverTick = true;
 
 	showDebug = false;
+	
+	numWPs    = 0;
+	distToWP = 0;
 
-	searchBehaviorType = SearchBehavior::BehaviorBased;
+	searchBehaviorType = SearchBehavior::Spiral;
 
 	// all lengths in cm (UE units)
 	targetHeight	= MOVE_HEIGHT;
@@ -36,8 +39,11 @@ AUSARAgent::AUSARAgent()
 	statusClimbing		= false;
 	statusTraveling		= false;
 	statusLoitering		= false;
+	statusRTB			= false;
 
-	expandingSearch = 0;
+	expandingSearch  = 0;
+	investigatingVic = false;
+
 	gridsExplored	= 0;
 
 	agentVelocity	= FVector::ZeroVector;
@@ -175,6 +181,7 @@ void AUSARAgent::PowerDown()
 	statusClimbing		= false;
 	statusTraveling		= false;
 	statusLoitering		= false;
+	statusRTB			= false;
 }
 
 /* Add all nearby neighbors to neighbor list. Should be called on agent bootup.
@@ -422,6 +429,8 @@ void AUSARAgent::AddFlockWP(FVector wp, bool atEnd)
 	else {
 		flockWPs.Insert(wp, 0);
 	}
+
+	numWPs++;
 }
 
 /* Remove a waypoint from the agent's list of target flockWPs.
@@ -431,6 +440,8 @@ void AUSARAgent::AddFlockWP(FVector wp, bool atEnd)
 void AUSARAgent::RemoveFlockWP(FVector wp)
 {
 	flockWPs.Remove(wp);
+
+	numWPs--;
 }
 
 /* Clear all waypoints from the agent's list of target flockWPs.
@@ -439,6 +450,8 @@ void AUSARAgent::RemoveFlockWP(FVector wp)
 void AUSARAgent::ClearFlockWPs()
 {
 	flockWPs.Empty();
+
+	numWPs = 0;
 }
 
 /* Set agent status to stuck and power down non-vital systems.

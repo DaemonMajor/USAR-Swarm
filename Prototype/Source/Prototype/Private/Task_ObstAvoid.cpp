@@ -7,32 +7,87 @@
 
 void AUSARAgent::ObstAvoidHandle()
 {
-    if (!statusStuck) {     // add cases here if obstacle avoidance should be turned off
-        ObstAvoidTask();
+    ObstAvoidTask();
+    MaintainPersonalSpace(8);
+}
+
+void AUSARAgent::MaintainPersonalSpace(int numPoints)
+{
+    FVector agentLoc = GetActorLocation();
+    float phi = (1.f + sqrtf(5.f)) / 2.f;
+
+    for (int i = 0; i < numPoints; i++) {
+        float itr   = float(-numPoints + 1 + 2 * i);
+        float theta = 2 * PI * itr / phi;
+        float sPhi  = itr / numPoints;
+        float cPhi  = sqrtf(FMath::Square(numPoints) - FMath::Square(itr)) / numPoints;
+
+        float x = cPhi * sinf(theta);
+        float y = cPhi * cosf(theta);
+        float z = sPhi;
+
+        FVector checkVec = (BODY_SIZE + SAFETY_DIST) * FVector(x, y, z) + agentLoc;
+
+        FHitResult hitResult;
+        FCollisionQueryParams queryParams;
+        queryParams.AddIgnoredActor(this);
+        FCollisionResponseParams responseParams;
+
+        if (GetWorld()->LineTraceSingleByChannel(hitResult, GetActorLocation(), checkVec, ECC_WorldStatic, queryParams, responseParams)) {
+            FVector obstDir = hitResult.ImpactPoint - GetActorLocation();
+            avoidanceVector -= obstDir;
+
+            /*DEBUGGING*/
+            if (showDebug) {
+                DrawDebugPoint(GetWorld(), hitResult.ImpactPoint, 7.5, FColor::Red, false, RATE_AVOID_TASK);
+            }
+            /*DEBUGGING*/
+        }
+
+        /*DEBUGGING*/
+        if (showDebug) {
+            DrawDebugLine(GetWorld(), GetActorLocation(), checkVec, FColor::Yellow, false, RATE_AVOID_TASK, 3);
+            DrawDebugPoint(GetWorld(), checkVec, 5, FColor::Yellow, false, RATE_AVOID_TASK);
+        }
+        /*DEBUGGING*/
     }
 }
 
 void AUSARAgent::ObstAvoidTask()
 {
-    if (statusDirectMove) {
-        if (GetActorLocation().Equals(GetDirectMoveLoc(), 1)) {
-            statusDirectMove = false;
-            directMoveLoc = FVector::ZeroVector;
-        }
+    //if (statusDirectMove) {
+    //    if (GetActorLocation().Equals(GetDirectMoveLoc(), 1)) {
+    //        statusDirectMove = false;
+    //        directMoveLoc = FVector::ZeroVector;
+    //    }
 
-        return;
-    }
+    //    return;
+    //}
 
     bool obstructed = false;
     TArray<FVector> safeVectors = LookAhead(rawVelocity, obstructed);
 
     if (obstructed) {
-        /*DEBUGGING*/
-        //FString obstructedText = FString::Printf(TEXT("Agent %d detected obstruction."), agentID);
-        //GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Orange, obstructedText, true);
-        /*DEBUGGING*/
+        if (statusAvoiding) {
+            obstructed = false;
+            safeVectors = LookAhead(GetVelocity(), obstructed);
 
-        if (!statusAvoiding) {
+            if (obstructed) {
+                FVector clearVec;
+                if (FindClearVector(clearVec, FIB_SPHERE_FIDELITY)) {
+                    avoidanceVector = clearVec;
+                }
+                else {
+                    SetStatusStuck();
+
+                    /*DEBUGGING*/
+                    FString stuckText = FString::Printf(TEXT("Agent %d stuck."), agentID);
+                    GEngine->AddOnScreenDebugMessage(INDEX_NONE, 5.0f, FColor::Red, stuckText, true);
+                    /*DEBUGGING*/
+                }
+            }
+        }
+        else {
             FVector clearVec;
             if (FindClearVector(clearVec, FIB_SPHERE_FIDELITY)) {
                 avoidanceVector = clearVec;
@@ -46,40 +101,16 @@ void AUSARAgent::ObstAvoidTask()
                 /*DEBUGGING*/
             }
         }
-        else {
-            obstructed = false;
-            safeVectors = LookAhead(GetVelocity(), obstructed);
-
-            if (obstructed) {
-                FVector clearVec;
-                if (FindClearVector(clearVec, FIB_SPHERE_FIDELITY)) {
-                    avoidanceVector = clearVec;
-
-                    /*DEBUGGING*/
-                    //FString safeVectorFoundText = FString::Printf(TEXT("Agent %d found safe vector."), agentID);
-                    //GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3.0f, FColor::Turquoise, safeVectorFoundText, true);
-                    /*DEBUGGING*/
-                }
-                else {
-                    SetStatusStuck();
-
-                    /*DEBUGGING*/
-                    FString stuckText = FString::Printf(TEXT("Agent %d stuck."), agentID);
-                    GEngine->AddOnScreenDebugMessage(INDEX_NONE, 5.0f, FColor::Red, stuckText, true);
-                    /*DEBUGGING*/
-                }
-            }
-        }
 
         statusAvoiding = true;
     }
     else {
-        if (statusAvoiding) {
-            statusDirectMove = true;
+        //if (statusAvoiding) {
+        //    statusDirectMove = true;
 
-            FVector goToVec = rawVelocity.GetClampedToSize(0, OBSTACLE_AVOID_DIST);
-            directMoveLoc = goToVec + GetActorLocation();
-        }
+        //    FVector goToVec = rawVelocity.GetClampedToSize(0, OBSTACLE_AVOID_DIST);
+        //    directMoveLoc = goToVec + GetActorLocation();
+        //}
 
         statusAvoiding = false;
         avoidanceVector = FVector::ZeroVector;
@@ -93,14 +124,16 @@ void AUSARAgent::ObstAvoidTask()
 */
 TArray<FVector> AUSARAgent::LookAhead(FVector vel, bool& obstructed)
 {
+    FVector agentLoc = GetActorLocation();
+
     // Transform agent velocity from local to world coordinates
     FVector targetVector = vel.GetClampedToSize(0, OBSTACLE_AVOID_DIST);
-    FRotator velRot = UKismetMathLibrary::FindLookAtRotation(FVector::ZeroVector, targetVector);
+    FRotator velRot = vel.Rotation();
     targetVector = TransformToWorld(targetVector);
 
     // Create array of raycast start/end points in concentric circles around agent
     TArray<FVector> rayStartPts;
-    rayStartPts.Add(GetActorLocation());
+    rayStartPts.Add(agentLoc);
     TArray<FVector> rayEndPts;
     rayEndPts.Add(targetVector);
 
@@ -113,7 +146,7 @@ TArray<FVector> AUSARAgent::LookAhead(FVector vel, bool& obstructed)
             offset = rotRoll.RotateVector(offset);
             offset = velRot.RotateVector(offset);
             
-            rayStartPts.Add(GetActorLocation() + offset);
+            rayStartPts.Add(agentLoc + offset);
             rayEndPts.Add(targetVector + offset);
 
             deg += degStep;
@@ -121,7 +154,7 @@ TArray<FVector> AUSARAgent::LookAhead(FVector vel, bool& obstructed)
             /*DEBUGGING*/
             if (showDebug) {
                 if (circle == BODY_SIZE) {
-                    DrawDebugLine(GetWorld(), GetActorLocation() + offset, targetVector + offset, FColor::Orange, false, 0.01, 0, 1);
+                    DrawDebugLine(GetWorld(), agentLoc + offset, targetVector + offset, FColor::Orange, false, RATE_AVOID_TASK, 2.5);
                 }
             }
             /*DEBUGGING*/
@@ -166,20 +199,21 @@ bool AUSARAgent::FindClearVector(FVector& targetVec, int fidelity)
     bool foundClearVec = false;
 
     // Fibonacci sphere
-    const float gRatio = (sqrt(5.f) + 1.f) / 2.f;   // golden ratio
-    const float gAngle = 180 * (3.f - sqrt(5.f));   // golden angle in degrees
+    FVector agentLoc = GetActorLocation();
+    float phi = (1.f + sqrtf(5.f)) / 2.f;
 
-    for (int i = 1; i <= fidelity; i++) {
-        float azimuth = FMath::Asin(-1.f + 2.f * float(i) / (fidelity + 1));
-        float inclination = gAngle * i;
+    for (int i = 0; i < fidelity; i++) {
+        float itr = float(-fidelity + 1 + 2 * i);
+        float theta = 2 * PI * itr / phi;
+        float sPhi = itr / fidelity;
+        float cPhi = sqrtf(FMath::Square(fidelity) - FMath::Square(itr)) / fidelity;
 
-        // set azimuth function to preferred direction of avoidance (x for forward, z for up)
-        float x = FMath::Cos(inclination) * FMath::Cos(-azimuth);
-        float y = FMath::Sin(inclination) * FMath::Cos(-azimuth);
-        float z = FMath::Sin(-azimuth);
+        float x = cPhi * sinf(theta);
+        float y = cPhi * cosf(theta);
+        float z = sPhi;
 
         FVector tmpVec = agentVelocity.Rotation().RotateVector(FVector(x, y, z));   // remove this once agent turning is in place
-        FVector checkVec = OBSTACLE_AVOID_DIST * tmpVec + GetActorLocation();       // check vectors closest to agent velocity first
+        FVector checkVec = OBSTACLE_AVOID_DIST * tmpVec + agentLoc;                 // check vectors closest to agent velocity first
 
         FHitResult hitResult;
         FCollisionQueryParams queryParams;

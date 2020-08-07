@@ -20,6 +20,17 @@ void AUSARAgent::DetectionTask()
 
 					FGridStruct* grid = AddGrid(vicLoc, false);
 					grid->survivors.AddUnique(vicLoc);
+
+					if (statusActiveSearch) {
+						investigatingVic = true;
+					}
+					else {
+						flockWPs.Insert(vicLoc, 0);
+						
+						for (AUSARAgent* n : neighborAgents) {
+							n->ReceiveVictimData(vic);
+						}
+					}
 				}
 
 				/*DEBUGGING*/
@@ -27,6 +38,18 @@ void AUSARAgent::DetectionTask()
 				/*DEBUGGING*/
 			}
 		}
+	}
+}
+
+/* Adds victim to list of located victims and sets a waypoint to the location if the victim is new.
+*	
+*	@param vic The victim.
+*/
+void AUSARAgent::ReceiveVictimData(AVictimActor* vic)
+{
+	if (locatedVictims.Find(vic) == INDEX_NONE) {
+		locatedVictims.Add(vic);
+		flockWPs.Insert(vic->GetActorLocation(), 0);
 	}
 }
 

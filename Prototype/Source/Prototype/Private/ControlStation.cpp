@@ -13,10 +13,11 @@ AControlStation::AControlStation()
 {
 	PrimaryActorTick.bCanEverTick = false;
 
-	simTime				= 5 * 60;		// switch to SIM_LENGTH after debug
-	searchBehaviorType	= SearchBehavior::BehaviorBased;
+	simTime				= 10 * 60;		// switch to SIM_LENGTH after debug
+	searchBehaviorType	= SearchBehavior::Spiral;
 	dispMapType			= GridDisp::Point;
 	dispFloor			= false;
+	dispEmpty			= false;
 	showMap				= false;
 }
 
@@ -26,18 +27,33 @@ void AControlStation::BeginPlay()
 	Super::BeginPlay();
 
 	GetWorld()->GetGameState<APrototypeGameState>()->SetControlStation(this);
-	
+
 	GetWorldTimerManager().SetTimer(timerBootUpDelay, this, &AControlStation::SwarmInit, 1, false);
 
 	FTimerDelegate dispMapDel;
-	dispMapDel.BindUFunction(this, FName("DisplayMap"), true, true, true);
+	dispMapDel.BindUFunction(this, FName("DisplayMap"), true, dispEmpty, true);
 	GetWorldTimerManager().SetTimer(timerMapDisplay, dispMapDel, 5, true);
+	GetWorldTimerManager().SetTimer(timerSaveMap, this, &AControlStation::SaveMap, SIM_SAVE_RATE, true, SIM_SAVE_RATE);
 	GetWorldTimerManager().SetTimer(timerEndSim, this, &AControlStation::EndSim, simTime, false);
 
 	// Create log directory for maps.
 	logDir = FString(LOG_DIR);
 	logDir.Append("Env_Map_Results/");
 	logDir.Append("USAR_Simulation_");
+	switch (searchBehaviorType) {
+		case SearchBehavior::None :
+			logDir.Append("NoSearch");
+			break;
+		case SearchBehavior::Spiral :
+			logDir.Append("Spiral");
+			break;
+		case SearchBehavior::RandomWalk :
+			logDir.Append("RandomWalk");
+			break;
+		case SearchBehavior::Frontier :
+			logDir.Append("Frontier");
+			break;
+	}
 	logDir.Append(FDateTime::Now().ToString());
 	logDir.Append("/");
 
@@ -45,6 +61,8 @@ void AControlStation::BeginPlay()
 	if (!fManager.CreateDirectory(*logDir)) {
 		UE_LOG(LogTemp, Warning, TEXT("Log directory was not created."));
 	}
+
+	save = 1;
 }
 
 /* Assign the passed agent a unique ID and add to control station's registry.
@@ -56,7 +74,7 @@ void AControlStation::AddAgent(AUSARAgent* agent)
 	agent->SetID(numAgents);
 	agent->searchBehaviorType = searchBehaviorType;
 
-	numAgents++
+	numAgents++;
 }
 
 /* Assigns the passed agent to the specified flock. A new flock with flockID will be formed if one does not exist.
@@ -196,7 +214,7 @@ void AControlStation::SwarmInit()
 
 /* Called by agents to update the global environment map.
 */
-void AControlStation::UpdateMap(const TArray<FGridStruct> agentMap)
+void AControlStation::UpdateMap(const TSet<FGridStruct>& agentMap)
 {
 	for (FGridStruct sharedGrid : agentMap) {
 		bool isNewGrid;
@@ -288,12 +306,10 @@ void AControlStation::DisplayMap(bool showOccupied, bool showEmpty, bool showVic
 	}
 }
 
-/* Pauses simulation and writes current state of map to a file.
+/* Writes the current map to a file.
 */
 void AControlStation::SaveMap()
 {
-	static int save = 1;
-
 	// grab map data from flocks
 	// remove after implementing flock return/map dump behavior
 	for (Flock* f : flockData) {

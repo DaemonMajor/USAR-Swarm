@@ -27,10 +27,12 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool dispFloor;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		bool dispEmpty;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 		bool showMap;
 
 	UFUNCTION()
-		void UpdateMap(const TArray<FGridStruct> agentMap);
+		void UpdateMap(const TSet<FGridStruct>& agentMap);
 	UFUNCTION()
 		void SaveMap();
 	UFUNCTION()
@@ -57,14 +59,18 @@ protected:
 	UPROPERTY()
 		int numWP;						// Number of active waypoints.
 
-	TSet<FGridStruct> envMap;	// Global map constructed from agent-provided maps
+	TSet<FGridStruct> envMap;			// Global map constructed from agent-provided maps
 
 	UPROPERTY()
 		FTimerHandle timerBootUpDelay;	// Timer handle for waypoints that exist on world start
 	UPROPERTY()
 		FTimerHandle timerMapDisplay;	// Timer handle for refreshing map display
 	UPROPERTY()
+		FTimerHandle timerSaveMap;
+	UPROPERTY()
 		FTimerHandle timerEndSim;		// Timer handle for countdown until end of simulation
+
+	int save;
 
 	UFUNCTION()
 		void SwarmInit();
