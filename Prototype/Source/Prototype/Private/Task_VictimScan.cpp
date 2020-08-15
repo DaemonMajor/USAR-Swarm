@@ -21,16 +21,16 @@ void AUSARAgent::DetectionTask()
 					FGridStruct* grid = AddGrid(vicLoc, false);
 					grid->survivors.AddUnique(vicLoc);
 
-					if (statusActiveSearch) {
-						investigatingVic = true;
-					}
-					else {
-						flockWPs.Insert(vicLoc, 0);
-						
-						for (AUSARAgent* n : neighborAgents) {
-							n->ReceiveVictimData(vic);
-						}
-					}
+					//if (statusActiveSearch) {
+					//	investigatingVic = true;
+					//}
+					//else {
+					//	flockWPs.Insert(vicLoc, 0);
+					//	
+					//	for (AUSARAgent* n : neighborAgents) {
+					//		n->ReceiveVictimData(vic);
+					//	}
+					//}
 				}
 
 				/*DEBUGGING*/

@@ -32,6 +32,8 @@ public:
 		bool showMap;
 
 	UFUNCTION()
+		void EndSim();
+	UFUNCTION()
 		void UpdateMap(const TSet<FGridStruct>& agentMap);
 	UFUNCTION()
 		void SaveMap();
@@ -70,12 +72,11 @@ protected:
 	UPROPERTY()
 		FTimerHandle timerEndSim;		// Timer handle for countdown until end of simulation
 
+	bool endingSim;
 	int save;
 
 	UFUNCTION()
 		void SwarmInit();
 	UFUNCTION()
 		void InitWaypoints();			// Activate preplaced waypoints
-	UFUNCTION()
-		void EndSim();
 };

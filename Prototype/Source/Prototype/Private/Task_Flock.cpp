@@ -14,6 +14,7 @@ void AUSARAgent::FlockTask()
 {
     if (flockSize == 1) {
         flockVector = FVector::ZeroVector;
+        flockCenter = GetActorLocation();
     }
     else {
         FVector alignFactor = alignWeight * GetAlignment();

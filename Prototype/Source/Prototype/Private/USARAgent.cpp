@@ -34,7 +34,6 @@ AUSARAgent::AUSARAgent()
 	statusStuck			= false;
 	statusAvoiding		= false;
 	statusDirectMove	= false;
-	statusReadyToSearch	= false;
 	statusActiveSearch	= false;
 	statusClimbing		= false;
 	statusTraveling		= false;
@@ -152,7 +151,7 @@ void AUSARAgent::BootUpSequence()
 	GetWorldTimerManager().SetTimer(timerFlockTask, this, &AUSARAgent::FlockHandle, RATE_FLOCK_TASK, true);
 	GetWorldTimerManager().SetTimer(timerCheckMoveReady, this, &AUSARAgent::FlockReadyToMove, 1.f, true);
 	GetWorldTimerManager().SetTimer(timerMapUpdate, this, &AUSARAgent::UpdateMap, RATE_MAP_UPDATE, true);
-	GetWorldTimerManager().SetTimer(timerMapShare, this, &AUSARAgent::ShareMap, RATE_MAP_SHARE, true);
+	//GetWorldTimerManager().SetTimer(timerMapShare, this, &AUSARAgent::ShareMap, RATE_MAP_SHARE, true);
 
 	isInitialized	= true;
 	statusLoitering = true;
@@ -176,7 +175,6 @@ void AUSARAgent::PowerDown()
 	statusStuck			= false;
 	statusAvoiding		= false;
 	statusDirectMove	= false;
-	statusReadyToSearch = false;
 	statusActiveSearch	= false;
 	statusClimbing		= false;
 	statusTraveling		= false;
@@ -297,22 +295,6 @@ void AUSARAgent::SetID(int id)
 TArray<AUSARAgent*> AUSARAgent::GetNeighbors()
 {
 	return neighborAgents;
-}
-
-/* Retrieves the current waypoint being traveled to.
-*
-*	@param wp Vector reference to write the waypoint location to.
-*	@return True if a waypoint is set, false otherwise.
-*/
-bool AUSARAgent::GetCurrFlockWP(FVector& wp)
-{
-	if (flockWPs.Num()) {
-		wp = flockWPs[0];
-
-		return true;
-	}
-
-	return false;
 }
 
 /* Retrieves the agent's current velocity.
@@ -459,6 +441,9 @@ void AUSARAgent::ClearFlockWPs()
 */
 void AUSARAgent::SetStatusStuck()
 {
+    // clear timer handles for behavior modules
+	GetWorldTimerManager().ClearAllTimersForObject(this);
+    
 	statusStuck			= true;
 	statusAvoiding		= false;
 	statusDirectMove	= false;
@@ -466,44 +451,43 @@ void AUSARAgent::SetStatusStuck()
 	statusClimbing		= false;
 	statusTraveling		= false;
 
-	// clear timer handles for behavior modules
-	GetWorldTimerManager().ClearAllTimersForObject(this);
-
 	// remove agent from neighbor's lists
 	for (AUSARAgent* n : neighborAgents) {
 		n->neighborAgents.Remove(this);
 		n->numNeighbors--;
 		n->flockSize--;
 	}
+    
+    GetWorldTimerManager().SetTimer(timerMapShare, this, &AUSARAgent::ShareMap, RATE_MAP_SHARE, true);
 
 	/*DEBUGGING*/
-	const float gRatio = (sqrt(5.f) + 1.f) / 2.f;   // golden ratio
-	const float gAngle = 180 * (3.f - sqrt(5.f));   // golden angle in degrees
+	//const float gRatio = (sqrt(5.f) + 1.f) / 2.f;   // golden ratio
+	//const float gAngle = 180 * (3.f - sqrt(5.f));   // golden angle in degrees
 
-	for (int i = 1; i <= FIB_SPHERE_FIDELITY; i++) {
-		float azimuth = FMath::Asin(-1.f + 2.f * float(i) / (FIB_SPHERE_FIDELITY + 1));
-		float inclination = gAngle * i;
+	//for (int i = 1; i <= FIB_SPHERE_FIDELITY; i++) {
+	//	float azimuth = FMath::Asin(-1.f + 2.f * float(i) / (FIB_SPHERE_FIDELITY + 1));
+	//	float inclination = gAngle * i;
 
-		float z = FMath::Cos(inclination)* FMath::Cos(-azimuth);
-		float y = FMath::Sin(inclination) * FMath::Cos(-azimuth);
-		float x = FMath::Sin(-azimuth);
+	//	float z = FMath::Cos(inclination)* FMath::Cos(-azimuth);
+	//	float y = FMath::Sin(inclination) * FMath::Cos(-azimuth);
+	//	float x = FMath::Sin(-azimuth);
 
-		FVector tmpVec = agentVelocity.Rotation().RotateVector(FVector(x, y, z));   // remove this once agent turning is in place
-		FVector checkVec = OBSTACLE_AVOID_DIST * tmpVec + GetActorLocation();       // check vectors closest to agent velocity first
+	//	FVector tmpVec = agentVelocity.Rotation().RotateVector(FVector(x, y, z));   // remove this once agent turning is in place
+	//	FVector checkVec = OBSTACLE_AVOID_DIST * tmpVec + GetActorLocation();       // check vectors closest to agent velocity first
 
-		FHitResult hitResult;
-		FCollisionQueryParams queryParams;
-		queryParams.AddIgnoredActor(this);
-		FCollisionResponseParams responseParams;
+	//	FHitResult hitResult;
+	//	FCollisionQueryParams queryParams;
+	//	queryParams.AddIgnoredActor(this);
+	//	FCollisionResponseParams responseParams;
 
-		if (!GetWorld()->LineTraceSingleByChannel(hitResult, GetActorLocation(), checkVec, ECC_WorldStatic, queryParams, responseParams)) {
-			DrawDebugPoint(GetWorld(), checkVec, 1, FColor::Green, true, 300.f);
-		}
-		else {
-			DrawDebugPoint(GetWorld(), hitResult.ImpactPoint, 1, FColor::Red, false, 300.f);
-		}
-	}
+	//	if (!GetWorld()->LineTraceSingleByChannel(hitResult, GetActorLocation(), checkVec, ECC_WorldStatic, queryParams, responseParams)) {
+	//		DrawDebugPoint(GetWorld(), checkVec, 1, FColor::Green, true, 300.f);
+	//	}
+	//	else {
+	//		DrawDebugPoint(GetWorld(), hitResult.ImpactPoint, 1, FColor::Red, false, 300.f);
+	//	}
+	//}
 
-	DrawDebugPoint(GetWorld(), GetActorLocation(), 1, FColor::Yellow, false, 300.f);
+	//DrawDebugPoint(GetWorld(), GetActorLocation(), 1, FColor::Yellow, false, 300.f);
 	/*DEBUGGING*/
 }

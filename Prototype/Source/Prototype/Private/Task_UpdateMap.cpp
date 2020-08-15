@@ -142,18 +142,14 @@ TSet<FGridStruct> AUSARAgent::UploadMap()
 */
 void AUSARAgent::ShareMap()
 {
-    float currTime = GetWorld()->GetTimeSeconds();
     TArray<FGridStruct> map;
 
-    // only share recently updated grids
-    for (FGridStruct grid : envMap) {
-        if (currTime - grid.lastUpdated < RATE_MAP_SHARE) {
-            map.AddUnique(grid);
-        }
-    }
-
     for (AUSARAgent* n : neighborAgents) {
-        n->TakeMapData(map);
+        if(alreadyShared.Find(n->agentID) != INDEX_NONE) {
+            n->TakeMapData(map);
+            
+            alreadyShared.Add(n->agentID);
+        }
     }
 }
 

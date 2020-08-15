@@ -15,6 +15,11 @@ public:
 	virtual void Tick(float DeltaSeconds) override;
 	ASwarmWP();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int wpID = -1;			// Unique waypoint ID. Value of -1 sets waypoint as inactive.
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		int flockID = -1;		// Flock assigned to this waypoint.
+
 	UFUNCTION()
 		int GetID();
 	UFUNCTION()
@@ -28,8 +33,5 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		int wpID = -1;			// Unique waypoint ID. Value of -1 sets waypoint as inactive.
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		int flockID = -1;		// Flock assigned to this waypoint.
+	
 };

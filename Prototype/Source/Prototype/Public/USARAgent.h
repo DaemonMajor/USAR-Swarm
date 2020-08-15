@@ -89,8 +89,6 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		bool statusDirectMove;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-		bool statusReadyToSearch;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		bool statusActiveSearch;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		bool statusClimbing;
@@ -187,15 +185,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 		FVector directMoveLoc;
 
-	UPROPERTY()
-		int expandingSearch;
-	
 	TSet<FGridStruct> envMap;
 	UPROPERTY()
 		TArray<AVictimActor*> detectedVictims = TArray<AVictimActor*>();
 
 	UPROPERTY()
-		float bootUpDelay = 0.5;
+		float bootUpDelay = 1;
 	UPROPERTY()
 		FTimerHandle bootUpDelayTimer;		// Start neighbor scans after this delay (after all agents have been placed in world).
 
@@ -242,17 +237,18 @@ protected:
 	void ReceiveVictimData(AVictimActor* vic);
 
 	// search behavior
-	FTimerHandle timerCheckSearchReady;
 	FTimerHandle timerBBSearchRevolve;
 	FTimerHandle timerBBSearchExpand;
 	FTimerHandle timerRandWalkSearchStep;
-	void FlockReadyToSearch();
+	FTimerHandle timerRWSearch;
+	void CheckNeighborsSearch();
 	float CalcWaitTime();
-	void BBSearch_Revolve();
+	void BBSearch_Revolve(float angle);
 	void BBSearch_Expand();
 	void MoveToVictim(AVictimActor* vic);
 	void RandWalkSearchStep();
 	void RandWalkSearch_End();
+	int expandingSearch;
 	bool investigatingVic;
 
 	// height maintenance behavior
@@ -281,6 +277,9 @@ protected:
 	void UpdateMap();
 	void ShareMap();
 	FGridStruct* AddGrid(FVector loc, bool occupied);
+    
+    // statusStuck behavior
+    TArray<int> alreadyShared = TArray<int>();
 	/***BEHAVIOR MODULES***/
 
 private:

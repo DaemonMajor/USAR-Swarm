@@ -42,16 +42,19 @@ void AControlStation::BeginPlay()
 	logDir.Append("USAR_Simulation_");
 	switch (searchBehaviorType) {
 		case SearchBehavior::None :
-			logDir.Append("NoSearch");
+			logDir.Append("NoSearch_");
 			break;
 		case SearchBehavior::Spiral :
-			logDir.Append("Spiral");
+			logDir.Append("Spiral_");
+			break;
+		case SearchBehavior::Radial:
+			logDir.Append("Radial_");
 			break;
 		case SearchBehavior::RandomWalk :
-			logDir.Append("RandomWalk");
+			logDir.Append("RandomWalk_");
 			break;
 		case SearchBehavior::Frontier :
-			logDir.Append("Frontier");
+			logDir.Append("Frontier_");
 			break;
 	}
 	logDir.Append(FDateTime::Now().ToString());
@@ -62,6 +65,7 @@ void AControlStation::BeginPlay()
 		UE_LOG(LogTemp, Warning, TEXT("Log directory was not created."));
 	}
 
+	endingSim = false;
 	save = 1;
 }
 
@@ -143,10 +147,16 @@ int AControlStation::AddWaypoint(ASwarmWP* waypoint, int flockID)
 			//	agent->AddFlockWP(waypoint->GetActorLocation());
 			//}
 
-			waypoint->SetID(numWP);
+			int setID = numWP;
+			if (waypoint->wpID < 0) {
+				waypoint->SetID(numWP);
+			}
+			else {
+				setID = waypoint->wpID;
+			}
 			numWP++;
 
-			return numWP - 1;
+			return setID;
 		}
 	}
 
@@ -314,12 +324,14 @@ void AControlStation::SaveMap()
 	// remove after implementing flock return/map dump behavior
 	for (Flock* f : flockData) {
 		for (AUSARAgent* agent : f->agents) {
-			TSet<FGridStruct> map = agent->UploadMap();
-			for (FGridStruct agentGrid : map) {
-				bool isNewGrid;
-				FGridStruct* grid = agentGrid.InsertInMap(envMap, isNewGrid);
-				if (!isNewGrid) {
-					grid->Combine(agentGrid);
+			if (!agent->statusStuck) {
+				TSet<FGridStruct> map = agent->UploadMap();
+				for (FGridStruct agentGrid : map) {
+					bool isNewGrid;
+					FGridStruct* grid = agentGrid.InsertInMap(envMap, isNewGrid);
+					if (!isNewGrid) {
+						grid->Combine(agentGrid);
+					}
 				}
 			}
 		}
@@ -366,6 +378,12 @@ void AControlStation::SaveMap()
 */
 void AControlStation::EndSim()
 {
+	if (endingSim) {
+		return;
+	}
+
+	endingSim = true;
+
 	UGameplayStatics::SetGamePaused(GetWorld(), true);
 	SaveMap();
 
@@ -379,4 +397,7 @@ void AControlStation::EndSim()
 			agent->PowerDown();
 		}
 	}
+
+	FString simEndText = FString::Printf(TEXT("Simulation done."));
+	GEngine->AddOnScreenDebugMessage(INDEX_NONE, 3600.f, FColor::Green, simEndText, true);
 }
